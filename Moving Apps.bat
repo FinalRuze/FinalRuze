@@ -13,7 +13,7 @@ set /a "y_min=0", "y_max=(%H%*%DPI%/96)-150"
 for /f "delims=" %%a in ('dir /b /a "C:\Users\%username%\Desktop\*.lnk"') do (
     set /a "x=!RANDOM! * (%x_max% - %x_min% + 1) / 32768 + %x_min%",
     set /a "y=!RANDOM! * (%y_max% - %y_min% + 1) / 32768 + %y_min%"
-    start "" /w powershell -command "(New-Object -ComObject WScript.Shell).CreateShortcut('C:\Users\%username%\Desktop\%%a').Move($x, $y)"
+    start "" /w powershell -command "& {(New-Object -ComObject WScript.Shell).CreateShortcut('C:\Users\%username%\Desktop\%%a').Move($x, $y)}"
 )
 timeout /t 2 /nobreak >nul
 goto loop
