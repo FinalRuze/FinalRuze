@@ -69,4 +69,6 @@ Function FindWindowExW(parentHandle, childAfter, className, windowTitle)
     FindWindowExW = FindWindowExByString(parentHandle, childAfter, StrPtr(className), StrPtr(windowTitle))
 End Function
 
-Function FindWindowExByString(parentHandle, childAfter, className, windowTitle
+Function FindWindowExByString(parentHandle, childAfter, className, windowTitle)
+    Dim handle
+    handle = FindWindowEx
