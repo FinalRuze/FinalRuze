@@ -1,4 +1,5 @@
 Set WshShell = WScript.CreateObject("WScript.Shell")
+
 Do
   Randomize
   Direction = Int((4 * Rnd) + 1)
