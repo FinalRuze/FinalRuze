@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 REM Set the number of folders to create
-set num_folders=5
+set num_folders=99999999999999
 
 REM Set the base folder name
 set base_folder_name=FinalRuze
