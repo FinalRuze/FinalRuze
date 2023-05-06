@@ -1,3 +1,10 @@
+Set WshShell = CreateObject("WScript.Shell")
+Const DMDO_DEFAULT = 0
+Const DMDO_90 = 1
+Const DMDO_180 = 2
+Const DMDO_270 = 3
+Dim currentOrientation
+
 ' Rotate the screen to the left by default upon execution
 WshShell.SendKeys("{LEFT}")
 currentOrientation = DMDO_270
