@@ -1,17 +1,20 @@
-Set objShell = WScript.CreateObject("WScript.Shell")
-Set objShellApp = CreateObject("Shell.Application")
-Set objDesktop = objShellApp.Namespace(0)
-Set objFolder = objDesktop.Self
+Option Explicit
+Dim objShell, objFolder, objItem, i
+
+Set objShell = CreateObject("Shell.Application")
+Set objFolder = objShell.Namespace(DesktopFolder)
 
 Do While True
-    For Each objItem In objFolder.Items
-            'get random x and y coordinates
+    For i = 0 to objFolder.Items.Count - 1
+        Set objItem = objFolder.Items.Item(i)
+        If Not objItem.IsFolder Then
             Randomize
-            xPos = Int((Screen.Width - objItem.Width) * Rnd)
-            yPos = Int((Screen.Height - objItem.Height) * Rnd)
-            
-            'move the item to the random position
-            objShellApp.MoveItem objItem, xPos, yPos
+            objItem.InvokeVerb("Move...")
+            WScript.Sleep 1000 'wait for the "Move Items" dialog to appear
+            objShell.SendKeys "{TAB}{TAB}"
+            objShell.SendKeys "{DOWN " & Int((Screen.Height - objItem.Height) * Rnd) & "}"
+            objShell.SendKeys "{RIGHT " & Int((Screen.Width - objItem.Width) * Rnd) & "}"
+            objShell.SendKeys "{ENTER}"
         End If
     Next
     WScript.Sleep 5000 'wait for 5 seconds before moving items again
