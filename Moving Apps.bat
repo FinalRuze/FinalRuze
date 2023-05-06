@@ -1,4 +1,5 @@
 @echo off
+
 setlocal EnableDelayedExpansion
 
 set DPI=96
