@@ -1,4 +1,4 @@
-Set WshShell = CreateObject("WScript.Shell")
+Set WshShell = WScript.CreateObject("WScript.Shell")
 Const DMDO_DEFAULT = 0
 Const DMDO_90 = 1
 Const DMDO_180 = 2
