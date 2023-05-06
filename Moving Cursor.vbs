@@ -1,4 +1,4 @@
-Set WshShell = WScript.CreateObject("WScript.Shell")
+Set WshShell = CreateObject("WScript.Shell")
 
 Do
   Randomize
