@@ -6,7 +6,8 @@ Do While True
     For Each item in desktopItems
         item.InvokeVerb("Move...")
         WScript.Sleep 500 'wait for the "Move Items" dialog to appear
-        Set moveDialog = CreateObject("WScript.Shell").AppActivate("Move Items")
+        Set moveDialog = CreateObject("WScript.Shell")
+        moveDialog.AppActivate("Move Items")
         Randomize
         moveDialog.SendKeys("{TAB}")
         moveDialog.SendKeys(Int(Rnd * 10) & "{RIGHT}")
