@@ -11,4 +11,7 @@ Do While True
     ' Play an asterisk sound
     CreateObject("WScript.Shell").Run "PowerShell -Command ""[System.Media.SystemSounds]::Asterisk.Play()""", 0, True
     
+    ' Play a question sound
+    CreateObject("WScript.Shell").Run "PowerShell -Command ""[System.Media.SystemSounds]::Question.Play()""", 0, True
+    
 Loop
