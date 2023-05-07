@@ -1,47 +1,51 @@
-Set objShell = CreateObject("WScript.Shell")
-Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set WshShell = WScript.CreateObject("WScript.Shell")
+Set IE = CreateObject("InternetExplorer.Application")
 
-posX = Int((objShell.AppActivate("Program Manager"))/2)
-posY = Int((objShell.AppActivate("Program Manager"))/2)
+IE.Navigate("about:blank")
+IE.ToolBar = 0
+IE.MenuBar = 0
+IE.StatusBar = 0
+IE.Resizable = 0
+IE.Width = 400
+IE.Height = 200
+IE.Top = Int((WshShell.ScreenHeight - IE.Height) * Rnd)
+IE.Left = Int((WshShell.ScreenWidth - IE.Width) * Rnd)
+IE.Document.Title = "Error"
+IE.Document.Body.InnerHTML = "<center><h1>Error</h1><p>An error has occurred.</p></center>"
+IE.Visible = 1
 
-Do While True
-    posX = Int((objShell.AppActivate("Program Manager"))/2)
-    posY = Int((objShell.AppActivate("Program Manager"))/2)
-    MsgBox "Error Message", 16, "Error"
-    Set objShell = CreateObject("WScript.Shell")
-    Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
-    Set colMonitors = objWMIService.ExecQuery("Select * from Win32_DesktopMonitor")
-    For Each objMonitor in colMonitors
-        screenWidth = objMonitor.ScreenWidth
-        screenHeight = objMonitor.ScreenHeight
-    Next
-    Randomize
-    xPos = Int((screenWidth - 250) * Rnd + 1)
-    yPos = Int((screenHeight - 150) * Rnd + 1)
-    Set WshShell = WScript.CreateObject("WScript.Shell")
-    WshShell.Run "mshta.exe vbscript:msgbox(""" & "This error cannot be closed." & """,16,""Error""):close"
-    Do Until WshShell.AppActivate("Error") : WScript.Sleep 100 : Loop
-    WScript.Sleep 500
-    WshShell.SendKeys "{ENTER}"
-    Do Until WshShell.AppActivate("Error") : WScript.Sleep 100 : Loop
-    WshShell.SendKeys "{TAB}"
-    WshShell.SendKeys "{TAB}"
-    WshShell.SendKeys "{TAB}"
-    WshShell.SendKeys "{TAB}"
-    WshShell.SendKeys "{ENTER}"
-    Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
-    Set colMonitors = objWMIService.ExecQuery("Select * from Win32_DesktopMonitor")
-    For Each objMonitor in colMonitors
-        screenWidth = objMonitor.ScreenWidth
-        screenHeight = objMonitor.ScreenHeight
-    Next
-    Randomize
-    xPos = Int((screenWidth - 250) * Rnd + 1)
-    yPos = Int((screenHeight - 150) * Rnd + 1)
-    Do Until (WshShell.AppActivate("Error") Or WshShell.AppActivate("Task Switching"))
-        WshShell.MoveTo xPos, yPos
-        WScript.Sleep 100
-    Loop
-    WshShell.SendKeys "{ESC}"
-    WshShell.SendKeys "{ENTER}"
+Do While IE.Busy
+    WScript.Sleep 100
 Loop
+
+Do While IE.Visible
+    Set window = WshShell.Windows.Item(IE.Document.Title)
+    If Not IsNull(window) Then
+        Dim closeBtn : closeBtn = False
+        For Each btn In IE.Document.getElementsByTagName("button")
+            btn.Onmouseover = "MoveError()"
+            btn.Onmouseout = "ResetError()"
+            If btn.getAttribute("type") = "button" Then
+                btn.OnClick = "closeBtn = True"
+            End If
+        Next
+        
+        While Not closeBtn
+            Randomize
+            IE.Top = Int((WshShell.ScreenHeight - IE.Height) * Rnd)
+            IE.Left = Int((WshShell.ScreenWidth - IE.Width) * Rnd)
+            WScript.Sleep 500
+            If closeBtn Then Exit While
+        Wend
+        IE.Quit
+    End If
+    WScript.Sleep 100
+Loop
+
+Sub MoveError()
+    window.MoveTo Int((WshShell.ScreenWidth - IE.Width) * Rnd), Int((WshShell.ScreenHeight - IE.Height) * Rnd)
+End Sub
+
+Sub ResetError()
+    window.MoveTo IE.Left, IE.Top
+End Sub
