@@ -1,51 +1,20 @@
-Set WshShell = WScript.CreateObject("WScript.Shell")
-Set IE = CreateObject("InternetExplorer.Application")
+Set objShell = WScript.CreateObject("WScript.Shell")
+Set objIE = CreateObject("InternetExplorer.Application")
 
-IE.Navigate("about:blank")
-IE.ToolBar = 0
-IE.MenuBar = 0
-IE.StatusBar = 0
-IE.Resizable = 0
-IE.Width = 400
-IE.Height = 200
-IE.Top = Int((WshShell.ScreenHeight - IE.Height) * Rnd)
-IE.Left = Int((WshShell.ScreenWidth - IE.Width) * Rnd)
-IE.Document.Title = "Error"
-IE.Document.Body.InnerHTML = "<center><h1>Error</h1><p>An error has occurred.</p></center>"
-IE.Visible = 1
+objIE.navigate "about:blank"
+objIE.ToolBar = 0
+objIE.StatusBar = 0
+objIE.Width = 400
+objIE.Height = 200
+objIE.Left = objShell.ExpandEnvironmentStrings("%random%") Mod (objShell.AppActivate("Untitled") + 1) * 200
+objIE.Top = objShell.ExpandEnvironmentStrings("%random%") Mod (objShell.AppActivate("Untitled") + 1) * 200
+objIE.Resizable = 0
+objIE.MenuBar = 0
+objIE.Document.Body.InnerHTML = "<h1>Error</h1><p>This is an error message that cannot be closed.</p>"
 
-Do While IE.Busy
-    WScript.Sleep 100
-Loop
-
-Do While IE.Visible
-    Set window = WshShell.Windows.Item(IE.Document.Title)
-    If Not IsNull(window) Then
-        Dim closeBtn : closeBtn = False
-        For Each btn In IE.Document.getElementsByTagName("button")
-            btn.Onmouseover = "MoveError()"
-            btn.Onmouseout = "ResetError()"
-            If btn.getAttribute("type") = "button" Then
-                btn.OnClick = "closeBtn = True"
-            End If
-        Next
-        
-        While Not closeBtn
-            Randomize
-            IE.Top = Int((WshShell.ScreenHeight - IE.Height) * Rnd)
-            IE.Left = Int((WshShell.ScreenWidth - IE.Width) * Rnd)
-            WScript.Sleep 500
-            If closeBtn Then Exit While
-        Wend
-        IE.Quit
+Do While True
+    If objIE.Left + objIE.Width < MouseX Or objIE.Left > MouseX + 15 Or objIE.Top + objIE.Height < MouseY Or objIE.Top > MouseY + 15 Then
+        objIE.Move objShell.ExpandEnvironmentStrings("%random%") Mod (objShell.AppActivate("Untitled") + 1) * 200, objShell.ExpandEnvironmentStrings("%random%") Mod (objShell.AppActivate("Untitled") + 1) * 200
     End If
     WScript.Sleep 100
 Loop
-
-Sub MoveError()
-    window.MoveTo Int((WshShell.ScreenWidth - IE.Width) * Rnd), Int((WshShell.ScreenHeight - IE.Height) * Rnd)
-End Sub
-
-Sub ResetError()
-    window.MoveTo IE.Left, IE.Top
-End Sub
