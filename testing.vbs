@@ -12,5 +12,5 @@ Do While True
     objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
     
     ' Wait for 1 second before creating the next folder
-    WScript.Sleep 1000
+    WScript.Sleep 100
 Loop
