@@ -1,16 +1,85 @@
-Set objShell = CreateObject("WScript.Shell")
-Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set objShell = WScript.CreateObject("WScript.Shell")
 
-' Modify these values to change the number of error messages and the message text
-numErrors = 10
-errorMsg = "Error: Something went wrong!"
+While True
+    xPos = Int((1919 - 0 + 1) * Rnd + 0)
+    yPos = Int((1079 - 0 + 1) * Rnd + 0)
 
-' Loop through the number of errors and display messages in random positions on the screen
-For i = 1 to numErrors
-    ' Calculate random x and y positions for the message
-    xPos = Int((objShell.AppActivate("Program Manager").ScreenWidth - 400) * Rnd + 1)
-    yPos = Int((objShell.AppActivate("Program Manager").ScreenHeight - 100) * Rnd + 1)
+    objShell.Run "cmd /c msg * ERROR", 0, True
+    WScript.Sleep 500
+    objShell.AppActivate "ERROR"
+    objShell.SendKeys "%{F4}"
 
-    ' Display the message box
-    objShell.Popup errorMsg, 5, "Error " & i, 16 + 0 + 4096, xPos, yPos
-Next
+    objShell.Run "cmd /c msg * WARNING", 0, True
+    WScript.Sleep 500
+    objShell.AppActivate "WARNING"
+    objShell.SendKeys "%{F4}"
+
+    objShell.Run "cmd /c msg * CRITICAL ERROR", 0, True
+    WScript.Sleep 500
+    objShell.AppActivate "CRITICAL ERROR"
+    objShell.SendKeys "%{F4}"
+
+    objShell.Run "cmd /c msg * FATAL ERROR", 0, True
+    WScript.Sleep 500
+    objShell.AppActivate "FATAL ERROR"
+    objShell.SendKeys "%{F4}"
+
+    WScript.Sleep 500
+    objShell.SendKeys "{ESC}"
+
+    objShell.Run "mspaint.exe", 0, True
+    WScript.Sleep 500
+    objShell.AppActivate "untitled - Paint"
+    WScript.Sleep 500
+    objShell.SendKeys "^v"
+    WScript.Sleep 500
+    objShell.SendKeys "%{F4}"
+
+    objShell.Run "notepad.exe", 0, True
+    WScript.Sleep 500
+    objShell.AppActivate "Untitled - Notepad"
+    WScript.Sleep 500
+    objShell.SendKeys "This is a fake error message!"
+    WScript.Sleep 500
+    objShell.SendKeys "{ENTER}"
+    WScript.Sleep 500
+    objShell.SendKeys "{ENTER}"
+    WScript.Sleep 500
+    objShell.SendKeys "{ENTER}"
+    WScript.Sleep 500
+    objShell.SendKeys "%{F4}"
+
+    objShell.Run "calc.exe", 0, True
+    WScript.Sleep 500
+    objShell.AppActivate "Calculator"
+    WScript.Sleep 500
+    objShell.SendKeys "{ESC}"
+
+    objShell.Run "taskmgr.exe", 0, True
+    WScript.Sleep 500
+    objShell.AppActivate "Task Manager"
+    WScript.Sleep 500
+    objShell.SendKeys "^+{ESC}"
+
+    objShell.Run "notepad.exe", 0, True
+    WScript.Sleep 500
+    objShell.AppActivate "Untitled - Notepad"
+    WScript.Sleep 500
+    objShell.SendKeys "This is a fake warning message!"
+    WScript.Sleep 500
+    objShell.SendKeys "{ENTER}"
+    WScript.Sleep 500
+    objShell.SendKeys "{ENTER}"
+    WScript.Sleep 500
+    objShell.SendKeys "{ENTER}"
+    WScript.Sleep 500
+    objShell.SendKeys "%{F4}"
+
+    objShell.Run "iexplore.exe www.google.com", 0, True
+    WScript.Sleep 500
+    objShell.AppActivate "Google - Internet Explorer"
+    WScript.Sleep 500
+    objShell.SendKeys "^w"
+
+    WScript.Sleep 5000
+Wend
