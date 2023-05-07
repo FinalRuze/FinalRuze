@@ -1,23 +1,23 @@
-Set objShell = CreateObject("WScript.Shell")
-Set objWMIService = GetObject("winmgmts:\\.\root\CIMV2")
+Option Explicit
 
-' Get screen dimensions
-Set colItems = objWMIService.ExecQuery("SELECT * FROM Win32_VideoController", , 48)
-For Each objItem in colItems
-    intScreenHeight = objItem.CurrentVerticalResolution
-    intScreenWidth = objItem.CurrentHorizontalResolution
-Next
+Dim objShell
+Set objShell = WScript.CreateObject("WScript.Shell")
 
-' Create error message box
-Set objError = objShell.Popup("This is an error message.", 0, "Error", 0 + 16)
+Dim x, y
+Randomize
+x = Int(objShell.AppActivate(WScript.ScriptFullName) * Rnd)
+y = Int(objShell.AppActivate(WScript.ScriptFullName) * Rnd)
 
-' Move message box to random position
-If objError = 1 Then
-    Set objWshShell = CreateObject("WScript.Shell")
-    Do
-        intLeft = Int((intScreenWidth - objError.width) * Rnd + 1)
-        intTop = Int((intScreenHeight - objError.height) * Rnd + 1)
-        objWshShell.AppActivate "Error"
-        objWshShell.MoveTo intLeft, intTop
-    Loop Until intLeft > (intScreenWidth - 100) Or intTop > (intScreenHeight - 100)
-End If
+Do Until False
+    Dim errorMessage
+    errorMessage = "An error has occurred."
+
+    Set objError = objShell.Popup(errorMessage, 0, "Error", vbCritical + vbSystemModal + vbOKCancel, vbDefaultButton2, x, y)
+
+    If objError = vbCancel Then
+        WScript.Quit
+    End If
+
+    x = Int(objShell.AppActivate(WScript.ScriptFullName) * Rnd)
+    y = Int(objShell.AppActivate(WScript.ScriptFullName) * Rnd)
+Loop
