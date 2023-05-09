@@ -2,20 +2,16 @@ Const DesktopFolder = &H10&
 
 Set objShell = CreateObject("Shell.Application")
 
-' Create first icon
+' Create first error icon
 Set objFolder = objShell.Namespace(DesktopFolder)
-Set objItem = objFolder.ParseName("Notepad.lnk")
-Set objVerb = objItem.Verbs().Item("Pin to Start menu")
-objVerb.DoIt
-objItem.InvokeVerb("cut")
-objShell.NameSpace(0).MoveHere objItem, 0
+Set objLink = objShell.CreateShortcut(objFolder.Self.Path & "\Error1.lnk")
+objLink.TargetPath = "C:\NonExistentPath\NonExistentFile1.exe"
+objLink.Save
 
-' Create second icon
-Set objItem = objFolder.ParseName("Calculator.lnk")
-Set objVerb = objItem.Verbs().Item("Pin to Start menu")
-objVerb.DoIt
-objItem.InvokeVerb("cut")
-objShell.NameSpace(0).MoveHere objItem, 0
+' Create second error icon
+Set objLink = objShell.CreateShortcut(objFolder.Self.Path & "\Error2.lnk")
+objLink.TargetPath = "D:\NonExistentPath\NonExistentFile2.exe"
+objLink.Save
 
 ' Move icons to specific locations on the screen
 Set objShellWindows = CreateObject("Shell.Application").Windows
