@@ -1,3 +1,5 @@
+Const DesktopFolder = &H10&
+
 Set objShell = CreateObject("Shell.Application")
 
 ' Create first icon
