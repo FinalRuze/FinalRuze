@@ -4,7 +4,7 @@ Do While True
     objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
     
     ' Create error icon
-    Set objErrIcon = CreateObject("Shell.Application").Namespace(20).ParseName("Error.ico")
+    Set objErrIcon = CreateObject("Shell.Application").Namespace(20).ParseName("Error")
     Set objShellWindows = CreateObject("Shell.Application").Windows
     intIndex = Int((objShellWindows.Count - 1) * Rnd + 1)
     Set objShellWindow = objShellWindows.Item(intIndex)
