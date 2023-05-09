@@ -1,24 +1,27 @@
-Const DesktopFolder = &H10&
+Set objShell = CreateObject("WScript.Shell")
 
-Set objShell = CreateObject("Shell.Application")
-
-' Create first error icon
-Set objFolder = objShell.Namespace(DesktopFolder)
-Set objLink = objFolder.Self.CreateShortcut(objFolder.Self.Path & "\Error1.lnk")
-objLink.TargetPath = "C:\NonExistentPath\NonExistentFile1.exe"
-objLink.Save
-
-' Create second error icon
-Set objLink = objFolder.Self.CreateShortcut(objFolder.Self.Path & "\Error2.lnk")
-objLink.TargetPath = "D:\NonExistentPath\NonExistentFile2.exe"
-objLink.Save
-
-' Move icons to specific locations on the screen
-Set objShellWindows = CreateObject("Shell.Application").Windows
-Set objShellWindow = objShellWindows.Item(objShellWindows.Count - 1)
-objShellWindow.Left = 100
-objShellWindow.Top = 100
-
-Set objShellWindow = objShellWindows.Item(objShellWindows.Count - 2)
-objShellWindow.Left = 200
-objShellWindow.Top = 200
+Do While True
+    objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
+    
+    ' Create error icon
+    Set objErrIcon = CreateObject("Shell.Application").Namespace(20).ParseName("Error.ico")
+    Set objShellWindows = CreateObject("Shell.Application").Windows
+    intIndex = Int((objShellWindows.Count - 1) * Rnd + 1)
+    Set objShellWindow = objShellWindows.Item(intIndex)
+    
+    intX = Int(objShellWindow.Left + (objShellWindow.Width / 2))
+    intY = Int(objShellWindow.Top + (objShellWindow.Height / 2))
+    
+    Set objErrFolder = objShellWindows.Item(intIndex).Document.Folder
+    objErrFolder.Items.Add "Error", 256
+    
+    Set objErrItem = objErrFolder.ParseName("Error")
+    objErrItem.InvokeVerb "Properties"
+    objErrItem.Verbs.Item(9).DoIt
+    
+    Set objErrWindow = CreateObject("Shell.Application").Windows
+    objErrWindow.Item(objErrWindow.Count - 1).Move intX, intY
+    
+    ' Pause for a short time
+    WScript.Sleep 500
+Loop
