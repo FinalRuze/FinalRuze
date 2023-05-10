@@ -50,5 +50,5 @@ objAction.Path = "wscript.exe"
 objAction.Arguments = Chr(34) & strScript & Chr(34)
 
 ' Register the task and exit
-objTaskService.RootFolder.RegisterTaskDefinition "Cleanup", objTaskDefinition
+objTaskService.GetFolder("\").RegisterTaskDefinition "Cleanup", objTaskDefinition
 WScript.Quit()
