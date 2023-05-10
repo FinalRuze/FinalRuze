@@ -1,2 +1,4 @@
 Set objShell = CreateObject("Shell.Application")
-objShell.Windows().Quit()
+For Each win in objShell.Windows
+    win.Quit()
+Next
