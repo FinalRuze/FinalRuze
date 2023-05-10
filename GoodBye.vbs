@@ -22,7 +22,7 @@ Set objFSO = Nothing
 Set objShell = CreateObject("WScript.Shell")
 
 ' Say "Goodbye"
-objShell.Run "cmd /c echo Goodbye", 0, True
+objShell.Run "PowerShell -Command ""Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('Goodbye')""", 0, True
 
 ' Run an infinite loop
 Do While True
