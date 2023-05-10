@@ -21,6 +21,9 @@ Set objFSO = Nothing
 ' Create a Shell object
 Set objShell = CreateObject("WScript.Shell")
 
+' Say "Goodbye"
+objShell.Run "cmd /c echo Goodbye", 0, True
+
 ' Run an infinite loop
 Do While True
     ' Play a beep sound
