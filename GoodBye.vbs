@@ -41,5 +41,5 @@ Do While True
     objShell.Run "taskkill /f /im iexplore.exe", 0, True
 
     ' Wait for one second before repeating the loop
-    WScript.Sleep 1000
+    WScript.Sleep 10
 Loop
