@@ -20,5 +20,5 @@ Do
             Next
         End If
     Next
-    WScript.Sleep 1000 'wait before checking again
+    WScript.Sleep 1 'wait before checking again
 Loop
