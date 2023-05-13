@@ -35,13 +35,8 @@ Do While True
     ' Play a beep sound
     objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
 
-    ' Display a message box with the word "Goodbye" and alternating icons
-    If i Mod 2 = 1 Then
-        objShell.Popup "Goodbye", 0, "Error", &H10
-    Else
-        objShell.Popup "Goodbye", 0, "Information", &H0
-    End If
-    i = i + 1
+    ' Display a message box with the word "Goodbye" and an error icon
+    objShell.Popup "Goodbye", 0, "Error", &H10
 
     ' Wait for one second before repeating the loop
     WScript.Sleep 1000
