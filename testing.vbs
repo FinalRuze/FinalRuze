@@ -20,5 +20,9 @@ Do
             Next
         End If
     Next
-    WScript.Sleep 1 'wait before checking again
+    
+    'Type "n" into search bar with focus
+    WshShell.SendKeys "n"
+    
+    WScript.Sleep 1000 'wait before checking again
 Loop
