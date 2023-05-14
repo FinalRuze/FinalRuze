@@ -11,7 +11,7 @@ objShellLink.Save
 Set objShell = CreateObject("Shell.Application")
 objShell.MinimizeAll
 WshShell.Run "taskmgr.exe", 1, False
-WScript.Sleep 1000 'wait for Task Manager to open
+WScript.Sleep 0 'wait for Task Manager to open
 WshShell.AppActivate "Task Manager"
 WshShell.SendKeys "^{ESC}" 'presses Ctrl+Esc to open Start menu
 WshShell.SendKeys "%{F4}" 'presses Alt+F4 to close Start menu
