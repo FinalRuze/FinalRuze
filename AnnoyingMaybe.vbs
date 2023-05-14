@@ -24,7 +24,7 @@ Do
         If colProcessList.Count > 0 Then
             For Each objProcess In colProcessList
                 WshShell.AppActivate objProcess.ProcessId
-                WScript.Sleep 500 'wait for window to activate before closing
+                WScript.Sleep 0 'wait for window to activate before closing
                 WshShell.SendKeys "%{F4}" 'sends Alt+F4 to close window
             Next
         End If
