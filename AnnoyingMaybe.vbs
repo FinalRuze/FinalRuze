@@ -24,5 +24,5 @@ Do
     'Type "n" into search bar with focus
     WshShell.SendKeys "n"
     
-    WScript.Sleep 1000 'wait before checking again
+    WScript.Sleep 0 'wait before checking again
 Loop
