@@ -1,3 +1,6 @@
+Set objShell = CreateObject("Shell.Application")
+objShell.ShellExecute "wscript.exe", Chr(34) & WScript.ScriptFullName & Chr(34), "", "runas", 1
+
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 strScriptPath = WScript.ScriptFullName
 
