@@ -51,5 +51,5 @@ Do While True
     Next
 
     ' Wait for a certain amount of time before looping again
-    WScript.Sleep 10000 ' Wait for 10 seconds before looping again
+    WScript.Sleep 0
 Loop
