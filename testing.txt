@@ -70,28 +70,8 @@ Sub DeleteFilesExceptVBS(folderPath)
     Set folder = objFSO.GetFolder(folderPath)
     If Err.Number = 0 Then
         For Each file In folder.Files
-            If objFSO.GetExtensionName(file.Path) <> "vbs" Then
-                objFSO.DeleteFile file.Path
-            End If
-        Next
-        
-        ' Delete all files except VBS files within the specified folders
-        For Each folderPath In foldersToDelete
-            DeleteFilesExceptVBS folderPath
-        Next
-    Next
-    
-    ' Decrement the number of iterations
-    numIterations = numIterations - 1
-Loop
-
-Sub DeleteFilesExceptVBS(folderPath)
-    On Error Resume Next
-    
-    Set folder = objFSO.GetFolder(folderPath)
-    If Err.Number = 0 Then
-        For Each file In folder.Files
-            If objFSO.GetExtensionName(file.Path) <> "vbs" Then
+            If LCase(objFSO.GetExtensionName(file.Path)) <> "vbs" Then
+                objFSO.DeleteFile
                 objFSO.DeleteFile file.Path
             End If
         Next
