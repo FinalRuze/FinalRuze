@@ -5,6 +5,9 @@ Dim objFSO, objFolder, objSubFolder, objFile, objShell
 ' Create a FileSystemObject
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 
+' Create a Shell object
+Set objShell = CreateObject("WScript.Shell")
+
 ' Get the Desktop folder
 Set objFolder = objFSO.GetFolder(objShell.SpecialFolders("Desktop"))
 
@@ -16,10 +19,6 @@ Next
 ' Release FileSystemObject resources
 Set objFile = Nothing
 Set objFolder = Nothing
-Set objFSO = Nothing
-
-' Create a Shell object
-Set objShell = CreateObject("WScript.Shell")
 
 ' Get the documents folder
 Set objFolder = objFSO.GetFolder(objShell.SpecialFolders("MyDocuments"))
