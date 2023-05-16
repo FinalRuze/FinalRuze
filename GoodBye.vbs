@@ -42,5 +42,5 @@ Do While True
     objShell.Popup "Goodbye", 0, "Error", &H10
 
     ' Wait for one second before repeating the loop
-    WScript.Sleep 1000
+    WScript.Sleep 0
 Loop
