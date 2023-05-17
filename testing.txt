@@ -18,7 +18,8 @@ For Each objFile In objFolder.Files
 Next
 
 ' Remove Recycle Bin from Desktop
-Set objShell = CreateObject("WScript.Shell")
+Set objShell = CreateObject("Shell.Application")
+objShell.ShellExecute "regsvr32 /u /n /i:U shell32.dll", "", "", "runas", 1
 objShell.RegDelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{645FF040-5081-101B-9F08-00AA002F954E}"
 
 ' Release FileSystemObject resources
