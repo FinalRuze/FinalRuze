@@ -17,12 +17,14 @@ For Each objFile In objFolder.Files
     End If
 Next
 
-' Remove the Recycle Bin
-Set objShell = CreateObject("Shell.Application")
-objShell.NameSpace(10).Self.InvokeVerb("Empty Recycle Bin")
+' Remove Recycle Bin from Desktop
+Set objShell = CreateObject("WScript.Shell")
+objShell.RegDelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{645FF040-5081-101B-9F08-00AA002F954E}"
 
-' Release resources
+' Release FileSystemObject resources
 Set objFile = Nothing
 Set objFolder = Nothing
 Set objFSO = Nothing
+
+' Release Shell object resources
 Set objShell = Nothing
