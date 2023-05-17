@@ -12,23 +12,34 @@ Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFo
 For Each objFile In objFolder.Files
     Dim extension
     extension = LCase(objFSO.GetExtensionName(objFile.Name))
-    If extension = "txt" Or extension = "exe" Or IsApplication(objFile) Then
-        objFSO.DeleteFile(objFile)
+    If extension = "txt" Or extension = "exe" Or IsApplication(objFile.Path) Then
+        objFSO.DeleteFile(objFile.Path)
     End If
 Next
 
 ' Function to check if a file is an application
-Function IsApplication(file)
-    Dim objShell, objFolder, objFolderItem
+Function IsApplication(filePath)
+    Dim objShell
     Set objShell = CreateObject("Shell.Application")
-    Set objFolder = objShell.Namespace("C:\Windows\System32")
-    Set objFolderItem = objFolder.ParseName(objFile.Name)
-    If Not objFolderItem Is Nothing Then
+    
+    ' Get the folder containing the file
+    Dim objFolder
+    Set objFolder = objShell.Namespace(objFSO.GetParentFolderName(filePath))
+    
+    ' Get the file object in the folder
+    Dim objItem
+    Set objItem = objFolder.ParseName(objFSO.GetFileName(filePath))
+    
+    ' Check if the file is an application
+    Dim appProperty
+    appProperty = objFolder.GetDetailsOf(objItem, 34)
+    If appProperty = "Application" Then
         IsApplication = True
     Else
         IsApplication = False
     End If
-    Set objFolderItem = Nothing
+    
+    Set objItem = Nothing
     Set objFolder = Nothing
     Set objShell = Nothing
 End Function
