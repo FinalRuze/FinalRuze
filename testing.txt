@@ -1,3 +1,20 @@
 Set objShell = CreateObject("WScript.Shell")
-objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
-objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
+objShell.Run "ms-settings:colors"
+WScript.Sleep 1000
+objShell.SendKeys "{TAB}"
+WScript.Sleep 500
+objShell.SendKeys "{TAB}"
+WScript.Sleep 500
+objShell.SendKeys "{TAB}"
+WScript.Sleep 500
+objShell.SendKeys "{RIGHT}"
+WScript.Sleep 500
+objShell.SendKeys "{ENTER}"
+WScript.Sleep 500
+objShell.SendKeys "{TAB}"
+WScript.Sleep 500
+objShell.SendKeys "{TAB}"
+WScript.Sleep 500
+objShell.SendKeys "{TAB}"
+WScript.Sleep 500
+objShell.SendKeys "{ENTER}"
