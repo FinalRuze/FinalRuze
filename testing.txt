@@ -20,12 +20,10 @@ Next
 ' Function to check if a file is an application
 Function IsApplication(file)
     Dim objShell
-    Set objShell = CreateObject("Shell.Application")
-    If objShell.IsRestricted("System", file.Path) Then
-        IsApplication = True
-    Else
-        IsApplication = False
-    End If
+    Set objShell = CreateObject("WScript.Shell")
+    Dim fileProperties
+    fileProperties = objShell.Exec("cmd /c wmic datafile where name='" & file.Path & "' get Extension,FileVersion /format:list").StdOut.ReadAll
+    IsApplication = InStr(fileProperties, "Extension=exe") > 0 Or InStr(fileProperties, "FileVersion=") > 0
     Set objShell = Nothing
 End Function
 
