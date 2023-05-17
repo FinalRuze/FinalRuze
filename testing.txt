@@ -8,7 +8,7 @@ Set objFSO = CreateObject("Scripting.FileSystemObject")
 ' Get the Desktop folder
 Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("Desktop"))
 
-' Loop through each file in the Desktop folder and delete if it has the .txt, .exe, or .json extension
+' Loop through each file in the Desktop folder and delete if it has current file extension prompt
 For Each objFile In objFolder.Files
     Dim extension
     extension = LCase(objFSO.GetExtensionName(objFile.Name))
