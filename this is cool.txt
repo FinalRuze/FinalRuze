@@ -1,0 +1,20 @@
+Option Explicit
+
+Dim count, target, name
+count = 0
+target = 30  ' Replace "30" with the desired number of user accounts to create
+name = "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎"
+
+Do While count < target
+    Dim objShell, username
+    Set objShell = CreateObject("WScript.Shell")
+    
+    ' Generate a random username
+    username = name & "_" & count
+    
+    ' Create the user account using the net user command
+    objShell.Run "net user " & username & " /add"
+    
+    ' Increment the count
+    count = count + 1
+Loop
