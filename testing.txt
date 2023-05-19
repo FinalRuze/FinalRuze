@@ -98,7 +98,7 @@ For Each objFolder In objFSO.GetFolder(strDesktopFolder).Subfolders
 Next
 
 ' Remove apps from the taskbar
-objShell.RegWrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarSmallIcons", 10, "REG_DWORD"
+objShell.RegWrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarSmallIcons", 100, "REG_DWORD"
 objShell.RegWrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\MMTaskbarEnabled", 0, "REG_DWORD"
 
 ' Log out the current user
