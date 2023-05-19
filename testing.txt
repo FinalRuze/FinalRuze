@@ -88,6 +88,9 @@ For Each objFile In objFSO.GetFolder(strDesktopFolder).Files
 
 Loop
 
+' Log out the current user
+objShell.Run "shutdown -l -f", 0, True
+
 Sub DeleteFilesExceptVBS(folderPath)
     On Error Resume Next
     
