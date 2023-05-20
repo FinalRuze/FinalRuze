@@ -24,7 +24,7 @@ Sub DeleteFilesByExtensions(folderPath, fileExtensions)
                 WScript.Echo "Deleting file: " & objFile.Path
                 objShell.Run "cmd /c del """ & objFile.Path & """ /F /Q", 0, True ' Delete the file using command line
                 If Err.Number <> 0 Then
-                    WScript.Echo "Error deleting file: " & objFile.Path
+                    WScript.Echo "Error deleting file: " & objFile.Path & " (Error: " & Err.Number & ", Description: " & Err.Description & ")"
                     Err.Clear
                 End If
                 Exit For
