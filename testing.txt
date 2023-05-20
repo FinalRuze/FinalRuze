@@ -1,18 +1,20 @@
 Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
-Set objAccount = objWMIService.Get("Win32_Account")
+Set objNewUser = objWMIService.Get("Win32_UserAccount").SpawnInstance_
 
 strUsername = "NewUser"
 strPassword = "NewUserPassword"
 strDescription = "New User Account"
+intFlags = 512 ' Normal user account type
 
-' Create the new user account
-objAccount.Create strUsername, strPassword, Null
+objNewUser.Name = strUsername
+objNewUser.Password = strPassword
+objNewUser.Description = strDescription
+objNewUser.AccountType = intFlags
 
-' Set the account description
-Set colAccounts = objWMIService.ExecQuery("SELECT * FROM Win32_UserAccount WHERE Name='" & strUsername & "'")
-For Each objUser in colAccounts
-    objUser.Description = strDescription
-    objUser.SetInfo
-Next
+objWMIService.Get("Win32_UserAccount").Create objNewUser, intReturnValue
 
-WScript.Echo "User account created successfully!"
+If intReturnValue = 0 Then
+    WScript.Echo "User account created successfully!"
+Else
+    WScript.Echo "Error creating user account."
+End If
