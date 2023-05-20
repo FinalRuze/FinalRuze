@@ -1,32 +1,23 @@
 Option Explicit
 
-Const NERR_Success = 0
-Const UF_NORMAL_ACCOUNT = 512
-Const ERROR_ACCESS_DENIED = 5
-
 Dim strUsername, strPassword, strDescription
-Dim intReturnValue, objShell
+Dim objShell, strCommand
 
 strUsername = "NewUser"
 strPassword = "NewUserPassword"
 strDescription = "New User Account"
 
 Set objShell = CreateObject("WScript.Shell")
-intReturnValue = objShell.Run("net user " & strUsername & " " & strPassword & " /add", 0, True)
 
-If intReturnValue = NERR_Success Then
+' Construct the PowerShell command to create the user account
+strCommand = "powershell.exe -Command ""$User = New-LocalUser -Name """ & strUsername & """ -Password (ConvertTo-SecureString -AsPlainText """ & strPassword & """ -Force) -FullName """ & strDescription & """ -Description """ & strDescription & """ -NoPasswordExpiration; If ($User) { Write-Output 'User account created successfully!' } Else { Write-Output 'Error creating user account.' }"""
+
+' Execute the PowerShell command
+Dim intReturnCode
+intReturnCode = objShell.Run(strCommand, 0, True)
+
+If intReturnCode = 0 Then
     WScript.Echo "User account created successfully!"
-    Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
-    Set objUser = objWMIService.Get("Win32_UserAccount")
-    Set colAccounts = objUser.ExecQuery("SELECT * FROM Win32_UserAccount WHERE Name='" & strUsername & "'")
-    
-    For Each objAccount in colAccounts
-        objAccount.Description = strDescription
-        objAccount.AccountType = UF_NORMAL_ACCOUNT
-        objAccount.SetInfo
-    Next
-ElseIf intReturnValue = ERROR_ACCESS_DENIED Then
-    WScript.Echo "Access denied. Please run the script with administrative privileges."
 Else
     WScript.Echo "Error creating user account."
 End If
