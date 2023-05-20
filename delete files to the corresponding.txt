@@ -21,7 +21,7 @@ Sub DeleteFilesByExtensions(folderPath, fileExtensions)
         For Each extension In fileExtensions
             If LCase(extension) = fileExtension Then
                 WScript.Echo "Deleting file: " & objFile.Path
-                objFSO.DeleteFile objFile.Path, True ' Delete the file
+                objFile.Delete(True) ' Delete the file
                 If Err.Number <> 0 Then
                     WScript.Echo "Error deleting file: " & objFile.Path
                     Err.Clear
