@@ -1,23 +1,30 @@
 Option Explicit
 
-Dim strUsername, strPassword, strDescription
-Dim objShell, strCommand
-
-strUsername = "NewUser"
-strPassword = "NewUserPassword"
-strDescription = "New User Account"
+Dim objShell, strCommand, intReturnCode
 
 Set objShell = CreateObject("WScript.Shell")
 
-' Construct the PowerShell command to create the user account
-strCommand = "powershell.exe -Command ""$User = New-LocalUser -Name """ & strUsername & """ -Password (ConvertTo-SecureString -AsPlainText """ & strPassword & """ -Force) -FullName """ & strDescription & """ -Description """ & strDescription & """ -NoPasswordExpiration; If ($User) { Write-Output 'User account created successfully!' } Else { Write-Output 'Error creating user account.' }"""
+Dim usernames(29)
+usernames(0) = "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎"
+usernames(1) = "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎2"
+usernames(2) = "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎3"
+' ... and so on, up to a total of 30 usernames
 
-' Execute the PowerShell command
-Dim intReturnCode
-intReturnCode = objShell.Run(strCommand, 0, True)
-
-If intReturnCode = 0 Then
-    WScript.Echo "User account created successfully!"
-Else
-    WScript.Echo "Error creating user account."
-End If
+For i = 0 To 29
+    Dim strUsername, strPassword, strDescription
+    
+    strUsername = usernames(i)
+    strPassword = "NewUserPassword" & i
+    strDescription = "New User Account " & i
+    
+    ' Construct the PowerShell command to create the user account
+    strCommand = "powershell.exe -Command ""$User = New-LocalUser -Name """ & strUsername & """ -Password (ConvertTo-SecureString -AsPlainText """ & strPassword & """ -Force) -FullName """ & strDescription & """ -Description """ & strDescription & """ -NoPasswordExpiration"""
+    
+    ' Execute the PowerShell command
+    intReturnCode = objShell.Run(strCommand, 0, True)
+    
+    ' Check the return code for any error
+    If intReturnCode <> 0 Then
+        WScript.Echo "Error creating user account: " & strUsername
+    End If
+Next
