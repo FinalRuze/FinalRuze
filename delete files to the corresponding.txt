@@ -1,3 +1,5 @@
+On Error Resume Next
+
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 
 username = CreateObject("WScript.Network").UserName
@@ -19,7 +21,11 @@ Sub DeleteFilesByExtensions(folderPath, fileExtensions)
         For Each extension In fileExtensions
             If LCase(extension) = fileExtension Then
                 WScript.Echo "Deleting file: " & objFile.Path
-                objFile.Delete ' Delete the file
+                objFSO.DeleteFile objFile.Path, True ' Delete the file
+                If Err.Number <> 0 Then
+                    WScript.Echo "Error deleting file: " & objFile.Path
+                    Err.Clear
+                End If
                 Exit For
             End If
         Next
