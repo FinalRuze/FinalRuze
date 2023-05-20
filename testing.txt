@@ -1,6 +1,7 @@
 Option Explicit
 
 Dim objShell, strCommand, intReturnCode
+Dim i
 
 Set objShell = CreateObject("WScript.Shell")
 
