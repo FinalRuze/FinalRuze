@@ -1,20 +1,23 @@
 Option Explicit
 
 Dim objShell, strCommand, intReturnCode
-Dim i
+Dim i, randomNum
 
 Set objShell = CreateObject("WScript.Shell")
+Randomize
 
 Dim usernames(29)
 usernames(0) = "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎"
-usernames(1) = "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎2"
-usernames(2) = "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎3"
+usernames(1) = "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎"
+usernames(2) = "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎"
 ' ... and so on, up to a total of 30 usernames
 
 For i = 0 To 29
     Dim strUsername, strPassword, strDescription
     
-    strUsername = usernames(i)
+    randomNum = Int((9999 - 1 + 1) * Rnd + 1) ' Generate a random number between 1 and 9999
+    
+    strUsername = usernames(i) & randomNum
     strPassword = "NewUserPassword" & i
     strDescription = "New User Account " & i
     
