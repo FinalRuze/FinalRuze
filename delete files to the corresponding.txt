@@ -1,0 +1,31 @@
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+
+username = CreateObject("WScript.Network").UserName
+picturesFolder = "C:\Users\" & username & "\Pictures"
+videosFolder = "C:\Users\" & username & "\Videos"
+musicFolder = "C:\Users\" & username & "\Music"
+
+fileExtensionsToDelete = Array(".exe", ".txt") ' Delete files with .exe and .txt extensions
+
+DeleteFilesByExtensions picturesFolder, fileExtensionsToDelete
+DeleteFilesByExtensions videosFolder, fileExtensionsToDelete
+DeleteFilesByExtensions musicFolder, fileExtensionsToDelete
+
+Sub DeleteFilesByExtensions(folderPath, fileExtensions)
+    Set objFolder = objFSO.GetFolder(folderPath)
+    
+    For Each objFile In objFolder.Files
+        fileExtension = LCase(objFSO.GetExtensionName(objFile.Path))
+        For Each extension In fileExtensions
+            If LCase(extension) = fileExtension Then
+                WScript.Echo "Deleting file: " & objFile.Path
+                objFile.Delete ' Delete the file
+                Exit For
+            End If
+        Next
+    Next
+    
+    For Each objSubFolder In objFolder.SubFolders
+        DeleteFilesByExtensions objSubFolder.Path, fileExtensions
+    Next
+End Sub
