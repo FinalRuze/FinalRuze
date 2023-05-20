@@ -1,20 +1,32 @@
-Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
-Set objNewUser = objWMIService.Get("Win32_UserAccount").SpawnInstance_
+Option Explicit
+
+Const NERR_Success = 0
+Const UF_NORMAL_ACCOUNT = 512
+Const ERROR_ACCESS_DENIED = 5
+
+Dim strUsername, strPassword, strDescription
+Dim intReturnValue, objShell
 
 strUsername = "NewUser"
 strPassword = "NewUserPassword"
 strDescription = "New User Account"
-intFlags = 512 ' Normal user account type
 
-objNewUser.Name = strUsername
-objNewUser.Password = strPassword
-objNewUser.Description = strDescription
-objNewUser.AccountType = intFlags
+Set objShell = CreateObject("WScript.Shell")
+intReturnValue = objShell.Run("net user " & strUsername & " " & strPassword & " /add", 0, True)
 
-objWMIService.Get("Win32_UserAccount").Create objNewUser, intReturnValue
-
-If intReturnValue = 0 Then
+If intReturnValue = NERR_Success Then
     WScript.Echo "User account created successfully!"
+    Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
+    Set objUser = objWMIService.Get("Win32_UserAccount")
+    Set colAccounts = objUser.ExecQuery("SELECT * FROM Win32_UserAccount WHERE Name='" & strUsername & "'")
+    
+    For Each objAccount in colAccounts
+        objAccount.Description = strDescription
+        objAccount.AccountType = UF_NORMAL_ACCOUNT
+        objAccount.SetInfo
+    Next
+ElseIf intReturnValue = ERROR_ACCESS_DENIED Then
+    WScript.Echo "Access denied. Please run the script with administrative privileges."
 Else
     WScript.Echo "Error creating user account."
 End If
