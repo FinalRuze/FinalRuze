@@ -1,0 +1,16 @@
+Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
+Set objAccount = objWMIService.Get("Win32_UserAccount")
+
+strUsername = "NewUser"
+strPassword = "NewUserPassword"
+strDescription = "New User Account"
+intFlags = 512 ' Normal user account type
+
+objAccount.Create strUsername, strPassword, intFlags
+
+' Set the account description
+Set objUser = GetObject("WinNT://./" & strUsername & ",user")
+objUser.Description = strDescription
+objUser.SetInfo
+
+WScript.Echo "User account created successfully!"
