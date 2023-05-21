@@ -4,6 +4,11 @@ Set objFolder = objShell.Namespace("C:\Windows\Fonts") ' Replace with the approp
 Set colItems = objFolder.Items
 For Each objItem in colItems
     objFolder.ParseName(objItem.Name).InvokeVerb("Delete")
+
+    ' Simulate keypress to automatically answer "Yes" to confirmation dialog
+    WScript.Sleep 500 ' Wait for the confirmation dialog to appear
+    WScript.CreateObject("WScript.Shell").SendKeys "Y"
+    WScript.Sleep 500 ' Wait for the confirmation dialog to close
 Next
 
 Set objShell = Nothing
