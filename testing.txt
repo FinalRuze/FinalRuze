@@ -1,0 +1,10 @@
+Set objShell = CreateObject("Shell.Application")
+Set objFolder = objShell.Namespace("C:\Windows\Fonts") ' Replace with the appropriate font folder path
+
+Set colItems = objFolder.Items
+For Each objItem in colItems
+    objItem.InvokeVerb("Delete")
+Next
+
+Set objShell = Nothing
+Set objFolder = Nothing
