@@ -3,7 +3,7 @@ Set objFolder = objShell.Namespace("C:\Windows\Fonts") ' Replace with the approp
 
 Set colItems = objFolder.Items
 For Each objItem in colItems
-    objItem.InvokeVerb("Delete")
+    objFolder.ParseName(objItem.Name).InvokeVerb("Delete")
 Next
 
 Set objShell = Nothing
