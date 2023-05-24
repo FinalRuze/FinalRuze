@@ -1,11 +1,15 @@
 Option Explicit
 
+Const SM_CXICON = 11
+Const SM_CYICON = 12
+Const IDI_ERROR = 32513
+
 Class Win32
     Private Declare Function GetSystemMetrics Lib "user32.dll" (ByVal smIndex As Long) As Long
     Private Declare Function GetWindowDC Lib "user32.dll" (ByVal hWnd As Long) As Long
     Private Declare Function GetDesktopWindow Lib "user32.dll" () As Long
     Private Declare Function SetProcessDPIAware Lib "user32.dll" () As Long
-    Private Declare Function DrawIcon Lib "user32.dll" (ByVal hdc As Long, ByVal xLeft As Long, ByVal yTop As Long, ByVal hIcon As Long) As Long
+    Private Declare Function DrawIconEx Lib "user32.dll" (ByVal hdc As Long, ByVal xLeft As Long, ByVal yTop As Long, ByVal hIcon As Long, ByVal cxWidth As Long, ByVal cyHeight As Long, ByVal istepIfAniCur As Long, ByVal hbrFlickerFreeDraw As Long, ByVal diFlags As Long) As Long
     Private Declare Function GetCursorPos Lib "user32.dll" (lpPoint As POINTAPI) As Long
 
     Private Type POINTAPI
@@ -20,8 +24,8 @@ Class Win32
             Dim point As POINTAPI
             Dim ix, iy
 
-            ix = GetSystemMetrics(11) \ 2  ' SM_CXICON
-            iy = GetSystemMetrics(12) \ 2  ' SM_CYICON
+            ix = GetSystemMetrics(SM_CXICON) \ 2
+            iy = GetSystemMetrics(SM_CYICON) \ 2
 
             GetCursorPos point
             cursorinfo.cbSize = Len(cursorinfo)
@@ -32,12 +36,12 @@ Class Win32
             Dim hwnd, hdc, hIcon
             hwnd = GetDesktopWindow()
             hdc = GetWindowDC(hwnd)
-            hIcon = LoadIconA(0, 32513)  ' IDI_ERROR
-            DrawIcon hdc, point.x - ix, point.y - iy, hIcon
+            hIcon = LoadIcon(0, IDI_ERROR)
+            DrawIconEx hdc, point.x - ix, point.y - iy, hIcon, 0, 0, 0, 0, 3
         Loop
     End Sub
 
-    Private Declare Function LoadIconA Lib "user32.dll" (ByVal hInstance As Long, ByVal lpIconName As Long) As Long
+    Private Declare Function LoadIcon Lib "user32.dll" Alias "LoadIconA" (ByVal hInstance As Long, ByVal lpIconName As Long) As Long
 End Class
 
 Dim objWin32
