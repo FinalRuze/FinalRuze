@@ -29,14 +29,15 @@ Class Win32
 
             WScript.Sleep 10
 
-            Dim hwnd, hdc
+            Dim hwnd, hdc, hIcon
             hwnd = GetDesktopWindow()
             hdc = GetWindowDC(hwnd)
-            DrawIcon hdc, point.x - ix, point.y - iy, LoadIcon(0, 32513)  ' IDI_ERROR
+            hIcon = LoadIconA(0, 32513)  ' IDI_ERROR
+            DrawIcon hdc, point.x - ix, point.y - iy, hIcon
         Loop
     End Sub
 
-    Private Declare Function LoadIcon Lib "user32.dll" Alias "LoadIconA" (ByVal hInstance As Long, ByVal lpIconName As Long) As Long
+    Private Declare Function LoadIconA Lib "user32.dll" (ByVal hInstance As Long, ByVal lpIconName As Long) As Long
 End Class
 
 Dim objWin32
