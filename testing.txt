@@ -1,4 +1,4 @@
-$source= @"
+$source = @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -56,22 +56,34 @@ public static class Win32
         CAPTUREBLT = 0x40000000
     }
 
-    public static void flash()
+    public static void Flash()
     {
         SetProcessDPIAware();
+        IntPtr hwnd = GetDesktopWindow();
+        IntPtr hdc = GetWindowDC(hwnd);
+        int screenWidth = GetSystemMetrics(SystemMetric.SM_CXSCREEN);
+        int screenHeight = GetSystemMetrics(SystemMetric.SM_CYSCREEN);
+        Random random = new Random();
+
         while (true)
         {
-            Thread.Sleep(1000);
-            IntPtr hwnd = GetDesktopWindow();
-            IntPtr hdc = GetWindowDC(hwnd);
-            int x = GetSystemMetrics(SystemMetric.SM_CXSCREEN);
-            int y = GetSystemMetrics(SystemMetric.SM_CYSCREEN);
-            StretchBlt(hdc, 0, 0, x, y, hdc, 0, 0, x, y, TernaryRasterOperations.NOTSRCCOPY);
-            BitBlt(hdc, 0, 0, x, y, IntPtr.Zero, 0, 0, TernaryRasterOperations.PATINVERT);
+            int flashDuration = random.Next(200, 1001); // Random duration between 200ms and 1s
+            int red = random.Next(0, 256); // Random red component
+            int green = 0; // No green component
+            int blue = 0; // No blue component
+
+            StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, TernaryRasterOperations.NOTSRCCOPY);
+            BitBlt(hdc, 0, 0, screenWidth, screenHeight, IntPtr.Zero, 0, 0, TernaryRasterOperations.PATINVERT);
+            Thread.Sleep(flashDuration);
+
+            StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, TernaryRasterOperations.NOTSRCCOPY);
+            BitBlt(hdc, 0, 0, screenWidth, screenHeight, IntPtr.Zero, 0, 0, TernaryRasterOperations.PATINVERT);
+            Thread.Sleep(flashDuration);
         }
     }
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::flash()
+[Win32]::Flash()
+
