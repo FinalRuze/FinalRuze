@@ -73,17 +73,16 @@ public static class Win32
             int blue = 0; // No blue component
 
             StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, TernaryRasterOperations.NOTSRCCOPY);
-            BitBlt(hdc, 0, 0, screenWidth, screenHeight, IntPtr.Zero, 0, 0, TernaryRasterOperations.PATINVERT);
+            StretchBlt(hdc, 0, 0, screenWidth, screenHeight, IntPtr.Zero, 0, 0, 0, 0, TernaryRasterOperations.PATINVERT);
             Thread.Sleep(flashDuration);
 
             StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, TernaryRasterOperations.NOTSRCCOPY);
-            BitBlt(hdc, 0, 0, screenWidth, screenHeight, IntPtr.Zero, 0, 0, TernaryRasterOperations.PATINVERT);
-            Thread.Sleep(flashDuration);
-        }
-    }
+StretchBlt(hdc, 0, 0, screenWidth, screenHeight, IntPtr.Zero, 0, 0, 0, 0, TernaryRasterOperations.PATINVERT);
+Thread.Sleep(flashDuration);
+}
+}
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
 [Win32]::Flash()
-
