@@ -1,49 +1,135 @@
-Option Explicit
+Dim objShell
+Set objShell = CreateObject("WScript.Shell")
 
-Const SM_CXICON = 11
-Const SM_CYICON = 12
-Const IDI_ERROR = 32513
+Dim strPowerShellScript
+strPowerShellScript = "$source = @"
+strPowerShellScript = strPowerShellScript & "using System;"
+strPowerShellScript = strPowerShellScript & "using System.Collections.Generic;"
+strPowerShellScript = strPowerShellScript & "using System.ComponentModel;"
+strPowerShellScript = strPowerShellScript & "using System.Drawing;"
+strPowerShellScript = strPowerShellScript & "using System.Linq;"
+strPowerShellScript = strPowerShellScript & "using System.Text;"
+strPowerShellScript = strPowerShellScript & "using System.Windows;"
+strPowerShellScript = strPowerShellScript & "using System.Runtime.InteropServices;"
+strPowerShellScript = strPowerShellScript & "using System.IO;"
+strPowerShellScript = strPowerShellScript & "using System.Diagnostics;"
+strPowerShellScript = strPowerShellScript & "using System.Media;"
+strPowerShellScript = strPowerShellScript & "using System.Reflection;"
+strPowerShellScript = strPowerShellScript & "using System.Threading;"
+strPowerShellScript = strPowerShellScript & "public static class Win32"
+strPowerShellScript = strPowerShellScript & "{"
+strPowerShellScript = strPowerShellScript & "[DllImport( ""user32.dll"" )]"
+strPowerShellScript = strPowerShellScript & "static extern int GetSystemMetrics( SystemMetric smIndex );"
+strPowerShellScript = strPowerShellScript & "public enum SystemMetric : int"
+strPowerShellScript = strPowerShellScript & "{"
+strPowerShellScript = strPowerShellScript & "SM_CXSCREEN = 0,"
+strPowerShellScript = strPowerShellScript & "SM_CYSCREEN = 1,"
+strPowerShellScript = strPowerShellScript & "SM_CYVSCROLL = 2,"
+strPowerShellScript = strPowerShellScript & "SM_CXVSCROLL = 3,"
+strPowerShellScript = strPowerShellScript & "SM_CYCAPTION = 4,"
+strPowerShellScript = strPowerShellScript & "SM_CXBORDER = 5,"
+strPowerShellScript = strPowerShellScript & "SM_CYBORDER = 6,"
+strPowerShellScript = strPowerShellScript & "SM_CXDLGFRAME = 7,"
+strPowerShellScript = strPowerShellScript & "SM_CYDLGFRAME = 8,"
+strPowerShellScript = strPowerShellScript & "SM_CYVTHUMB = 9,"
+strPowerShellScript = strPowerShellScript & "SM_CXHTHUMB = 10,"
+strPowerShellScript = strPowerShellScript & "SM_CXICON = 11,"
+strPowerShellScript = strPowerShellScript & "SM_CYICON = 12,"
+strPowerShellScript = strPowerShellScript & "SM_CXCURSOR = 13,"
+strPowerShellScript = strPowerShellScript & "SM_CYCURSOR = 14,"
+strPowerShellScript = strPowerShellScript & "SM_CYMENU = 15,"
+strPowerShellScript = strPowerShellScript & "SM_CXFULLSCREEN = 16,"
+strPowerShellScript = strPowerShellScript & "SM_CYFULLSCREEN = 17,"
+strPowerShellScript = strPowerShellScript & "SM_CYKANJIWINDOW = 18,"
+strPowerShellScript = strPowerShellScript & "SM_MOUSEWHEELPRESENT = 75,"
+strPowerShellScript = strPowerShellScript & "SM_CYHSCROLL = 20,"
+strPowerShellScript = strPowerShellScript & "SM_CXHSCROLL = 21,"
+strPowerShellScript = strPowerShellScript & "SM_DEBUG = 22,"
+strPowerShellScript = strPowerShellScript & "SM_SWAPBUTTON = 23,"
+strPowerShellScript = strPowerShellScript & "SM_RESERVED1 = 24,"
+strPowerShellScript = strPowerShellScript & "SM_RESERVED2 = 25,"
+strPowerShellScript = strPowerShellScript & "SM_RESERVED3 = 26,"
+strPowerShellScript = strPowerShellScript & "SM_RESERVED4 = 27,"
+strPowerShellScript = strPowerShellScript & "SM_CXMIN = 28,"
+strPowerShellScript = strPowerShellScript & "SM_CYMIN = 29,"
+strPowerShellScript = strPowerShellScript & "SM_CXSIZE = 30,"
+strPowerShellScript = strPowerShellScript & "SM_CYSIZE = 31,"
+strPowerShellScript = strPowerShellScript & "SM_CXFRAME = 32,"
+strPowerShellScript = strPowerShellScript & "SM_CYFRAME = 33,"
+strPowerShellScript = strPowerShellScript & "SM_CXMINTRACK = 34,"
+strPowerShellScript = strPowerShellScript & "SM_CYMINTRACK = 35,"
+strPowerShellScript = strPowerShellScript & "SM_CXDOUBLECLK = 36,"
+strPowerShellScript = strPowerShellScript & "SM_CYDOUBLECLK = 37,"
+strPowerShellScript = strPowerShellScript & "SM_CXICONSPACING = 38,"
+strPowerShellScript = strPowerShellScript & "SM_CYICONSPACING = 39,"
+strPowerShellScript = strPowerShellScript & "SM_MENUDROPALIGNMENT = 40,"
+strPowerShellScript = strPowerShellScript & "SM_PENWINDOWS = 41,"
+strPowerShellScript = strPowerShellScript & "SM_DBCSENABLED = 42,"
+strPowerShellScript = strPowerShellScript & "SM_CMOUSEBUTTONS = 43,"
+strPowerShellScript = strPowerShellScript & "SM_CXFIXEDFRAME = SM_CXDLGFRAME,"
+strPowerShellScript = strPowerShellScript & "SM_CYFIXEDFRAME = SM_CYDLGFRAME,"
+strPowerShellScript = strPowerShellScript & "SM_CXSIZEFRAME = SM_CXFRAME,"
+strPowerShellScript = strPowerShellScript & "SM_CYSIZEFRAME = SM_CYFRAME,"
+strPowerShellScript = strPowerShellScript & "SM_SECURE = 44,"
+strPowerShellScript = strPowerShellScript & "SM_CXEDGE = 45,"
+strPowerShellScript = strPowerShellScript & "SM_CYEDGE = 46,"
+strPowerShellScript = strPowerShellScript & "SM_CXMINSPACING = 47,"
+strPowerShellScript = strPowerShellScript & "SM_CYMINSPACING = 48,"
+strPowerShellScript = strPowerShellScript & "SM_CXSMICON = 49,"
+strPowerShellScript = strPowerShellScript & "SM_CYSMICON = 50,"
+strPowerShellScript = strPowerShellScript & "SM_CYSMCAPTION = 51,"
+strPowerShellScript = strPowerShellScript & "SM_CXSMSIZE = 52,"
+strPowerShellScript = strPowerShellScript & "SM_CYSMSIZE = 53,"
+strPowerShellScript = strPowerShellScript & "SM_CXMENUSIZE = 54,"
+strPowerShellScript = strPowerShellScript & "SM_CYMENUSIZE = 55,"
+strPowerShellScript = strPowerShellScript & "SM_ARRANGE = 56,"
+strPowerShellScript = strPowerShellScript & "SM_CXMINIMIZED = 57,"
+strPowerShellScript = strPowerShellScript & "SM_CYMINIMIZED = 58,"
+strPowerShellScript = strPowerShellScript & "SM_CXMAXTRACK = 59,"
+strPowerShellScript = strPowerShellScript & "SM_CYMAXTRACK = 60,"
+strPowerShellScript = strPowerShellScript & "SM_CXMAXIMIZED = 61,"
+strPowerShellScript = strPowerShellScript & "SM_CYMAXIMIZED = 62,"
+strPowerShellScript = strPowerShellScript & "SM_NETWORK = 63,"
+strPowerShellScript = strPowerShellScript & "SM_CLEANBOOT = 67,"
+strPowerShellScript = strPowerShellScript & "SM_CXDRAG = 68,"
+strPowerShellScript = strPowerShellScript & "SM_CYDRAG = 69,"
+strPowerShellScript = strPowerShellScript & "SM_SHOWSOUNDS = 70,"
+strPowerShellScript = strPowerShellScript & "SM_CXMENUCHECK = 71,"
+strPowerShellScript = strPowerShellScript & "SM_CYMENUCHECK = 72,"
+strPowerShellScript = strPowerShellScript & "SM_SLOWMACHINE = 73,"
+strPowerShellScript = strPowerShellScript & "SM_MIDEASTENABLED = 74,"
+strPowerShellScript = strPowerShellScript & "SM_MOUSEPRESENT = 19,"
+strPowerShellScript = strPowerShellScript & "SM_XVIRTUALSCREEN = 76,"
+strPowerShellScript = strPowerShellScript & "SM_YVIRTUALSCREEN = 77,"
+strPowerShellScript = strPowerShellScript & "SM_CXVIRTUALSCREEN = 78,"
+strPowerShellScript = strPowerShellScript & "SM_CYVIRTUALSCREEN = 79,"
+strPowerShellScript = strPowerShellScript & "SM_CMONITORS = 80,"
+strPowerShellScript = strPowerShellScript & "SM_SAMEDISPLAYFORMAT = 81,"
+strPowerShellScript = strPowerShellScript & "SM_IMMENABLED = 82,"
+strPowerShellScript = strPowerShellScript & "SM_CXFOCUSBORDER = 83,"
+strPowerShellScript = strPowerShellScript & "SM_CYFOCUSBORDER = 84,"
+strPowerShellScript = strPowerShellScript & "SM_TABLETPC = 86,"
+strPowerShellScript = strPowerShellScript & "SM_MEDIACENTER = 87,"
+strPowerShellScript = strPowerShellScript & "SM_CMETRICS_OTHER = 76,"
+strPowerShellScript = strPowerShellScript & "SM_CMETRICS_2000 = 83,"
+strPowerShellScript = strPowerShellScript & "SM_CMETRICS_NT = 88,"
+strPowerShellScript = strPowerShellScript & "SM_REMOTESESSION = 0x1000,"
+strPowerShellScript = strPowerShellScript & "SM_SHUTTINGDOWN = 0x2000,"
+strPowerShellScript = strPowerShellScript & "SM_REMOTECONTROL = 0x2001"
 
-Class Win32
-    Private Declare Function GetSystemMetrics Lib "user32.dll" (ByVal smIndex As Long) As Long
-    Private Declare Function GetWindowDC Lib "user32.dll" (ByVal hWnd As Long) As Long
-    Private Declare Function GetDesktopWindow Lib "user32.dll" () As Long
-    Private Declare Function SetProcessDPIAware Lib "user32.dll" () As Long
-    Private Declare Function DrawIconEx Lib "user32.dll" (ByVal hdc As Long, ByVal xLeft As Long, ByVal yTop As Long, ByVal hIcon As Long, ByVal cxWidth As Long, ByVal cyHeight As Long, ByVal istepIfAniCur As Long, ByVal hbrFlickerFreeDraw As Long, ByVal diFlags As Long) As Long
-    Private Declare Function GetCursorPos Lib "user32.dll" (lpPoint As POINTAPI) As Long
+' Create the VBScript file
+strVBScript = "script.vbs"
 
-    Private Type POINTAPI
-        x As Long
-        y As Long
-    End Type
+' Write the PowerShell script to the VBScript file
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set objFile = objFSO.CreateTextFile(strVBScript, True)
+objFile.Write strPowerShellScript
+objFile.Close
 
-    Public Sub draw()
-        SetProcessDPIAware
-        Do
-            Dim cursorinfo As CURSORINFO
-            Dim point As POINTAPI
-            Dim ix, iy
+' Execute the VBScript file using cscript.exe
+strCommand = "cscript.exe " & strVBScript
+Set objShell = CreateObject("WScript.Shell")
+objShell.Run strCommand, 0, True
 
-            ix = GetSystemMetrics(SM_CXICON) \ 2
-            iy = GetSystemMetrics(SM_CYICON) \ 2
-
-            GetCursorPos point
-            cursorinfo.cbSize = Len(cursorinfo)
-            GetCursorInfo cursorinfo
-
-            WScript.Sleep 10
-
-            Dim hwnd, hdc, hIcon
-            hwnd = GetDesktopWindow()
-            hdc = GetWindowDC(hwnd)
-            hIcon = LoadIcon(0, IDI_ERROR)
-            DrawIconEx hdc, point.x - ix, point.y - iy, hIcon, 0, 0, 0, 0, 3
-        Loop
-    End Sub
-
-    Private Declare Function LoadIcon Lib "user32.dll" Alias "LoadIconA" (ByVal hInstance As Long, ByVal lpIconName As Long) As Long
-End Class
-
-Dim objWin32
-Set objWin32 = New Win32
-objWin32.draw
+' Clean up the VBScript file
+objFSO.DeleteFile strVBScript, True
