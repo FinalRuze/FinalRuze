@@ -38,13 +38,13 @@ public static class Win32
             StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 50, 50, screenWidth - 100, screenHeight - 100, 0xCC0020);
 
             // BitBlt for Inverting Colors (Negative Effect)
-            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x550009);
+            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00550009);
 
             // TransparentBlt for Transparency (Fade Effect)
-            TransparentBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, 0x7F000000);
+            TransparentBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, 0xFF000000);
 
             // BitBlt with Raster Operation (ROP) Code for XOR Effect (Flashing Effect)
-            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x990066);
+            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00660046);
         }
     }
 }
