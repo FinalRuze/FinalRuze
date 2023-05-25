@@ -6,171 +6,51 @@ using System.Threading;
 public static class Win32
 {
     [DllImport("user32.dll")]
-    public static extern int GetSystemMetrics(int smIndex);
+    static extern int GetSystemMetrics(int smIndex);
 
     [DllImport("user32.dll")]
-    public static extern IntPtr GetDC(IntPtr hWnd);
+    static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
 
     [DllImport("user32.dll", SetLastError = true)]
-    public static extern bool SetProcessDPIAware();
+    static extern bool SetProcessDPIAware();
 
-    [DllImport("shell32.dll")]
-    public static extern int SHGetKnownFolderIDList([MarshalAs(UnmanagedType.Struct)]ref Guid rfid, uint dwFlags, IntPtr hToken, out IntPtr ppidl);
+    [DllImport("gdi32.dll")]
+    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
 
-    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
-    public static extern int SHGetDesktopFolder(out IntPtr ppshf);
+    [DllImport("gdi32.dll")]
+    static extern bool TransparentBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint crTransparent);
 
-    [DllImport("shell32.dll")]
-    public static extern int SHGetSpecialFolderLocation(IntPtr hwndOwner, int nFolder, out IntPtr ppidl);
-
-    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
-    public static extern int SHGetPathFromIDList(IntPtr pidl, [MarshalAs(UnmanagedType.LPWStr)]StringBuilder pszPath);
-
-    [DllImport("shell32.dll")]
-    public static extern int SHChangeNotify(int eventId, uint flags, IntPtr item1, IntPtr item2);
-
-    [DllImport("shell32.dll")]
-    public static extern int SHGetFileInfo(string pszPath, uint dwFileAttributes, out SHFILEINFO psfi, uint cbFileInfo, SHGFI uFlags);
-
-    [DllImport("user32.dll")]
-    public static extern bool DestroyIcon(IntPtr hIcon);
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    public struct SHFILEINFO
-    {
-        public IntPtr hIcon;
-        public int iIcon;
-        public uint dwAttributes;
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-        public string szDisplayName;
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
-        public string szTypeName;
-    }
-
-    public const uint SHGFI_ICON = 0x000000100;
-    public const uint SHGFI_SMALLICON = 0x000000001;
-    public const int CSIDL_DESKTOP = 0x0000;
-
-    public static void ChangeDesktopIcons()
+    public static void ReversePIP()
     {
         SetProcessDPIAware();
+        int screenWidth = GetSystemMetrics(0);
+        int screenHeight = GetSystemMetrics(1);
 
-        IntPtr desktopFolder;
-        int result = SHGetDesktopFolder(out desktopFolder);
-        if (result != 0)
+        while (true)
         {
-            Console.WriteLine("Failed to get the desktop folder.");
-            return;
-        }
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
 
-        IntPtr desktopPtr;
-        result = SHGetSpecialFolderLocation(IntPtr.Zero, CSIDL_DESKTOP, out desktopPtr);
-        if (result != 0)
-        {
-            Console.WriteLine("Failed to get the desktop special folder location.");
-            return;
-        }
+            // StretchBlt for Reverse PIP
+            //StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 50, 50, screenWidth - 100, screenHeight - 100, 0x00CC0020);
 
-        StringBuilder desktopPath = new StringBuilder(260);
-        result = SHGetPathFromIDList(desktopPtr, desktopPath);
-        if (result != 1)
-        {
-            Console.WriteLine("Failed to get the desktop path.");
-            return;
-        }
+            // BitBlt for Inverting Colors
+            //BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00550009);
 
-        string desktopFolderPath = desktopPath.ToString();
-        EnumerateDesktopItems(desktopFolder, desktopFolderPath);
+            // TransparentBlt for Transparency
+            //TransparentBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, 0xFF0000);
 
-        Marshal.ReleaseComObject(desktopFolder);
-    }
-
-    private static void EnumerateDesktopItems(IntPtr desktopFolder, string desktopFolderPath)
-    {
-        IntPtr enumItems;
-        int result = Shell32.SHCreateShellItemArrayFromShellItem(desktopFolder, ref Shell32.BHID_EnumItems, 0, IntPtr.Zero, out enumItems);
-       
-               if (result != 0)
-        {
-            Console.WriteLine("Failed to create shell item array from desktop folder.");
-            return;
-        }
-
-        IntPtr desktopItem;
-        uint fetchedItems = 0;
-        result = Shell32.IEnumShellItems.Next(enumItems, 1, out desktopItem, out fetchedItems);
-        while (result == 0 && fetchedItems == 1)
-        {
-            IntPtr desktopItemName;
-            result = Shell32.SHGetNameFromIDList(desktopItem, Shell32.SIGDN.SIGDN_NORMALDISPLAY, out desktopItemName);
-            if (result == 0)
-            {
-                string desktopItemPath = Marshal.PtrToStringAuto(desktopItemName);
-                ChangeDesktopItemIcon(desktopItemPath);
-                Marshal.FreeCoTaskMem(desktopItemName);
-            }
-
-            Marshal.ReleaseComObject(desktopItem);
-            result = Shell32.IEnumShellItems.Next(enumItems, 1, out desktopItem, out fetchedItems);
-        }
-
-        Marshal.ReleaseComObject(enumItems);
-    }
-
-    private static void ChangeDesktopItemIcon(string itemPath)
-    {
-        SHFILEINFO shinfo = new SHFILEINFO();
-        uint flags = SHGFI_ICON | SHGFI_SMALLICON;
-
-        IntPtr hIcon = Shell32.SHGetFileInfo(itemPath, 0, out shinfo, (uint)Marshal.SizeOf(shinfo), flags);
-        if (hIcon != IntPtr.Zero)
-        {
-            Icon icon = Icon.FromHandle(shinfo.hIcon);
-
-            // Modify the icon as desired
-            // ...
-
-            // Destroy the original icon handle
-            DestroyIcon(shinfo.hIcon);
-            icon.Dispose();
-
-            // Notify the system of the changes
-            SHChangeNotify(0x8000000, 0x1000, IntPtr.Zero, IntPtr.Zero);
-            SHChangeNotify(0x8000000, 0x0800, IntPtr.Zero, IntPtr.Zero);
+            // BitBlt with Raster Operation (ROP) Code for XOR Effect
+            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00660046);
         }
     }
 }
+"@
 
-public static class Shell32
-{
-    [DllImport("shell32.dll")]
-    public static extern int SHCreateShellItemArrayFromShellItem(IntPtr psi, ref Guid riid, uint flags, IntPtr ppenum);
+Write-Host "Running vibrant ReversePIP effect..."
+Write-Host "Press Ctrl+C to stop."
 
-    [DllImport("shell32.dll")]
-    public static extern int SHGetNameFromIDList(IntPtr pidl, SIGDN sigdnName, out IntPtr ppszName);
-
-    [DllImport("shell32.dll")]
-    public static extern int SHGetFileInfo(string pszPath, uint dwFileAttributes, out SHFILEINFO psfi, uint cbFileInfo, uint uFlags);
-
-    [Flags]
-    public enum SIGDN : uint
-    {
-        SIGDN_NORMALDISPLAY = 0x00000000,
-        SIGDN_PARENTRELATIVEPARSING = 0x80018001,
-        SIGDN_PARENTRELATIVEFORADDRESSBAR = 0x8001c001,
-        SIGDN_DESKTOPABSOLUTEPARSING = 0x80028000,
-        SIGDN_PARENTRELATIVEEDITING = 0x80031001,
-        SIGDN_DESKTOPABSOLUTEEDITING = 0x8004c000,
-        SIGDN_FILESYSPATH = 0x80058000,
-        SIGDN_URL = 0x80068000,
-        SIGDN_PARENTRELATIVEFORUI = 0x80094001,
-    }
-
-    public static readonly Guid BHID_EnumItems = new Guid("{94F60519-2850-4924-AA5A-D15E84868039}");
-
-}
-
-[Win32]::ChangeDesktopIcons()
-
+[Win32]::ReversePIP()
