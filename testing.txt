@@ -35,16 +35,16 @@ public static class Win32
             IntPtr hdc = GetDC(IntPtr.Zero);
 
             // StretchBlt for Reverse PIP (Zoomed In Effect)
-            StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 50, 50, screenWidth - 100, screenHeight - 100, 0x00CC0020);
+            StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 50, 50, screenWidth - 100, screenHeight - 100, 0xCC0020);
 
             // BitBlt for Inverting Colors (Negative Effect)
-            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00550009);
+            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x550009);
 
             // TransparentBlt for Transparency (Fade Effect)
-            TransparentBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, 0x7F0000);
+            TransparentBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, 0x7F000000);
 
             // BitBlt with Raster Operation (ROP) Code for XOR Effect (Flashing Effect)
-            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00990066);
+            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x990066);
         }
     }
 }
