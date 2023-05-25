@@ -5,59 +5,47 @@ using System.Runtime.InteropServices;
 public class Win32Interop
 {
     [DllImport("user32.dll")]
-    public static extern IntPtr GetDesktopWindow();
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
     [DllImport("user32.dll")]
-    public static extern IntPtr GetDC(IntPtr hWnd);
-
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr CreateCompatibleDC(IntPtr hDC);
-
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
-
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
+    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
     [DllImport("user32.dll")]
-    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+    public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
-    [DllImport("gdi32.dll")]
-    public static extern int DeleteDC(IntPtr hdc);
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
 
-    [DllImport("gdi32.dll")]
-    public static extern int DeleteObject(IntPtr hObject);
-
-    public const int SRCCOPY = 0x00CC0020;
+    public const int SW_HIDE = 0;
+    public const int SW_SHOWMAXIMIZED = 3;
+    public static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+    public const uint SWP_SHOWWINDOW = 0x0040;
+    public const uint SWP_FRAMECHANGED = 0x0020;
 }
 "@
 
 function FillScreenWithStatic {
-    $desktopWindow = [Win32Interop]::GetDesktopWindow()
-    $hDC = [Win32Interop]::GetDC($desktopWindow)
-    $compatibleDC = [Win32Interop]::CreateCompatibleDC($hDC)
-
+    $consoleWindow = [System.Diagnostics.Process]::GetCurrentProcess().MainWindowHandle
     $screenWidth = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width
     $screenHeight = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
 
-    $compatibleBitmap = [Win32Interop]::CreateCompatibleBitmap($hDC, $screenWidth, $screenHeight)
-    $compatibleBitmapPtr = [Win32Interop]::SelectObject($compatibleDC, $compatibleBitmap)
-
-    $random = New-Object System.Random
+    $null = [Win32Interop]::ShowWindow($consoleWindow, [Win32Interop]::SW_SHOWMAXIMIZED)
+    $null = [Win32Interop]::SetWindowPos($consoleWindow, [Win32Interop]::HWND_TOPMOST, 0, 0, $screenWidth, $screenHeight, [Win32Interop]::SWP_SHOWWINDOW + [Win32Interop]::SWP_FRAMECHANGED)
 
     while ($true) {
-        $staticRop = [Win32Interop]::SRCCOPY + ($random.Next(1, 255) -band 0x000000FF)
-        [Win32Interop]::BitBlt($hDC, 0, 0, $screenWidth, $screenHeight, $compatibleDC, 0, 0, $staticRop)
+        $null = [Win32Interop]::GetWindowRect($consoleWindow, [ref]$rect)
+        $consoleWidth = $rect.Right - $rect.Left
+        $consoleHeight = $rect.Bottom - $rect.Top
+
+        $staticCmd = "mode con cols=$consoleWidth lines=$consoleHeight | set /p =="
+        Invoke-Expression $staticCmd
     }
-
-    [Win32Interop]::SelectObject($compatibleDC, $compatibleBitmapPtr)
-
-    [Win32Interop]::DeleteObject($compatibleBitmap)
-    [Win32Interop]::DeleteDC($compatibleDC)
-    [Win32Interop]::ReleaseDC($desktopWindow, $hDC)
 }
 
 FillScreenWithStatic
