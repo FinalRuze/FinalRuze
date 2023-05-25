@@ -1,8 +1,9 @@
-$source = @"
+Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Drawing;
+using System.Windows.Forms;
 
 public static class Win32
 {
@@ -33,6 +34,18 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool DeleteObject(IntPtr hObject);
 
+    [DllImport("user32.dll")]
+    static extern bool ReleaseDC(IntPtr hWnd, IntPtr hdc);
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    static extern int GetWindowTextLength(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
+
     public static void CreateStatic()
     {
         SetProcessDPIAware();
@@ -42,7 +55,8 @@ public static class Win32
         while (true)
         {
             Thread.Sleep(800);
-            IntPtr hdc = GetDC(IntPtr.Zero);
+            IntPtr hwnd = GetForegroundWindow();
+            IntPtr hdc = GetDC(hwnd);
             IntPtr hdcMem = CreateCompatibleDC(hdc);
             IntPtr hBitmap = CreateCompatibleBitmap(hdc, cx, cy);
             IntPtr hOld = SelectObject(hdcMem, hBitmap);
@@ -72,10 +86,16 @@ public static class Win32
             SelectObject(hdcMem, hOld);
             DeleteObject(hBitmap);
             DeleteObject(hdcMem);
+            ReleaseDC(hwnd, hdc);
         }
     }
 }
 "@
 
-Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::CreateStatic()
+[System.Windows.Forms.Application]::Run(
+    [System.Windows.Forms.Form]::new(
+        [System.Windows.Forms.MethodInvoker] {
+            [Win32]::CreateStatic()
+        }
+    )
+)
