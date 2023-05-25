@@ -1,4 +1,4 @@
-Add-Type -TypeDefinition @"
+$source = @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -23,34 +23,97 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool TransparentBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint crTransparent);
 
-    public static void ReversePIP()
+    [DllImport("gdi32.dll")]
+    static extern bool GradientFill(IntPtr hdc, IntPtr pVertex, uint dwNumVertex, IntPtr pMesh, uint dwNumMesh, uint dwMode);
+
+    public static void UniquePIP()
     {
         SetProcessDPIAware();
-        int screenWidth = GetSystemMetrics(0);
-        int screenHeight = GetSystemMetrics(1);
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
 
         while (true)
         {
             Thread.Sleep(800);
             IntPtr hdc = GetDC(IntPtr.Zero);
 
-            // StretchBlt for Reverse PIP (Zoomed In Effect)
-            StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 50, 50, screenWidth - 100, screenHeight - 100, 0xCC0020);
+            // StretchBlt with custom effect
+            StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
 
-            // BitBlt for Inverting Colors (Negative Effect)
-            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00550009);
+            // BitBlt with inverted colors effect
+            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
 
-            // TransparentBlt for Transparency (Fade Effect)
-            TransparentBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, 0xFF000000);
+            // TransparentBlt with custom transparency effect
+            TransparentBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0xFF0000);
 
-            // BitBlt with Raster Operation (ROP) Code for XOR Effect (Flashing Effect)
-            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00660046);
+            // BitBlt with XOR effect using a custom Raster Operation (ROP) code
+            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00660046);
+
+            // GradientFill to apply a gradient effect
+            // Define gradient colors (e.g., blue to yellow)
+            uint startColor = 0x0000FF; // Blue
+            uint endColor = 0xFFFF00;   // Yellow
+
+            // Define a rectangle for the gradient fill
+            int rectLeft = cx / 4;
+            int rectTop = cy / 4;
+            int rectRight = cx - (cx / 4);
+            int rectBottom = cy - (cy / 4);
+
+            // Create a vertex array for the gradient fill
+            var vertices = new []
+            {
+                new Win32.TRIVERTEX
+                {
+                    x = rectLeft,
+                    y = rectTop,
+                    Red = (ushort)(startColor & 0xFF),
+                    Green = (ushort)((startColor >> 8) & 0xFF),
+                    Blue = (ushort)((startColor >> 16) & 0xFF),
+                    Alpha = 0x0000
+                },
+                new Win32.TRIVERTEX
+                {
+                    x = rectRight,
+                    y = rectBottom,
+                    Red = (ushort)(endColor & 0xFF),
+                    Green = (ushort)((endColor >> 8) & 0xFF),
+                    Blue = (ushort)((endColor >> 16) & 0xFF),
+                    Alpha = 0x0000
+                }
+            };
+
+            // Create a GRADIENT_RECT structure defining the rectangle
+            var gradientRect = new Win32.GRADIENT_RECT
+            {
+                UpperLeft = 0,
+                LowerRight = 1
+            };
+
+            // Apply the gradient fill to the specified rectangle
+            GradientFill(hdc, vertices, (uint)vertices.Length, ref gradientRect, 1, 0x00000010);
         }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct TRIVERTEX
+    {
+        public int x;
+        public int y;
+        public ushort Red;
+        public ushort Green;
+        public ushort Blue;
+        public ushort Alpha;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct GRADIENT_RECT
+    {
+        public uint UpperLeft;
+        public uint LowerRight;
     }
 }
 "@
 
-Write-Host "Running vibrant ReversePIP effect..."
-Write-Host "Press Ctrl+C to stop."
-
-[Win32]::ReversePIP()
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::UniquePIP()
