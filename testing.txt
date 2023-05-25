@@ -17,28 +17,6 @@ public static class Win32
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
 
-    public static void RotateScreen()
-    {
-        SetProcessDPIAware();
-        int cx = GetSystemMetrics(0);
-        int cy = GetSystemMetrics(1);
-        int angle = 0;
-
-        while (true)
-        {
-            Thread.Sleep(800);
-            IntPtr hdc = GetDC(IntPtr.Zero);
-
-            StretchBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0x00CC0020);
-
-            angle += 10;
-            if (angle >= 360)
-                angle = 0;
-
-            StretchBlt(hdc, 0, 0, cx, cy, hdc, cx / 2, cy / 2, cx / 2, cy / 2, 0x00CC0020 | (angle << 16));
-        }
-    }
-
     public static void MagnifyScreen()
     {
         SetProcessDPIAware();
@@ -53,14 +31,29 @@ public static class Win32
             StretchBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0x00CC0020);
         }
     }
+
+    public static void PixelateScreen()
+    {
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
+
+        while (true)
+        {
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
+
+            StretchBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx / 10, cy / 10, 0x00CC0020);
+        }
+    }
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
 
 # Start the different graphic effects on separate threads
-$rotateScreenTask = Start-Job -ScriptBlock { [Win32]::RotateScreen() }
 $magnifyScreenTask = Start-Job -ScriptBlock { [Win32]::MagnifyScreen() }
+$pixelateScreenTask = Start-Job -ScriptBlock { [Win32]::PixelateScreen() }
 
 # Wait for user input to stop the effects
 Write-Host "Graphic effects are running. Press any key to stop..."
@@ -68,5 +61,5 @@ Write-Host "Graphic effects are running. Press any key to stop..."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 
 # Stop the effects by terminating the threads
-$rotateScreenTask | Stop-Job
 $magnifyScreenTask | Stop-Job
+$pixelateScreenTask | Stop-Job
