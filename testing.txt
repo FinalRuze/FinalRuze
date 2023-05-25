@@ -1,77 +1,39 @@
-Add-Type -TypeDefinition @"
+$source = @"
 using System;
-using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
-
-public static class StaticForm
-{
-    private static Form form;
-    private static Random random = new Random();
-
-    public static void RunStatic()
-    {
-        form = new Form()
-        {
-            Width = Screen.PrimaryScreen.Bounds.Width,
-            Height = Screen.PrimaryScreen.Bounds.Height,
-            FormBorderStyle = FormBorderStyle.None,
-            ShowInTaskbar = false,
-            StartPosition = FormStartPosition.Manual,
-            Location = Screen.PrimaryScreen.Bounds.Location,
-            Opacity = 0.5
-        };
-
-        form.Load += (sender, e) =>
-        {
-            IntPtr desktopDC = Win32.GetDC(IntPtr.Zero);
-            IntPtr memoryDC = Win32.CreateCompatibleDC(desktopDC);
-            IntPtr bitmap = Win32.CreateCompatibleBitmap(desktopDC, form.Width, form.Height);
-            IntPtr oldBitmap = Win32.SelectObject(memoryDC, bitmap);
-
-            while (true)
-            {
-                Win32.BitBlt(memoryDC, 0, 0, form.Width, form.Height, desktopDC, 0, 0, 0x00CC0020 | (random.Next(1, 255) & 0x000000FF));
-                form.Invoke(new Action(form.Refresh));
-                Thread.Sleep(100); // Adjust the delay as desired
-            }
-
-            Win32.SelectObject(memoryDC, oldBitmap);
-            Win32.DeleteObject(bitmap);
-            Win32.DeleteDC(memoryDC);
-            Win32.ReleaseDC(IntPtr.Zero, desktopDC);
-        };
-
-        Application.Run(form);
-    }
-}
 
 public static class Win32
 {
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    public static extern IntPtr GetDC(IntPtr hWnd);
+    [DllImport("user32.dll")]
+    static extern int GetSystemMetrics(int smIndex);
 
-    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-    public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDC(IntPtr hWnd);
 
-    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-    public static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
 
-    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-    public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SetProcessDPIAware();
 
-    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-    public static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
+    public static void ReversePIP()
+    {
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
 
-    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-    public static extern bool DeleteObject(IntPtr hObject);
+        while (true)
+        {
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
 
-    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-    public static extern bool DeleteDC(IntPtr hdc);
-
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hdc);
+            StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
+        }
+    }
 }
 "@
 
-[StaticForm]::RunStatic()
+Add-Type -TypeDefinition $source -Language CSharp
+
+[Win32]::ReversePIP()
