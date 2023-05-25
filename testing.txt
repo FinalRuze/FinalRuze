@@ -1,4 +1,4 @@
-$source = @"
+Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -28,23 +28,22 @@ public static class Win32
             Thread.Sleep(800);
             IntPtr hdc = GetDC(IntPtr.Zero);
 
-            // StretchBlt for Reverse PIP
-            //StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
-
-            // TransparentBlt for Transparency
-            //TransparentBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0xFF0000);
-
             // Custom Graphic Effect: Blur
             int blurRadius = 5;
+            int width = cx - 100;
+            int height = cy - 100;
 
-            for (int x = 0; x < cx - 100; x++)
+            byte[] pixels = new byte[width * height * 4];
+            Marshal.Copy(hdc, pixels, 0, pixels.Length);
+
+            for (int x = 0; x < width; x++)
             {
-                for (int y = 0; y < cy - 100; y++)
+                for (int y = 0; y < height; y++)
                 {
                     int startX = Math.Max(x - blurRadius, 0);
                     int startY = Math.Max(y - blurRadius, 0);
-                    int endX = Math.Min(x + blurRadius, cx - 100);
-                    int endY = Math.Min(y + blurRadius, cy - 100);
+                    int endX = Math.Min(x + blurRadius, width - 1);
+                    int endY = Math.Min(y + blurRadius, height - 1);
 
                     int sumRed = 0;
                     int sumGreen = 0;
@@ -55,33 +54,27 @@ public static class Win32
                     {
                         for (int py = startY; py <= endY; py++)
                         {
-                            int pixelIndex = (px + py * (cx - 100)) * 4;
+                            int pixelIndex = (px + py * width) * 4;
 
-                            byte blue = Marshal.ReadByte(hdc, pixelIndex);
-                            byte green = Marshal.ReadByte(hdc, pixelIndex + 1);
-                            byte red = Marshal.ReadByte(hdc, pixelIndex + 2);
-
-                            sumRed += red;
-                            sumGreen += green;
-                            sumBlue += blue;
+                            sumRed += pixels[pixelIndex + 2];
+                            sumGreen += pixels[pixelIndex + 1];
+                            sumBlue += pixels[pixelIndex];
                             pixelCount++;
                         }
                     }
 
-                    byte averageRed = (byte)(sumRed / pixelCount);
-                    byte averageGreen = (byte)(sumGreen / pixelCount);
-                    byte averageBlue = (byte)(sumBlue / pixelCount);
+                    int destPixelIndex = (x + y * width) * 4;
 
-                    int destPixelIndex = (x + y * (cx - 100)) * 4;
-                    Marshal.WriteByte(hdc, destPixelIndex, averageBlue);
-                    Marshal.WriteByte(hdc, destPixelIndex + 1, averageGreen);
-                    Marshal.WriteByte(hdc, destPixelIndex + 2, averageRed);
+                    pixels[destPixelIndex] = (byte)(sumBlue / pixelCount);
+                    pixels[destPixelIndex + 1] = (byte)(sumGreen / pixelCount);
+                    pixels[destPixelIndex + 2] = (byte)(sumRed / pixelCount);
                 }
             }
+
+            Marshal.Copy(pixels, 0, hdc, pixels.Length);
         }
     }
 }
 "@
 
-Add-Type -TypeDefinition $source -Language CSharp
 [Win32]::ReversePIP()
