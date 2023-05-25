@@ -6,57 +6,117 @@ using System.Threading;
 public static class Win32
 {
     [DllImport("user32.dll")]
-    static extern int GetSystemMetrics(int smIndex);
+    public static extern int GetSystemMetrics(int smIndex);
 
     [DllImport("user32.dll")]
-    static extern IntPtr GetDC(IntPtr hWnd);
-
-    [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+    public static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("user32.dll", SetLastError = true)]
-    static extern bool SetProcessDPIAware();
+    public static extern bool SetProcessDPIAware();
 
-    [DllImport("gdi32.dll")]
-    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetShellWindow();
 
-    [DllImport("gdi32.dll")]
-    static extern bool TransparentBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint crTransparent);
+    [DllImport("user32.dll")]
+    public static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
 
-    [DllImport("gdi32.dll")]
-    static extern int SetROP2(IntPtr hdc, int fnDrawMode);
+    [DllImport("user32.dll")]
+    public static extern bool SetWindowText(IntPtr hWnd, string lpString);
 
-    [DllImport("gdi32.dll")]
-    static extern int GetROP2(IntPtr hdc);
+    [DllImport("user32.dll")]
+    public static extern bool SystemParametersInfo(int uiAction, int uiParam, string pvParam, int fWinIni);
 
-    public static void ReversePIP()
+    [DllImport("user32.dll")]
+    public static extern bool SetSystemCursor(IntPtr hCursor, uint id);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr LoadCursor(IntPtr hInstance, int lpCursorName);
+
+    [DllImport("user32.dll")]
+    public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+    [DllImport("user32.dll")]
+    public static extern bool IsWindowVisible(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern int GetClassName(IntPtr hWnd, System.Text.StringBuilder lpClassName, int nMaxCount);
+
+    [DllImport("user32.dll")]
+    public static extern bool SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+    [DllImport("user32.dll")]
+    public static extern bool RedrawWindow(IntPtr hWnd, IntPtr lprcUpdate, IntPtr hrgnUpdate, uint flags);
+
+    [DllImport("shell32.dll")]
+    public static extern IntPtr ExtractAssociatedIcon(IntPtr hInst, string lpIconPath, out ushort lpiIcon);
+
+    [DllImport("shell32.dll")]
+    public static extern int SHChangeNotify(int eventId, uint flags, IntPtr item1, IntPtr item2);
+
+    public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+    public static void ChangeAppAndFileIcon()
     {
         SetProcessDPIAware();
-        int cx = GetSystemMetrics(0);
-        int cy = GetSystemMetrics(1);
 
-        while (true)
+        // Change icon of apps and files
+        const string filePath = "C:\\Path\\To\\File.exe";
+        ushort iconIndex;
+        IntPtr hIcon = ExtractAssociatedIcon(IntPtr.Zero, filePath, out iconIndex);
+        SHChangeNotify(0x8000000, 0x1000, IntPtr.Zero, IntPtr.Zero);
+        SHChangeNotify(0x8000000, 0x0800, IntPtr.Zero, IntPtr.Zero);
+
+        // Change cursor
+        IntPtr hCursor = LoadCursor(IntPtr.Zero, 32512);
+        SetSystemCursor(hCursor, 32512);
+
+        // Modify open window appearance
+        EnumWindows((hWnd, lParam) =>
         {
-            Thread.Sleep(800);
-            IntPtr hdc = GetDC(IntPtr.Zero);
+            if (IsWindowVisible(hWnd))
+            {
+                System.Text.StringBuilder classNameBuilder = new System.Text.StringBuilder(256);
+                GetClassName(hWnd, classNameBuilder, classNameBuilder.Capacity);
+                string className = classNameBuilder.ToString();
 
-            // StretchBlt for Reverse PIP
-            //StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
+                // Modify window title
+                System.Text.StringBuilder windowTitleBuilder = new System.Text.StringBuilder(256);
+                GetWindowText(hWnd, windowTitleBuilder, windowTitleBuilder.Capacity);
+                string windowTitle = windowTitleBuilder.ToString();
 
-            // BitBlt for Inverting Colors
-            //BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
+                // Update window title
+                SetWindowText(hWnd, "Modified Title");
 
-            // TransparentBlt for Transparency
-            //TransparentBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0xFF0000);
+                // Modify window style to remove title bar
+                const int GWL_STYLE = -16;
+                const int WS_CAPTION = 0x00C00000;
+                const int WS_SYSMENU = 0x00080000;
+                const int WS_MINIMIZEBOX = 0x00020000;
+                const int WS_MAXIMIZEBOX = 0x00010000;
+                const int WS_BORDER = 0x00800000;
 
-            // SetROP2 and BitBlt for XOR Effect
-            int prevROP2 = GetROP2(hdc);
-            SetROP2(hdc, 0x00660046);
-            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00CC0020);
-            SetROP2(hdc, prevROP2);
-        }
+                int windowStyle = (int)GetWindowLong(hWnd, GWL_STYLE);
+                windowStyle &= ~(WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_BORDER);
+                SetWindowLong(hWnd, GWL_STYLE, windowStyle);
+
+                // Redraw the window to reflect the changes
+                RedrawWindow(hWnd, IntPtr.Zero, IntPtr.Zero, 0x0400);
+
+                // Perform other modifications or effects on the open window as needed
+
+                // Return true to continue enumerating windows
+                return true;
+            }
+
+            // Return false to stop enumerating windows
+            return false;
+        }, IntPtr.Zero);
+
+        // Wait indefinitely to keep the script running
+        Thread.Sleep(Timeout.Infinite);
     }
 }
 "@
 
-[Win32]::ReversePIP()
+[Win32]::ChangeAppAndFileIcon()
+
