@@ -34,39 +34,48 @@ public static class Win32
             // TransparentBlt for Transparency
             //TransparentBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0xFF0000);
 
-            // BitBlt with Raster Operation (ROP) Code for XOR Effect
-            //BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00660046);
+            // Custom Graphic Effect: Blur
+            int blurRadius = 5;
 
-            // Custom Graphic Effect: Pixelate
-            int pixelSize = 10;
-
-            for (int x = 0; x < cx - 100; x += pixelSize)
+            for (int x = 0; x < cx - 100; x++)
             {
-                for (int y = 0; y < cy - 100; y += pixelSize)
+                for (int y = 0; y < cy - 100; y++)
                 {
-                    int startX = x;
-                    int startY = y;
-                    int endX = Math.Min(x + pixelSize, cx - 100);
-                    int endY = Math.Min(y + pixelSize, cy - 100);
+                    int startX = Math.Max(x - blurRadius, 0);
+                    int startY = Math.Max(y - blurRadius, 0);
+                    int endX = Math.Min(x + blurRadius, cx - 100);
+                    int endY = Math.Min(y + blurRadius, cy - 100);
 
-                    for (int px = startX; px < endX; px++)
+                    int sumRed = 0;
+                    int sumGreen = 0;
+                    int sumBlue = 0;
+                    int pixelCount = 0;
+
+                    for (int px = startX; px <= endX; px++)
                     {
-                        for (int py = startY; py < endY; py++)
+                        for (int py = startY; py <= endY; py++)
                         {
-                            int srcPixelIndex = (px + py * (cx - 100)) * 4;
-                            int destPixelIndex = (x + y * (cx - 100)) * 4;
+                            int pixelIndex = (px + py * (cx - 100)) * 4;
 
-                            byte blue = Marshal.ReadByte(hdc, srcPixelIndex);
-                            byte green = Marshal.ReadByte(hdc, srcPixelIndex + 1);
-                            byte red = Marshal.ReadByte(hdc, srcPixelIndex + 2);
-                            byte alpha = Marshal.ReadByte(hdc, srcPixelIndex + 3);
+                            byte blue = Marshal.ReadByte(hdc, pixelIndex);
+                            byte green = Marshal.ReadByte(hdc, pixelIndex + 1);
+                            byte red = Marshal.ReadByte(hdc, pixelIndex + 2);
 
-                            Marshal.WriteByte(hdc, destPixelIndex, blue);
-                            Marshal.WriteByte(hdc, destPixelIndex + 1, green);
-                            Marshal.WriteByte(hdc, destPixelIndex + 2, red);
-                            Marshal.WriteByte(hdc, destPixelIndex + 3, alpha);
+                            sumRed += red;
+                            sumGreen += green;
+                            sumBlue += blue;
+                            pixelCount++;
                         }
                     }
+
+                    byte averageRed = (byte)(sumRed / pixelCount);
+                    byte averageGreen = (byte)(sumGreen / pixelCount);
+                    byte averageBlue = (byte)(sumBlue / pixelCount);
+
+                    int destPixelIndex = (x + y * (cx - 100)) * 4;
+                    Marshal.WriteByte(hdc, destPixelIndex, averageBlue);
+                    Marshal.WriteByte(hdc, destPixelIndex + 1, averageGreen);
+                    Marshal.WriteByte(hdc, destPixelIndex + 2, averageRed);
                 }
             }
         }
