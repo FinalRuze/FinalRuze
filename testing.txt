@@ -26,6 +26,12 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
+    [DllImport("gdi32.dll")]
+    static extern bool Ellipse(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
+    [DllImport("gdi32.dll")]
+    static extern bool GradientFill(IntPtr hdc, IntPtr pVertex, uint dwNumVertex, IntPtr pMesh, uint dwNumMesh, uint dwMode);
+
     public static void ReversePIP()
     {
         SetProcessDPIAware();
@@ -51,10 +57,41 @@ public static class Win32
             IntPtr oldPen2 = SelectObject(hdc, bluePen);
             Rectangle(hdc, 200, 200, cx - 200, cy - 200);
             SelectObject(hdc, oldPen2);
-        }
+
+            // Additional effect 3 - Circular gradient pattern
+            IntPtr vertexBuffer = Marshal.AllocHGlobal(4 * 2); // 4 bytes per vertex, 2 vertices
+            IntPtr meshBuffer = Marshal.AllocHGlobal(2); // 2 bytes for the mesh
+
+            // Define vertex colors
+            byte red = 0xFF;
+            byte green = 0x00;
+            byte blue = 0xFF;
+
+            // Define vertex positions
+            int centerX = cx / 2;
+            int centerY = cy / 2;
+            int radius = Math.Min(cx, cy) / 2 - 100; // Adjust the radius as needed
+
+            // Set vertex positions and colors
+            Marshal.WriteByte(vertexBuffer, 0, red);
+            Marshal.WriteByte(vertexBuffer, 1, green);
+Marshal.WriteByte(vertexBuffer, 2, blue);
+Marshal.WriteByte(vertexBuffer, 3, red);
+Marshal.WriteByte(vertexBuffer, 4, green);
+Marshal.WriteByte(vertexBuffer, 5, blue);
+
+        // Set mesh value
+        Marshal.WriteByte(meshBuffer, 0, 0);
+
+        // Perform gradient fill
+        GradientFill(hdc, vertexBuffer, 2, meshBuffer, 1, 0x00000000);
+
+        // Clean up allocated memory
+        Marshal.FreeHGlobal(vertexBuffer);
+        Marshal.FreeHGlobal(meshBuffer);
     }
+  }
 }
 "@
 Add-Type -TypeDefinition $source -Language CSharp
 [Win32]::ReversePIP()
-
