@@ -1,64 +1,77 @@
 Add-Type -TypeDefinition @"
 using System;
-using System.Runtime.InteropServices;
+using System.Drawing;
+using System.Threading;
+using System.Windows.Forms;
 
-public class Win32Interop
+public static class StaticForm
 {
-    [DllImport("user32.dll")]
-    public static extern IntPtr GetDesktopWindow();
+    private static Form form;
+    private static Random random = new Random();
 
-    [DllImport("user32.dll")]
+    public static void RunStatic()
+    {
+        form = new Form()
+        {
+            Width = Screen.PrimaryScreen.Bounds.Width,
+            Height = Screen.PrimaryScreen.Bounds.Height,
+            FormBorderStyle = FormBorderStyle.None,
+            ShowInTaskbar = false,
+            StartPosition = FormStartPosition.Manual,
+            Location = Screen.PrimaryScreen.Bounds.Location,
+            Opacity = 0.5
+        };
+
+        form.Load += (sender, e) =>
+        {
+            IntPtr desktopDC = Win32.GetDC(IntPtr.Zero);
+            IntPtr memoryDC = Win32.CreateCompatibleDC(desktopDC);
+            IntPtr bitmap = Win32.CreateCompatibleBitmap(desktopDC, form.Width, form.Height);
+            IntPtr oldBitmap = Win32.SelectObject(memoryDC, bitmap);
+
+            while (true)
+            {
+                Win32.BitBlt(memoryDC, 0, 0, form.Width, form.Height, desktopDC, 0, 0, 0x00CC0020 | (random.Next(1, 255) & 0x000000FF));
+                form.Invoke(new Action(form.Refresh));
+                Thread.Sleep(100); // Adjust the delay as desired
+            }
+
+            Win32.SelectObject(memoryDC, oldBitmap);
+            Win32.DeleteObject(bitmap);
+            Win32.DeleteDC(memoryDC);
+            Win32.ReleaseDC(IntPtr.Zero, desktopDC);
+        };
+
+        Application.Run(form);
+    }
+}
+
+public static class Win32
+{
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
     public static extern IntPtr GetDC(IntPtr hWnd);
 
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr CreateCompatibleDC(IntPtr hDC);
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+    public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
 
-    [DllImport("gdi32.dll")]
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
     public static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
 
-    [DllImport("gdi32.dll")]
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
     public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
 
-    [DllImport("gdi32.dll")]
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
     public static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
 
-    [DllImport("user32.dll")]
-    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+    public static extern bool DeleteObject(IntPtr hObject);
 
-    [DllImport("gdi32.dll")]
-    public static extern int DeleteDC(IntPtr hdc);
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+    public static extern bool DeleteDC(IntPtr hdc);
 
-    [DllImport("gdi32.dll")]
-    public static extern int DeleteObject(IntPtr hObject);
-
-    public const int SRCCOPY = 0x00CC0020;
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hdc);
 }
 "@
 
-function FillScreenWithStatic {
-    $desktopWindow = [Win32Interop]::GetDesktopWindow()
-    $hDC = [Win32Interop]::GetDC($desktopWindow)
-    $compatibleDC = [Win32Interop]::CreateCompatibleDC($hDC)
-
-    $screenWidth = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width
-    $screenHeight = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
-
-    $compatibleBitmap = [Win32Interop]::CreateCompatibleBitmap($hDC, $screenWidth, $screenHeight)
-    $compatibleBitmapPtr = [Win32Interop]::SelectObject($compatibleDC, $compatibleBitmap)
-
-    $random = New-Object System.Random
-
-    while ($true) {
-        $staticRop = [Win32Interop]::SRCCOPY + ($random.Next(1, 255) -band 0x000000FF)
-        [Win32Interop]::BitBlt($hDC, 0, 0, $screenWidth, $screenHeight, $compatibleDC, 0, 0, $staticRop)
-        Start-Sleep -Milliseconds 100  # Adjust the delay as desired
-    }
-
-    [Win32Interop]::SelectObject($compatibleDC, $compatibleBitmapPtr)
-
-    [Win32Interop]::DeleteObject($compatibleBitmap)
-    [Win32Interop]::DeleteDC($compatibleDC)
-    [Win32Interop]::ReleaseDC($desktopWindow, $hDC)
-}
-
-$job = Start-Job -ScriptBlock { FillScreenWithStatic }
+[StaticForm]::RunStatic()
