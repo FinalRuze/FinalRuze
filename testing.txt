@@ -12,7 +12,7 @@ public static class Win32
     static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
@@ -37,7 +37,7 @@ public static class Win32
                 int width = random.Next(10, 100);
                 int height = random.Next(10, 100);
 
-                StretchBlt(hdc, x, y, width, height, hdc, x, y, width, height, 0x00CC0020);
+                PatBlt(hdc, x, y, width, height, 0xD3D5819A);
             }
         }
     }
