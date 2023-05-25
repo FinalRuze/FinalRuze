@@ -25,7 +25,6 @@ public static class Win32
 
         while (true)
         {
-            Thread.Sleep(800);
             IntPtr hdc = GetDC(IntPtr.Zero);
 
             // Custom Graphic Effect: Blur
@@ -72,9 +71,17 @@ public static class Win32
             }
 
             Marshal.Copy(pixels, 0, hdc, pixels.Length);
+            Thread.Sleep(800);
         }
     }
 }
 "@
 
-[Win32]::ReversePIP()
+$thread = [System.Threading.Thread]::new([Win32], "ReversePIP")
+$thread.IsBackground = $true
+$thread.Start()
+
+# Optionally, you can wait for a key press to stop the script.
+# Write-Host "Press any key to stop..."
+# $null = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
+# $thread.Abort()
