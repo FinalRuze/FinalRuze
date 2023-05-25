@@ -61,7 +61,23 @@ public static class Win32
 
             ShowWindow(consoleWindow, SW_SHOW);
             SetForegroundWindow(consoleWindow);
+
+            // Unique feature: Display custom ASCII art
+            DisplayCustomArt();
         }
+    }
+
+    private static void DisplayCustomArt()
+    {
+        Console.WriteLine();
+        Console.WriteLine("***********************************************");
+        Console.WriteLine("*                                             *");
+        Console.WriteLine("*         Welcome to the Unique PIP!           *");
+        Console.WriteLine("*                                             *");
+        Console.WriteLine("*     This is a never-before-seen version.     *");
+        Console.WriteLine("*                                             *");
+        Console.WriteLine("***********************************************");
+        Console.WriteLine();
     }
 }
 "@
