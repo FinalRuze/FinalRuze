@@ -226,5 +226,7 @@ public static class Win32
     }
 }
 
-
+"@ 
+Add-Type -TypeDefinition $source -Language CSharp
+ [Win32]::draw()
 
