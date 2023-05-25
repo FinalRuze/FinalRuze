@@ -31,35 +31,48 @@ public static class Win32
             StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
         }
     }
-}
 
-public static class Win32Effects
-{
-    [DllImport("user32.dll")]
-    static extern bool LockWorkStation();
-
-    [DllImport("user32.dll")]
-    static extern bool SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-
-    [DllImport("user32.dll")]
-    static extern bool ExitWindowsEx(uint uFlags, uint dwReason);
-
-    public static void BlurScreen()
+    public static void MagnifyScreen()
     {
-        SendMessage(IntPtr.Zero, 0x0419, IntPtr.Zero, IntPtr.Zero);
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
+
+        while (true)
+        {
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
+
+            StretchBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0x00CC0020);
+        }
     }
 
-    public static void LockScreen()
+    public static void InvertColors()
     {
-        LockWorkStation();
-    }
+        while (true)
+        {
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
 
-    public static void Shutdown()
-    {
-        ExitWindowsEx(0x00000008, 0);
+            StretchBlt(hdc, 0, 0, GetSystemMetrics(0), GetSystemMetrics(1), hdc, 0, 0, 0, 0, 0x00220326);
+        }
     }
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::ReversePIP()
+
+# Start the different graphic effects on separate threads
+$reversePIPTask = Start-Job -ScriptBlock { [Win32]::ReversePIP() }
+$magnifyScreenTask = Start-Job -ScriptBlock { [Win32]::MagnifyScreen() }
+$invertColorsTask = Start-Job -ScriptBlock { [Win32]::InvertColors() }
+
+# Wait for user input to stop the effects
+Write-Host "Graphic effects are running. Press any key to stop..."
+
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+
+# Stop the effects by terminating the threads
+$reversePIPTask | Stop-Job
+$magnifyScreenTask | Stop-Job
+$invertColorsTask | Stop-Job
