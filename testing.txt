@@ -1,75 +1,32 @@
-Add-Type -TypeDefinition @"
-using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
+Add-Type -AssemblyName System.Windows.Forms
 
-public static class Win32Interop
-{
-    [DllImport("kernel32.dll")]
-    public static extern IntPtr GetConsoleWindow();
+$Form = New-Object System.Windows.Forms.Form
+$Form.Size = New-Object System.Drawing.Size(500, 500)
+$Form.StartPosition = "CenterScreen"
 
-    [DllImport("user32.dll")]
-    public static extern IntPtr GetDC(IntPtr hWnd);
+$Line = New-Object System.Windows.Forms.Label
+$Line.BackColor = "Black"
+$Line.AutoSize = $true
+$Form.Controls.Add($Line)
 
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+$timer = New-Object System.Windows.Forms.Timer
+$timer.Interval = 10
 
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
+$timer.Add_Tick({
+    $currentPosition = $Line.Location
+    $newPosition = $currentPosition + GetRandomDirection
 
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
+    $Line.Location = $newPosition
+})
 
-    [DllImport("gdi32.dll")]
-    public static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
+Function GetRandomDirection {
+    $random = New-Object System.Random
+    $angle = $random.NextDouble() * 360
+    $x = [Math]::Cos($angle * [Math]::PI / 180)
+    $y = [Math]::Sin($angle * [Math]::PI / 180)
 
-    [DllImport("user32.dll")]
-    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
-
-    [DllImport("gdi32.dll")]
-    public static extern int DeleteDC(IntPtr hdc);
-
-    [DllImport("gdi32.dll")]
-    public static extern int DeleteObject(IntPtr hObject);
-
-    public const int SRCCOPY = 0x00CC0020;
+    return New-Object System.Drawing.PointF($x, $y)
 }
 
-public static class StaticScreen
-{
-    private static Process currentProcess;
-    private static IntPtr consoleWindow;
-
-    public static void FillScreenWithStatic()
-    {
-        consoleWindow = Win32Interop.GetConsoleWindow();
-
-        currentProcess = Process.GetCurrentProcess();
-        currentProcess.PriorityClass = ProcessPriorityClass.RealTime;
-
-        IntPtr hdc = Win32Interop.GetDC(consoleWindow);
-        IntPtr compatibleDC = Win32Interop.CreateCompatibleDC(hdc);
-
-        int screenWidth = Console.WindowWidth;
-        int screenHeight = Console.WindowHeight;
-
-        IntPtr compatibleBitmap = Win32Interop.CreateCompatibleBitmap(hdc, screenWidth, screenHeight);
-        IntPtr oldBitmap = Win32Interop.SelectObject(compatibleDC, compatibleBitmap);
-
-        Random random = new Random();
-
-        while (true)
-        {
-            Win32Interop.BitBlt(hdc, 0, 0, screenWidth, screenHeight, compatibleDC, 0, 0, Win32Interop.SRCCOPY + (random.Next(1, 255) & 0x000000FF));
-        }
-
-        Win32Interop.SelectObject(compatibleDC, oldBitmap);
-
-        Win32Interop.DeleteObject(compatibleBitmap);
-        Win32Interop.DeleteDC(compatibleDC);
-        Win32Interop.ReleaseDC(consoleWindow, hdc);
-    }
-}
-"@
-
-[StaticScreen]::FillScreenWithStatic()
+$timer.Start()
+$Form.ShowDialog()
