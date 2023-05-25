@@ -1,117 +1,65 @@
-Add-Type -TypeDefinition @"
+$source = @"
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 
-public class WallpaperEffects
-{
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
-
-    public static void SetDesktopWallpaper(string wallpaperPath)
-    {
-        SystemParametersInfo(0x14, 0, wallpaperPath, 0x01 | 0x02);
-    }
-
-    public static void SetTransparency(int transparencyLevel)
-    {
-        const int LWA_ALPHA = 0x2;
-        const int LWA_COLORKEY = 0x1;
-        const int WS_EX_LAYERED = 0x80000;
-
-        IntPtr hWnd = GetDesktopWindow();
-        SetWindowLong(hWnd, -20, WS_EX_LAYERED);
-        SetLayeredWindowAttributes(hWnd, 0, (byte)(255 * transparencyLevel / 100), LWA_ALPHA);
-    }
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr GetDesktopWindow();
-
-    [DllImport("user32.dll")]
-    private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-
-    [DllImport("user32.dll")]
-    private static extern bool SetLayeredWindowAttributes(IntPtr hWnd, uint crKey, byte alpha, uint dwFlags);
-}
-"@
-
-# Set desktop wallpaper
-$wallpaperPath = "C:\Path\To\Your\Wallpaper.jpg"
-WallpaperEffects::SetDesktopWallpaper($wallpaperPath)
-
-# Set transparency (50%)
-$transparencyLevel = 50
-WallpaperEffects::SetTransparency($transparencyLevel)
-
-# Apply blur effect
-Add-Type -TypeDefinition @"
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-
-public class WallpaperEffects
+public static class Win32
 {
     [DllImport("user32.dll")]
-    private static extern IntPtr GetDesktopWindow();
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr GetWindowDC(IntPtr window);
+    static extern int GetSystemMetrics(int smIndex);
 
     [DllImport("user32.dll")]
-    private static extern int ReleaseDC(IntPtr window, IntPtr dc);
+    static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    private static extern int BitBlt(IntPtr destDC, int destX, int destY, int width, int height, IntPtr srcDC, int srcX, int srcY, RasterOperations rop);
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
 
-    [Flags]
-    public enum RasterOperations : uint
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SetProcessDPIAware();
+
+    public static void ReversePIP()
     {
-        SRCCOPY = 0x00CC0020,
-        CAPTUREBLT = 0x40000000
-    }
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
 
-    public static void ApplyBlurEffect()
-    {
-        IntPtr hWnd = GetDesktopWindow();
-        IntPtr hDC = GetWindowDC(hWnd);
-
-        Rectangle bounds = GetScreenBounds();
-
-        using (Bitmap bmp = new Bitmap(bounds.Width, bounds.Height))
+        while (true)
         {
-            using (Graphics g = Graphics.FromImage(bmp))
-            {
-                IntPtr hMemDC = g.GetHdc();
-                BitBlt(hMemDC, 0, 0, bmp.Width, bmp.Height, hDC, bounds.Left, bounds.Top, RasterOperations.SRCCOPY);
-                g.ReleaseHdc(hMemDC);
-            }
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
 
-            using (Graphics g = Graphics.FromHwnd(hWnd))
-            {
-                using (TextureBrush brush = new TextureBrush(bmp))
-                {
-                    brush.TranslateTransform(-bounds.Left, -bounds.Top);
-                    g.FillRectangle(brush, bounds);
-                }
-            }
+            StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
         }
-
-        ReleaseDC(hWnd, hDC);
     }
+}
 
-    private static Rectangle GetScreenBounds()
+public static class Win32Effects
+{
+    [DllImport("user32.dll")]
+    static extern bool LockWorkStation();
+
+    [DllImport("user32.dll")]
+    static extern bool SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+    [DllImport("user32.dll")]
+    static extern bool ExitWindowsEx(uint uFlags, uint dwReason);
+
+    public static void BlurScreen()
     {
-        Rectangle bounds = Rectangle.Empty
-{
-foreach (Screen screen in Screen.AllScreens)
-{
-bounds = Rectangle.Union(bounds, screen.Bounds);
-}
-        return bounds;
+        SendMessage(IntPtr.Zero, 0x0419, IntPtr.Zero, IntPtr.Zero);
     }
-}
+
+    public static void LockScreen()
+    {
+        LockWorkStation();
+    }
+
+    public static void Shutdown()
+    {
+        ExitWindowsEx(0x00000008, 0);
+    }
 }
 "@
 
-Apply blur effect
-WallpaperEffects::ApplyBlurEffect()
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::ReversePIP()
