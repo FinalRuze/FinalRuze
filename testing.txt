@@ -34,17 +34,17 @@ public static class Win32
             Thread.Sleep(800);
             IntPtr hdc = GetDC(IntPtr.Zero);
 
-            // StretchBlt for Reverse PIP
-            //StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 50, 50, screenWidth - 100, screenHeight - 100, 0x00CC0020);
+            // StretchBlt for Reverse PIP (Zoomed In Effect)
+            StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 50, 50, screenWidth - 100, screenHeight - 100, 0x00CC0020);
 
-            // BitBlt for Inverting Colors
-            //BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00550009);
+            // BitBlt for Inverting Colors (Negative Effect)
+            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00550009);
 
-            // TransparentBlt for Transparency
-            //TransparentBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, 0xFF0000);
+            // TransparentBlt for Transparency (Fade Effect)
+            TransparentBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, 0x7F0000);
 
-            // BitBlt with Raster Operation (ROP) Code for XOR Effect
-            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00660046);
+            // BitBlt with Raster Operation (ROP) Code for XOR Effect (Flashing Effect)
+            BitBlt(hdc, 0, 0, screenWidth, screenHeight, hdc, 0, 0, 0x00990066);
         }
     }
 }
