@@ -1,19 +1,1 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-class RandomLine
-{
-    static void Main()
-    {
-        Console.CursorVisible = false;
-        Random random = new Random();
-
-        while (true)
-        {
-            Console.SetCursorPosition(random.Next(Console.WindowWidth), random.Next(Console.WindowHeight));
-            Console.Write("*");
-            Thread.Sleep(100);
-        }
-    }
-}
