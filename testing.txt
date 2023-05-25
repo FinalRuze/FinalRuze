@@ -12,7 +12,7 @@ public static class Win32
     static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
@@ -23,33 +23,25 @@ public static class Win32
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
 
+        Random random = new Random();
+
         while (true)
         {
             Thread.Sleep(800);
             IntPtr hdc = GetDC(IntPtr.Zero);
 
-            Random random = new Random();
-            byte[] buffer = new byte[cx * cy * 4];
-            random.NextBytes(buffer);
-
-            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-            IntPtr ptr = handle.AddrOfPinnedObject();
-
-            using (var bitmap = new System.Drawing.Bitmap(cx, cy, cx * 4, System.Drawing.Imaging.PixelFormat.Format32bppRgb, ptr))
+            for (int i = 0; i < 100; i++)
             {
-                using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
-                {
-                    graphics.CopyFromScreen(0, 0, 0, 0, new System.Drawing.Size(cx, cy));
-                }
+                int x = random.Next(cx);
+                int y = random.Next(cy);
+                int width = random.Next(10, 100);
+                int height = random.Next(10, 100);
+
+                StretchBlt(hdc, x, y, width, height, hdc, x, y, width, height, 0x00CC0020);
             }
-
-            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00CC0020);
-
-            handle.Free();
         }
     }
 }
 "@
-
 Add-Type -TypeDefinition $source -Language CSharp
 [Win32]::CreateStatic()
