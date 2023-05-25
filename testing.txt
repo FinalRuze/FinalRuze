@@ -1,1 +1,60 @@
+$source = @"
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+public static class Win32
+{
+    [DllImport("user32.dll")]
+    static extern int GetSystemMetrics(int smIndex);
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SetProcessDPIAware();
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreatePen(int fnPenStyle, int nWidth, uint crColor);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+    [DllImport("gdi32.dll")]
+    static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
+    public static void ReversePIP()
+    {
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
+
+        while (true)
+        {
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
+
+            // Original effect - StretchBlt
+            StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
+
+            // Additional effect 1 - Drawing a red rectangle
+            IntPtr redPen = CreatePen(0, 5, 0xFF0000); // Red color pen
+            IntPtr oldPen = SelectObject(hdc, redPen);
+            Rectangle(hdc, 100, 100, cx - 100, cy - 100);
+            SelectObject(hdc, oldPen);
+
+            // Additional effect 2 - Drawing a blue rectangle
+            IntPtr bluePen = CreatePen(0, 5, 0x0000FF); // Blue color pen
+            IntPtr oldPen2 = SelectObject(hdc, bluePen);
+            Rectangle(hdc, 200, 200, cx - 200, cy - 200);
+            SelectObject(hdc, oldPen2);
+        }
+    }
+}
+"@
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::ReversePIP()
 
