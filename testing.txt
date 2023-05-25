@@ -1,39 +1,75 @@
-$source = @"
+Add-Type -TypeDefinition @"
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading;
 
-public static class Win32
+public static class Win32Interop
 {
-    [DllImport("user32.dll")]
-    static extern int GetSystemMetrics(int smIndex);
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr GetConsoleWindow();
 
     [DllImport("user32.dll")]
-    static extern IntPtr GetDC(IntPtr hWnd);
+    public static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+    public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
 
-    [DllImport("user32.dll", SetLastError = true)]
-    static extern bool SetProcessDPIAware();
+    [DllImport("gdi32.dll")]
+    public static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
 
-    public static void ReversePIP()
+    [DllImport("gdi32.dll")]
+    public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
+
+    [DllImport("gdi32.dll")]
+    public static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
+
+    [DllImport("user32.dll")]
+    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+    [DllImport("gdi32.dll")]
+    public static extern int DeleteDC(IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    public static extern int DeleteObject(IntPtr hObject);
+
+    public const int SRCCOPY = 0x00CC0020;
+}
+
+public static class StaticScreen
+{
+    private static Process currentProcess;
+    private static IntPtr consoleWindow;
+
+    public static void FillScreenWithStatic()
     {
-        SetProcessDPIAware();
-        int cx = GetSystemMetrics(0);
-        int cy = GetSystemMetrics(1);
+        consoleWindow = Win32Interop.GetConsoleWindow();
+
+        currentProcess = Process.GetCurrentProcess();
+        currentProcess.PriorityClass = ProcessPriorityClass.RealTime;
+
+        IntPtr hdc = Win32Interop.GetDC(consoleWindow);
+        IntPtr compatibleDC = Win32Interop.CreateCompatibleDC(hdc);
+
+        int screenWidth = Console.WindowWidth;
+        int screenHeight = Console.WindowHeight;
+
+        IntPtr compatibleBitmap = Win32Interop.CreateCompatibleBitmap(hdc, screenWidth, screenHeight);
+        IntPtr oldBitmap = Win32Interop.SelectObject(compatibleDC, compatibleBitmap);
+
+        Random random = new Random();
 
         while (true)
         {
-            Thread.Sleep(800);
-            IntPtr hdc = GetDC(IntPtr.Zero);
-
-            StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
+            Win32Interop.BitBlt(hdc, 0, 0, screenWidth, screenHeight, compatibleDC, 0, 0, Win32Interop.SRCCOPY + (random.Next(1, 255) & 0x000000FF));
         }
+
+        Win32Interop.SelectObject(compatibleDC, oldBitmap);
+
+        Win32Interop.DeleteObject(compatibleBitmap);
+        Win32Interop.DeleteDC(compatibleDC);
+        Win32Interop.ReleaseDC(consoleWindow, hdc);
     }
 }
 "@
 
-Add-Type -TypeDefinition $source -Language CSharp
-
-[Win32]::ReversePIP()
+[StaticScreen]::FillScreenWithStatic()
