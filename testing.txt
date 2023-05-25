@@ -2,6 +2,7 @@ $source = @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Drawing;
 
 public static class Win32
 {
@@ -46,22 +47,24 @@ public static class Win32
             IntPtr hBitmap = CreateCompatibleBitmap(hdc, cx, cy);
             IntPtr hOld = SelectObject(hdcMem, hBitmap);
 
-            Graphics g = Graphics.FromHdc(hdcMem);
-            g.Clear(Color.Black);
-
-            Random random = new Random();
-            int numStatic = 2000;
-            for (int i = 0; i < numStatic; i++)
+            using (Graphics g = Graphics.FromHdc(hdcMem))
             {
-                int x = random.Next(0, cx);
-                int y = random.Next(0, cy);
-                int width = random.Next(1, 4);
-                int height = random.Next(1, 4);
-                int r = random.Next(0, 256);
-                int g = random.Next(0, 256);
-                int b = random.Next(0, 256);
-                Color color = Color.FromArgb(r, g, b);
-                g.FillRectangle(new SolidBrush(color), x, y, width, height);
+                g.Clear(Color.Black);
+
+                Random random = new Random();
+                int numStatic = 2000;
+                for (int i = 0; i < numStatic; i++)
+                {
+                    int x = random.Next(0, cx);
+                    int y = random.Next(0, cy);
+                    int width = random.Next(1, 4);
+                    int height = random.Next(1, 4);
+                    int r = random.Next(0, 256);
+                    int g = random.Next(0, 256);
+                    int b = random.Next(0, 256);
+                    Color color = Color.FromArgb(r, g, b);
+                    g.FillRectangle(new SolidBrush(color), x, y, width, height);
+                }
             }
 
             BitBlt(hdc, 0, 0, cx, cy, hdcMem, 0, 0, 0x00CC0020);
