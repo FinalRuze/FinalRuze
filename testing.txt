@@ -17,12 +17,6 @@ public static class Win32
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
 
-    [DllImport("gdi32.dll")]
-    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
-
-    [DllImport("gdi32.dll")]
-    static extern bool TransparentBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint crTransparent);
-
     public static void ReversePIP()
     {
         SetProcessDPIAware();
@@ -37,14 +31,37 @@ public static class Win32
             // StretchBlt for Reverse PIP
             //StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
 
-            // BitBlt for Inverting Colors
-            //BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
-
             // TransparentBlt for Transparency
             //TransparentBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0xFF0000);
 
             // BitBlt with Raster Operation (ROP) Code for XOR Effect
-            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00660046);
+            //BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00660046);
+
+            // Custom Graphic Effect: Grayscale
+            int width = cx - 100;
+            int height = cy - 100;
+            byte[] pixels = new byte[width * height * 4];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    int pixelIndex = (x + y * width) * 4;
+
+                    // Get original pixel colors
+                    byte blue = Marshal.ReadByte(hdc, pixelIndex);
+                    byte green = Marshal.ReadByte(hdc, pixelIndex + 1);
+                    byte red = Marshal.ReadByte(hdc, pixelIndex + 2);
+
+                    // Convert to grayscale
+                    byte gray = (byte)((blue + green + red) / 3);
+
+                    // Set pixel colors to grayscale value
+                    Marshal.WriteByte(hdc, pixelIndex, gray);
+                    Marshal.WriteByte(hdc, pixelIndex + 1, gray);
+                    Marshal.WriteByte(hdc, pixelIndex + 2, gray);
+                }
+            }
         }
     }
 }
