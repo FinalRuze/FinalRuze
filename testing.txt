@@ -46,7 +46,7 @@ public static class Win32
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
 
-    public static void ReversePIP()
+    public static void CreateStatic()
     {
         SetProcessDPIAware();
         int cx = GetSystemMetrics(0);
@@ -56,13 +56,28 @@ public static class Win32
         {
             Thread.Sleep(800);
             IntPtr hdc = GetDC(IntPtr.Zero);
-            IntPtr hdcSrc = GetDC(IntPtr.Zero);
 
-            BitBlt(hdc, cx - 100, cy - 100, 100, 100, hdcSrc, 0, 0, 0x00CC0020);
+            Random random = new Random();
+            byte[] buffer = new byte[cx * cy * 4];
+            random.NextBytes(buffer);
+
+            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            IntPtr ptr = handle.AddrOfPinnedObject();
+
+            using (var bitmap = new System.Drawing.Bitmap(cx, cy, cx * 4, System.Drawing.Imaging.PixelFormat.Format32bppRgb, ptr))
+            {
+                using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
+                {
+                    graphics.CopyFromScreen(0, 0, 0, 0, new System.Drawing.Size(cx, cy));
+                }
+            }
+
+            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00CC0020);
+
+            handle.Free();
         }
     }
 }
 "@
-
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::ReversePIP()
+[Win32]::CreateStatic()
