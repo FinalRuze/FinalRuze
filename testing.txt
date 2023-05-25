@@ -12,10 +12,25 @@ public static class Win32
     static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
+
+    [DllImport("gdi32.dll")]
+    static extern int BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
+
+    [DllImport("gdi32.dll")]
+    static extern bool DeleteObject(IntPtr hObject);
 
     public static void CreateStatic()
     {
@@ -23,25 +38,41 @@ public static class Win32
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
 
-        Random random = new Random();
-
         while (true)
         {
             Thread.Sleep(800);
             IntPtr hdc = GetDC(IntPtr.Zero);
+            IntPtr hdcMem = CreateCompatibleDC(hdc);
+            IntPtr hBitmap = CreateCompatibleBitmap(hdc, cx, cy);
+            IntPtr hOld = SelectObject(hdcMem, hBitmap);
 
-            for (int i = 0; i < 100; i++)
+            Graphics g = Graphics.FromHdc(hdcMem);
+            g.Clear(Color.Black);
+
+            Random random = new Random();
+            int numStatic = 2000;
+            for (int i = 0; i < numStatic; i++)
             {
-                int x = random.Next(cx);
-                int y = random.Next(cy);
-                int width = random.Next(10, 100);
-                int height = random.Next(10, 100);
-
-                PatBlt(hdc, x, y, width, height, 0xD3D5819A);
+                int x = random.Next(0, cx);
+                int y = random.Next(0, cy);
+                int width = random.Next(1, 4);
+                int height = random.Next(1, 4);
+                int r = random.Next(0, 256);
+                int g = random.Next(0, 256);
+                int b = random.Next(0, 256);
+                Color color = Color.FromArgb(r, g, b);
+                g.FillRectangle(new SolidBrush(color), x, y, width, height);
             }
+
+            BitBlt(hdc, 0, 0, cx, cy, hdcMem, 0, 0, 0x00CC0020);
+
+            SelectObject(hdcMem, hOld);
+            DeleteObject(hBitmap);
+            DeleteObject(hdcMem);
         }
     }
 }
 "@
+
 Add-Type -TypeDefinition $source -Language CSharp
 [Win32]::CreateStatic()
