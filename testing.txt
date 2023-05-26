@@ -274,19 +274,28 @@ for (int i = 0; i < glitchCount; i++)
     Thread.Sleep(100);
 }
 
-// Additional effect 11 - Cursed effect: Flashing Colors
-int flashingDuration = 2000; // Duration of the flashing effect in milliseconds
+// Additional effect 11 - Cursed effect: Random Transformations
+int transformationDuration = 5000; // Duration of the transformation effect in milliseconds
+int maxOffset = 50; // Maximum offset for the transformation
 
 DateTime startTime = DateTime.Now;
 
-while ((DateTime.Now - startTime).TotalMilliseconds < flashingDuration)
+while ((DateTime.Now - startTime).TotalMilliseconds < transformationDuration)
 {
-    IntPtr flashingBrush = CreateSolidBrush((uint)random.Next(0x1000000)); // Random color brush
-    IntPtr oldBrush = SelectObject(hdc, flashingBrush);
+    IntPtr hdcTemp = CreateCompatibleDC(hdc);
+    IntPtr hbitmap = CreateCompatibleBitmap(hdc, cx, cy);
+    IntPtr hbitmapOld = SelectObject(hdcTemp, hbitmap);
 
-    Rectangle(hdc, 0, 0, cx, cy);
+    BitBlt(hdcTemp, 0, 0, cx, cy, hdc, 0, 0, 0x00CC0020);
 
-    SelectObject(hdc, oldBrush);
+    int offsetX = random.Next(-maxOffset, maxOffset + 1);
+    int offsetY = random.Next(-maxOffset, maxOffset + 1);
+
+    StretchBlt(hdc, offsetX, offsetY, cx, cy, hdcTemp, 0, 0, cx, cy, 0x00CC0020);
+
+    SelectObject(hdcTemp, hbitmapOld);
+    DeleteObject(hbitmap);
+    DeleteDC(hdcTemp);
 
     Thread.Sleep(10);
 }
