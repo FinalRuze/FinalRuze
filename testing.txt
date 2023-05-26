@@ -304,9 +304,23 @@ for (int i = 0; i < 200; i++)
 // Additional effect 13 - Cursed effect: Distorted StretchBlt
 int distortionAmount = 500; // Amount of distortion to apply
 
-for (int i = 0; i < 10; i++)
+for (int i = 0; i < 200; i++)
 {
     StretchBlt(hdc, 0, 0, cx, cy, hdc, random.Next(-distortionAmount, distortionAmount), random.Next(-distortionAmount, distortionAmount), cx, cy, 0x00CC0020);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 14 - Cursed effect: Randomized color inversion
+for (int i = 0; i < 200; i++)
+{
+    int inversionX = random.Next(0, cx);
+    int inversionY = random.Next(0, cy);
+    int inversionWidth = random.Next(0, cx - inversionX);
+    int inversionHeight = random.Next(0, cy - inversionY);
+
+    BitBlt(hdc, inversionX, inversionY, inversionWidth, inversionHeight, hdc, inversionX, inversionY, 0x00550009);
 
     // Delay for 200 milliseconds
     Thread.Sleep(200);
