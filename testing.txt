@@ -273,6 +273,8 @@ for (int i = 0; i < glitchCount; i++)
     // Delay for 100 milliseconds
     Thread.Sleep(100);
 
+}
+
 // Additional effect 11 - Cursed effect: Pixel Displacement
 int displacementDuration = 5000; // Duration of the displacement effect in milliseconds
 int displacementAmount = 100; // Maximum displacement amount
