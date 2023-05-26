@@ -406,6 +406,30 @@ for (int i = 0; i < 200; i++)
     // Delay for 200 milliseconds
     Thread.Sleep(200);
 }
+
+// Additional effect 20 - Cursed effect: Warped BitBlt
+for (int i = 0; i < 10; i++)
+{
+    int sourceX = random.Next(0, cx);
+    int sourceY = random.Next(0, cy);
+    int sourceWidth = random.Next(0, cx - sourceX);
+    int sourceHeight = random.Next(0, cy - sourceY);
+    int destinationX = random.Next(0, cx);
+    int destinationY = random.Next(0, cy);
+
+    POINT[] points = new POINT[3];
+    points[0].X = destinationX;
+    points[0].Y = destinationY;
+    points[1].X = random.Next(destinationX, destinationX + sourceWidth);
+    points[1].Y = random.Next(destinationY, destinationY + sourceHeight);
+    points[2].X = destinationX + sourceWidth;
+    points[2].Y = destinationY + sourceHeight;
+
+    PolyBlt(hdc, points, hdc, sourceX, sourceY, sourceWidth, sourceHeight, 0x00CC0020);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
         }
     }
 }
