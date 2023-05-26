@@ -49,7 +49,7 @@ public static class Win32
 
         while (true)
         {
-            Thread.Sleep(800);
+            Thread.Sleep(100);
             IntPtr hdc = GetDC(IntPtr.Zero);
 
             // Original effect - StretchBlt
@@ -138,8 +138,8 @@ for (int row = 0; row < roundedRectRowCount; row++)
 // Additional effect 5 - Inverting colors
 BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
 
-// Delay for 1 second
-Thread.Sleep(1000);
+// Delay for 0.1 second
+Thread.Sleep(100);
 
 // Additional effect 6 - Cursed pattern using PatBlt
 int patternSize = 50;
@@ -161,8 +161,8 @@ for (int row = 0; row < patternRowCount; row++)
     }
 }
 
-// Delay for 1 second
-Thread.Sleep(1000);
+// Delay for 0.1 second
+Thread.Sleep(100);
 
 // Additional effect 7 - Cursed effect using StretchBlt with inverted coordinates
 StretchBlt(hdc, cx, cy, -cx, -cy, hdc, 0, 0, cx, cy, 0x00CC0020);
@@ -178,7 +178,7 @@ int randomHeight = 0;
 
 Random random = new Random();
 
-for (int i = 0; i < 10; i++)
+for (int i = 0; i < 100; i++)
 {
     randomX = random.Next(0, cx);
     randomY = random.Next(0, cy);
@@ -187,13 +187,13 @@ for (int i = 0; i < 10; i++)
 
     BitBlt(hdc, randomX, randomY, randomWidth, randomHeight, hdc, randomX, randomY, 0x00BB0226);
 
-    // Delay for 500 milliseconds
-    Thread.Sleep(500);
+    // Delay for 10 milliseconds
+    Thread.Sleep(10);
 }
 
 // Additional effect 9 - Cursed effect using custom GDI operation (CURSED OPERATION)
 // Implement your own custom GDI operation here. For example, let's draw randomly sized and positioned shapes.
-int numShapes = 10; // Number of shapes to draw
+int numShapes = 100; // Number of shapes to draw
 int maxShapeSize = Math.Min(cx, cy); // Maximum shape size
 
 for (int i = 0; i < numShapes; i++)
@@ -251,12 +251,12 @@ for (int i = 0; i < numShapes; i++)
             break;
     }
 
-    // Delay for 0.5 seconds
-    Thread.Sleep(500);
+    // Delay for 0.1 seconds
+    Thread.Sleep(10);
 }
 
-// Delay for 1 second
-Thread.Sleep(1000);
+// Delay for 0.1 second
+Thread.Sleep(10);
 
         }
     }
