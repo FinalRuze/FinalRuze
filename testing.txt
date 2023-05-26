@@ -192,37 +192,20 @@ for (int i = 0; i < 10; i++)
     Thread.Sleep(500);
 }
 
-// Additional effect 9 - Cursed effect by randomly coloring pixels
-int pixelSize = 5;
-int pixelRowCount = cy / pixelSize;
-int pixelColumnCount = cx / pixelSize;
+// Additional effect 9 - Cursed effect using SetPixel to create random colored pixels
+Random randomColor = new Random();
 
-for (int row = 0; row < pixelRowCount; row++)
+for (int i = 0; i < 1000; i++)
 {
-    for (int column = 0; column < pixelColumnCount; column++)
-    {
-        int pixelX = column * pixelSize;
-        int pixelY = row * pixelSize;
+    int x = random.Next(0, cx);
+    int y = random.Next(0, cy);
+    int color = (int)(0x1000000 * randomColor.NextDouble()) | 0xFF000000; // Random ARGB color
 
-        // Generate a random color for each pixel
-        int red = random.Next(0, 256);
-        int green = random.Next(0, 256);
-        int blue = random.Next(0, 256);
-        uint color = (uint)((red << 16) | (green << 8) | blue);
+    SetPixel(hdc, x, y, color);
 
-        for (int i = 0; i < pixelSize; i++)
-        {
-            for (int j = 0; j < pixelSize; j++)
-            {
-                SetPixel(hdc, pixelX + i, pixelY + j, color);
-            }
-        }
-    }
+    // Delay for 10 milliseconds
+    Thread.Sleep(10);
 }
-
-// Delay for 1 second
-Thread.Sleep(1000);
-
 
         }
     }
