@@ -377,15 +377,15 @@ for (int i = 0; i < 200; i++)
     Thread.Sleep(200);
 }
 
-// Additional effect 18 - Cursed effect: Randomized LineTo
-for (int i = 0; i < 200; i++)
+// Additional effect 18 - Cursed effect: Randomized Ellipse
+for (int i = 0; i < 10; i++)
 {
-    int startX = random.Next(0, cx);
-    int startY = random.Next(0, cy);
-    int endX = random.Next(0, cx);
-    int endY = random.Next(0, cy);
+    int left = random.Next(0, cx);
+    int top = random.Next(0, cy);
+    int right = random.Next(left, cx);
+    int bottom = random.Next(top, cy);
 
-    LineTo(hdc, endX, endY);
+    Ellipse(hdc, left, top, right, bottom);
 
     // Delay for 200 milliseconds
     Thread.Sleep(200);
