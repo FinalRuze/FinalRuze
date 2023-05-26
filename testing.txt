@@ -275,30 +275,19 @@ for (int i = 0; i < glitchCount; i++)
 
 }
 
-// Additional effect 11 - Cursed effect: Horizontal Pixel Shift
-int shiftDuration = 5000; // Duration of the shift effect in milliseconds
-int shiftAmount = 20; // Amount of horizontal shift in pixels
+// Additional effect 11 - Cursed effect: Random Noise
+Random random = new Random();
 
-DateTime startTime = DateTime.Now;
-
-while ((DateTime.Now - startTime).TotalMilliseconds < shiftDuration)
+for (int y = 0; y < cy; y++)
 {
-    for (int y = 0; y < cy; y++)
+    for (int x = 0; x < cx; x++)
     {
-        for (int x = 0; x < cx - shiftAmount; x++)
-        {
-            int pixel = GetPixel(hdc, x + shiftAmount, y);
-            SetPixel(hdc, x, y, pixel);
-        }
+        // Generate a random noise value between 0 and 255
+        byte noise = (byte)random.Next(256);
 
-        for (int x = cx - shiftAmount; x < cx; x++)
-        {
-            // Set shifted pixels to black
-            SetPixel(hdc, x, y, 0x000000);
-        }
+        // Set the pixel color using the noise value
+        SetPixel(hdc, x, y, (noise << 16) | (noise << 8) | noise);
     }
-
-    Thread.Sleep(10);
 }
 
         }
