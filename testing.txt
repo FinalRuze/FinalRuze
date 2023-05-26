@@ -138,6 +138,9 @@ public static class Win32
             // Additional effect 5 - Inverting colors
             BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
 
+// Delay for 2 seconds
+            Thread.Sleep(2000);
+
             // Additional effect 6 - Cursed pattern using PatBlt
             int patternSize = 50;
             int patternRowCount = (cy - patternSize) / patternSize;
