@@ -193,7 +193,7 @@ for (int i = 0; i < 10; i++)
 
 // Additional effect 9 - Cursed effect using custom GDI operation (CURSED OPERATION)
 // Implement your own custom GDI operation here. For example, let's draw randomly sized and positioned shapes.
-int numShapes = 5; // Number of shapes to draw
+int numShapes = 10; // Number of shapes to draw
 int maxShapeSize = Math.Min(cx, cy); // Maximum shape size
 
 for (int i = 0; i < numShapes; i++)
@@ -217,6 +217,9 @@ for (int i = 0; i < numShapes; i++)
             RoundRect(hdc, shapeX, shapeY, shapeX + shapeSize, shapeY + shapeSize, cornerRadius, cornerRadius);
             break;
     }
+
+    // Delay for 0.5 seconds
+    Thread.Sleep(500);
 }
 
 // Delay for 1 second
