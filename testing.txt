@@ -425,31 +425,23 @@ for (int i = 0; i < 200; i++)
     Thread.Sleep(200);
 }
 
-// Additional effect 21 - Cursed effect: Randomized AlphaBlend
-for (int i = 0; i < 200; i++)
+// Additional effect 31 - Cursed effect: Drawing lines with different pen styles
+int lineY = cy / 2;
+int lineMargin = 50;
+int lineLength = cx - 2 * lineMargin;
+int lineCount = 200;
+
+for (int i = 0; i < lineCount; i++)
 {
-    int sourceX = random.Next(0, cx);
-    int sourceY = random.Next(0, cy);
-    int sourceWidth = random.Next(0, cx - sourceX);
-    int sourceHeight = random.Next(0, cy - sourceY);
+    int lineX = lineMargin + i * (lineLength / lineCount);
 
-    int destinationX = random.Next(0, cx);
-    int destinationY = random.Next(0, cy);
-    int destinationWidth = random.Next(0, cx - destinationX);
-    int destinationHeight = random.Next(0, cy - destinationY);
+    IntPtr penStyle = CreatePen(i, 1, 0x000000); // Varying pen style
+    IntPtr oldPenStyle = SelectObject(hdc, penStyle);
 
-    double alpha = random.NextDouble(); // Random alpha value between 0 and 1
+    MoveToEx(hdc, lineX, lineY, IntPtr.Zero);
+    LineTo(hdc, lineX + lineLength / lineCount, lineY);
 
-    AlphaBlend(hdc, destinationX, destinationY, destinationWidth, destinationHeight, hdc, sourceX, sourceY, sourceWidth, sourceHeight, new BLENDFUNCTION
-    {
-        BlendOp = AC_SRC_OVER,
-        BlendFlags = 0,
-        SourceConstantAlpha = (byte)(alpha * 255), // Convert alpha to byte value
-        AlphaFormat = AC_SRC_ALPHA
-    });
-
-    // Delay for 200 milliseconds
-    Thread.Sleep(200);
+    SelectObject(hdc, oldPenStyle);
 }
         }
     }
