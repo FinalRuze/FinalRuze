@@ -71,107 +71,106 @@ public static class Win32
             int hexagonColumnCount = (cx - 2 * hexagonMargin) / (hexagonSize + hexagonMargin);
             int totalHexagons = hexagonRowCount * hexagonColumnCount;
 
-            int[] hexagonXPositions = new int[totalHexagons];
-            int[] hexagonYPositions = new int[totalHexagons];
+int[] hexagonXPositions = new int[totalHexagons];
+int[] hexagonYPositions = new int[totalHexagons];
 
-            int startX = hexagonMargin;
-            int startY = hexagonMargin;
+int startX = hexagonMargin;
+int startY = hexagonMargin;
 
-            for (int i = 0; i < totalHexagons; i++)
-            {
-                int row = i / hexagonColumnCount;
-                int column = i % hexagonColumnCount;
+for (int i = 0; i < totalHexagons; i++)
+{
+    int row = i / hexagonColumnCount;
+    int column = i % hexagonColumnCount;
 
-                int hexagonX = startX + column * (hexagonSize + hexagonMargin);
-                int hexagonY = startY + row * (hexagonSize + hexagonMargin);
+    int hexagonX = startX + column * (hexagonSize + hexagonMargin);
+    int hexagonY = startY + row * (hexagonSize + hexagonMargin);
 
-                hexagonXPositions[i] = hexagonX;
-                hexagonYPositions[i] = hexagonY;
+    hexagonXPositions[i] = hexagonX;
+    hexagonYPositions[i] = hexagonY;
 
-                int[] hexagonPoints = new int[]
-                {
-                    hexagonX + hexagonSize / 2, hexagonY,
-                    hexagonX + hexagonSize, hexagonY + hexagonSize / 3,
-                    hexagonX + hexagonSize, hexagonY + 2 * hexagonSize / 3,
-                    hexagonX + hexagonSize / 2, hexagonY + hexagonSize,
-                    hexagonX, hexagonY + 2 * hexagonSize / 3,
-                    hexagonX, hexagonY + hexagonSize / 3
-                };
-                Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
-            }
+    int[] hexagonPoints = new int[]
+    {
+        hexagonX + hexagonSize / 2, hexagonY,
+        hexagonX + hexagonSize, hexagonY + hexagonSize / 3,
+        hexagonX + hexagonSize, hexagonY + 2 * hexagonSize / 3,
+        hexagonX + hexagonSize / 2, hexagonY + hexagonSize,
+        hexagonX, hexagonY + 2 * hexagonSize / 3,
+        hexagonX, hexagonY + hexagonSize / 3
+    };
+    Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
+}
 
-            // Additional effect 3 - Drawing ellipses
-            int ellipseSize = 100;
-            int ellipseMargin = 50;
-            int ellipseRowCount = (cy - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
-            int ellipseColumnCount = (cx - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
+// Additional effect 3 - Drawing ellipses
+int ellipseSize = 100;
+int ellipseMargin = 50;
+int ellipseRowCount = (cy - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
+int ellipseColumnCount = (cx - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
 
-            for (int row = 0; row < ellipseRowCount; row++)
-            {
-                for (int column = 0; column < ellipseColumnCount; column++)
-                {
-                    int ellipseX = ellipseMargin + column * (ellipseSize + ellipseMargin);
-                    int ellipseY = ellipseMargin + row * (ellipseSize + ellipseMargin);
+for (int row = 0; row < ellipseRowCount; row++)
+{
+    for (int column = 0; column < ellipseColumnCount; column++)
+    {
+        int ellipseX = ellipseMargin + column * (ellipseSize + ellipseMargin);
+        int ellipseY = ellipseMargin + row * (ellipseSize + ellipseMargin);
 
-                    Ellipse(hdc, ellipseX, ellipseY, ellipseX + ellipseSize, ellipseY + ellipseSize);
-                }
-            }
+        Ellipse(hdc, ellipseX, ellipseY, ellipseX + ellipseSize, ellipseY + ellipseSize);
+    }
+}
 
-            // Additional effect 4 - Drawing rounded rectangles
-            int roundedRectWidth = 200;
-            int roundedRectHeight = 100;
-            int roundedRectMargin = 50;
-            int roundedRectRowCount = (cy - 2 * roundedRectMargin) / (roundedRectHeight + roundedRectMargin);
-            int roundedRectColumnCount = (cx - 2 * roundedRectMargin) / (roundedRectWidth + roundedRectMargin);
+// Additional effect 4 - Drawing rounded rectangles
+int roundedRectWidth = 200;
+int roundedRectHeight = 100;
+int roundedRectMargin = 50;
+int roundedRectRowCount = (cy - 2 * roundedRectMargin) / (roundedRectHeight + roundedRectMargin);
+int roundedRectColumnCount = (cx - 2 * roundedRectMargin) / (roundedRectWidth + roundedRectMargin);
 
-            for (int row = 0; row < roundedRectRowCount; row++)
-            {
-                for (int column = 0; column < roundedRectColumnCount; column++)
-                {
-                    int roundedRectX = roundedRectMargin + column * (roundedRectWidth + roundedRectMargin);
-                    int roundedRectY = roundedRectMargin + row * (roundedRectHeight + roundedRectMargin);
+for (int row = 0; row < roundedRectRowCount; row++)
+{
+    for (int column = 0; column < roundedRectColumnCount; column++)
+    {
+        int roundedRectX = roundedRectMargin + column * (roundedRectWidth + roundedRectMargin);
+        int roundedRectY = roundedRectMargin + row * (roundedRectHeight + roundedRectMargin);
 
-                    RoundRect(hdc, roundedRectX, roundedRectY, roundedRectX + roundedRectWidth, roundedRectY + roundedRectHeight, 20, 20);
-                }
-            }
+        RoundRect(hdc, roundedRectX, roundedRectY, roundedRectX + roundedRectWidth, roundedRectY + roundedRectHeight, 20, 20);
+    }
+}
 
-            // Additional effect 5 - Inverting colors
-            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
-
-// Delay for 1 second
-            Thread.Sleep(1000);
-
-            // Additional effect 6 - Cursed pattern using PatBlt
-            int patternSize = 50;
-            int patternRowCount = (cy - patternSize) / patternSize;
-            int patternColumnCount = (cx - patternSize) / patternSize;
-
-            for (int row = 0; row < patternRowCount; row++)
-            {
-                for (int column = 0; column < patternColumnCount; column++)
-                {
-                    int patternX = patternSize * column;
-                    int patternY = patternSize * row;
-
-                    // Alternate between BLACKNESS and WHITENESS
-                    if ((row + column) % 2 == 0)
-                        PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x000F0000); // BLACKNESS
-                    else
-                        PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x00FF0062); // WHITENESS
-                }
-            }
-
+// Additional effect 5 - Inverting colors
+BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
 
 // Delay for 1 second
-            Thread.Sleep(1000);
+Thread.Sleep(1000);
 
-            // Additional effect 7 - Cursed effect using StretchBlt with inverted coordinates
-            StretchBlt(hdc, cx, cy, -cx, -cy, hdc, 0, 0, cx, cy, 0x00CC0020);
+// Additional effect 6 - Cursed pattern using PatBlt
+int patternSize = 50;
+int patternRowCount = (cy - patternSize) / patternSize;
+int patternColumnCount = (cx - patternSize) / patternSize;
 
-            // Delay for 1 second
-            Thread.Sleep(1000);
-            
-            // Additional effect 8 - Cursed effect using BitBlt with random positions
+for (int row = 0; row < patternRowCount; row++)
+{
+    for (int column = 0; column < patternColumnCount; column++)
+    {
+        int patternX = patternSize * column;
+        int patternY = patternSize * row;
+
+        // Alternate between BLACKNESS and WHITENESS
+        if ((row + column) % 2 == 0)
+            PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x000F0000); // BLACKNESS
+        else
+            PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x00FF0062); // WHITENESS
+    }
+}
+
+// Delay for 1 second
+Thread.Sleep(1000);
+
+// Additional effect 7 - Cursed effect using StretchBlt with inverted coordinates
+StretchBlt(hdc, cx, cy, -cx, -cy, hdc, 0, 0, cx, cy, 0x00CC0020);
+
+// Delay for 1 second
+Thread.Sleep(1000);
+
+// Additional effect 8 - Cursed effect using BitBlt with random positions
 int randomX = 0;
 int randomY = 0;
 int randomWidth = 0;
@@ -192,26 +191,24 @@ for (int i = 0; i < 10; i++)
     Thread.Sleep(500);
 }
 
-// Additional effect 9 - Cursed effect using TransparentBlt with random positions and transparency
-int randomX = 0;
-int randomY = 0;
-int randomWidth = 0;
-int randomHeight = 0;
+// Additional effect 9 - Cursed effect using custom GDI operation (CURSED OPERATION)
+// Implement your own custom GDI operation here. For example, let's draw a randomly sized and positioned triangle.
+int triangleSize = random.Next(50, 200);
+int triangleX = random.Next(0, cx - triangleSize);
+int triangleY = random.Next(0, cy - triangleSize);
 
-Random random = new Random();
-
-for (int i = 0; i < 10; i++)
+int[] trianglePoints = new int[]
 {
-    randomX = random.Next(0, cx);
-    randomY = random.Next(0, cy);
-    randomWidth = random.Next(0, cx - randomX);
-    randomHeight = random.Next(0, cy - randomY);
+    triangleX, triangleY,
+    triangleX + triangleSize / 2, triangleY + triangleSize,
+    triangleX + triangleSize, triangleY
+};
 
-    TransparentBlt(hdc, randomX, randomY, randomWidth, randomHeight, hdc, randomX, randomY, randomWidth, randomHeight, 0xFF000000);
+Polygon(hdc, trianglePoints, trianglePoints.Length / 2);
 
-    // Delay for 500 milliseconds
-    Thread.Sleep(500);
-}
+// Delay for 1 second
+Thread.Sleep(1000);
+
         }
     }
 }
