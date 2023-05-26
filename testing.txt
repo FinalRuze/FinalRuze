@@ -424,18 +424,6 @@ for (int i = 0; i < 200; i++)
     // Delay for 200 milliseconds
     Thread.Sleep(200);
 }
-
-// Additional effect 40 - Cursed effect: Warping
-int warpAmount = 200;
-for (int y = 0; y < cy; y++)
-{
-    for (int x = 0; x < cx; x++)
-    {
-        int newX = (int)(x + (warpAmount * Math.Sin(2 * Math.PI * y / cy)));
-        int newY = (int)(y + (warpAmount * Math.Sin(2 * Math.PI * x / cx)));
-        SetPixel(hdc, newX, newY, GetPixel(hdc, x, y));
-    }
-}
         }
     }
 }
