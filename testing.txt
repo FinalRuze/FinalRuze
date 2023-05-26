@@ -49,10 +49,10 @@ public static class Win32
             // Additional effect 1 - Drawing rectangles
             IntPtr pen = CreatePen(0, 5, 0x000000); // Black color pen
             IntPtr oldPen = SelectObject(hdc, pen);
-            
+
             Rectangle(hdc, 100, 100, cx - 100, cy - 100);
             Rectangle(hdc, 200, 200, cx - 200, cy - 200);
-            
+
             SelectObject(hdc, oldPen);
 
             // Additional effect 2 - Drawing multiple hexagons to fill the screen
@@ -96,16 +96,26 @@ public static class Win32
             int ellipseMargin = 50;
             int ellipseRowCount = (cy - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
             int ellipseColumnCount = (cx - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
+            int totalEllipses = ellipseRowCount * ellipseColumnCount;
 
-            for (int row = 0; row < ellipseRowCount; row++)
+            int[] ellipseXPositions = new int[totalEllipses];
+            int[] ellipseYPositions = new int[totalEllipses];
+
+            int startX = ellipseMargin;
+            int startY = ellipseMargin;
+
+            for (int i = 0; i < totalEllipses; i++)
             {
-                for (int column = 0; column < ellipseColumnCount; column++)
-                {
-                    int ellipseX = ellipseMargin + column * (ellipseSize + ellipseMargin);
-                    int ellipseY = ellipseMargin + row * (ellipseSize + ellipseMargin);
+                int row = i / ellipseColumnCount;
+                int column = i % ellipseColumnCount;
 
-                    Ellipse(hdc, ellipseX, ellipseY, ellipseX + ellipseSize, ellipseY + ellipseSize);
-                }
+                int ellipseX = startX + column * (ellipseSize + ellipseMargin);
+                int ellipseY = startY + row * (ellipseSize + ellipseMargin);
+
+                ellipseXPositions[i] = ellipseX;
+                ellipseYPositions[i] = ellipseY;
+
+                Ellipse(hdc, ellipseX, ellipseY, ellipseX + ellipseSize, ellipseY + ellipseSize);
             }
         }
     }
