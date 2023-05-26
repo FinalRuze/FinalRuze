@@ -193,15 +193,15 @@ for (int i = 0; i < 10; i++)
 
 // Additional effect 9 - Cursed effect using custom GDI operation (CURSED OPERATION)
 // Implement your own custom GDI operation here. For example, let's draw a randomly sized and positioned triangle.
-int triangleSize = random.Next(50, 200);
+int triangleSize = Math.Min(cx, cy);
 int triangleX = random.Next(0, cx - triangleSize);
 int triangleY = random.Next(0, cy - triangleSize);
 
 int[] trianglePoints = new int[]
 {
-    triangleX, triangleY,
-    triangleX + triangleSize / 2, triangleY + triangleSize,
-    triangleX + triangleSize, triangleY
+    triangleX, triangleY + triangleSize,
+    triangleX + triangleSize / 2, triangleY,
+    triangleX + triangleSize, triangleY + triangleSize
 };
 
 Polygon(hdc, trianglePoints, trianglePoints.Length / 2);
