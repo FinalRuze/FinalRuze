@@ -138,9 +138,6 @@ public static class Win32
             // Additional effect 5 - Inverting colors
             BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
 
-            // Delay for 1 seconds
-            Thread.Sleep(1000);
-
             // Additional effect 6 - Cursed pattern using PatBlt
             int patternSize = 50;
             int patternRowCount = (cy - patternSize) / patternSize;
@@ -161,38 +158,14 @@ public static class Win32
                 }
             }
 
-// Additional effect 7 - Drawing lines with a custom pen
-IntPtr customPen = CreatePen(0, 3, 0xFF0000); // Red color pen
-IntPtr oldCustomPen = SelectObject(hdc, customPen);
+            // Additional effect 7 - Cursed effect using StretchBlt with inverted coordinates
+            StretchBlt(hdc, cx, cy, -cx, -cy, hdc, 0, 0, cx, cy, 0x00CC0020);
 
-int lineSpacing = 20;
-
-for (int y = 0; y < cy; y += lineSpacing)
-{
-MoveToEx(hdc, 0, y, IntPtr.Zero);
-LineTo(hdc, cx, y);
-}
-
-SelectObject(hdc, oldCustomPen);
-
-// Additional effect 8 - Drawing text
-string text = "Cursed Powershell Script";
-IntPtr font = CreateFont(48, 0, 0, 0, 700, 0, 0, 0, 0, 0, 0, 0, 0, "Arial");
-IntPtr oldFont = SelectObject(hdc, font);
-
-SetTextColor(hdc, 0xFF0000); // Red color text
-SetBkMode(hdc, 1); // Transparent background
-
-TextOut(hdc, cx / 2 - 250, cy / 2 - 50, text, text.Length);
-
-SelectObject(hdc, oldFont);
-
-// Release the device context
-ReleaseDC(IntPtr.Zero, hdc);
-}
-}
+            // Delay for 1 second
+            Thread.Sleep(1000);
+        }
+    }
 }
 "@
-
 Add-Type -TypeDefinition $source -Language CSharp
 [Win32]::ReversePIP()
