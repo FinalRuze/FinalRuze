@@ -274,6 +274,21 @@ for (int i = 0; i < glitchCount; i++)
     Thread.Sleep(100);
 }
 
+// Additional effect 12 - Cursed effect: Randomized BitBlt
+for (int i = 0; i < 10; i++)
+{
+    int sourceX = random.Next(0, cx);
+    int sourceY = random.Next(0, cy);
+    int destinationX = random.Next(0, cx);
+    int destinationY = random.Next(0, cy);
+    int width = random.Next(0, cx - destinationX);
+    int height = random.Next(0, cy - destinationY);
+
+    BitBlt(hdc, destinationX, destinationY, width, height, hdc, sourceX, sourceY, 0x00BB0226);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
         }
     }
 }
