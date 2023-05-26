@@ -425,30 +425,33 @@ for (int i = 0; i < 200; i++)
     Thread.Sleep(200);
 }
 
-// Additional effect 21 - Cursed effect: Warped StretchBlt
+// Additional effect 21 - Cursed effect: Randomized GradientFill
 for (int i = 0; i < 200; i++)
 {
-    int sourceX = random.Next(0, cx);
-    int sourceY = random.Next(0, cy);
-    int sourceWidth = random.Next(0, cx - sourceX);
-    int sourceHeight = random.Next(0, cy - sourceY);
-    int destinationX = random.Next(0, cx);
-    int destinationY = random.Next(0, cy);
-    int destinationWidth = random.Next(0, cx - destinationX);
-    int destinationHeight = random.Next(0, cy - destinationY);
+    TRIVERTEX[] vertices = new TRIVERTEX[2];
+    vertices[0].x = random.Next(0, cx);
+    vertices[0].y = random.Next(0, cy);
+    vertices[0].Red = (ushort)random.Next(0, 0xFFFF);
+    vertices[0].Green = (ushort)random.Next(0, 0xFFFF);
+    vertices[0].Blue = (ushort)random.Next(0, 0xFFFF);
+    vertices[0].Alpha = (ushort)random.Next(0, 0xFFFF);
 
-    POINT[] points = new POINT[3];
-    points[0].X = destinationX;
-    points[0].Y = destinationY;
-    points[1].X = random.Next(destinationX, destinationX + destinationWidth);
-    points[1].Y = random.Next(destinationY, destinationY + destinationHeight);
-    points[2].X = destinationX + destinationWidth;
-    points[2].Y = destinationY + destinationHeight;
+    vertices[1].x = random.Next(0, cx);
+    vertices[1].y = random.Next(0, cy);
+    vertices[1].Red = (ushort)random.Next(0, 0xFFFF);
+    vertices[1].Green = (ushort)random.Next(0, 0xFFFF);
+    vertices[1].Blue = (ushort)random.Next(0, 0xFFFF);
+    vertices[1].Alpha = (ushort)random.Next(0, 0xFFFF);
 
-    StretchPolyBlt(hdc, points, hdc, sourceX, sourceY, sourceWidth, sourceHeight, 0x00CC0020);
+    GRADIENT_RECT rect;
+    rect.UpperLeft = 0;
+    rect.LowerRight = 1;
 
+    GradientFill(hdc, vertices, 2, &rect, 1, GRADIENT_FILL_RECT_H);
+    
     // Delay for 200 milliseconds
-    Thread.Sleep(200);
+Thread.Sleep(200);
+
 }
         }
     }
