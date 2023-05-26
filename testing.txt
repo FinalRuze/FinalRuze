@@ -336,6 +336,22 @@ for (int i = 0; i < 200; i++)
     // Delay for 200 milliseconds
     Thread.Sleep(200);
 }
+
+// Additional effect 16 - Cursed effect: Randomized PatBlt
+for (int i = 0; i < 200; i++)
+{
+    int patternX = random.Next(0, cx);
+    int patternY = random.Next(0, cy);
+    int patternWidth = random.Next(0, cx - patternX);
+    int patternHeight = random.Next(0, cy - patternY);
+
+    uint patternColor = (uint)random.Next(0, 0xFFFFFF + 1); // Random pattern color
+
+    PatBlt(hdc, patternX, patternY, patternWidth, patternHeight, PATCOPY | (uint)patternColor);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
         }
     }
 }
