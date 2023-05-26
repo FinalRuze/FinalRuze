@@ -358,7 +358,7 @@ for (int i = 0; i < 200; i++)
 // Additional effect 17 - Cursed effect: Scrambled StretchBlt
 for (int i = 0; i < 200; i++)
 {
-    int scrambleAmount = 5; // Amount to scramble the image
+    int scrambleAmount = 500; // Amount to scramble the image
 
     for (int x = 0; x < cx; x += scrambleAmount)
     {
@@ -370,6 +370,25 @@ for (int i = 0; i < 200; i++)
             int destinationY = random.Next(y, y + scrambleAmount);
 
             BitBlt(hdc, destinationX, destinationY, scrambleAmount, scrambleAmount, hdc, sourceX, sourceY, 0x00CC0020);
+        }
+    }
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 18 - Cursed effect: Pixelation
+int pixelSize = 100; // Size of the pixels
+
+for (int i = 0; i < 200; i++)
+{
+    for (int x = 0; x < cx; x += pixelSize)
+    {
+        for (int y = 0; y < cy; y += pixelSize)
+        {
+            int averageColor = GetAverageColor(hdc, x, y, pixelSize, pixelSize);
+
+            PatBlt(hdc, x, y, pixelSize, pixelSize, PATCOPY | (uint)averageColor);
         }
     }
 
