@@ -378,7 +378,7 @@ for (int i = 0; i < 200; i++)
 }
 
 // Additional effect 18 - Cursed effect: Randomized Ellipse
-for (int i = 0; i < 10; i++)
+for (int i = 0; i < 200; i++)
 {
     int left = random.Next(0, cx);
     int top = random.Next(0, cy);
@@ -386,6 +386,31 @@ for (int i = 0; i < 10; i++)
     int bottom = random.Next(top, cy);
 
     Ellipse(hdc, left, top, right, bottom);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 19 - Cursed effect: Warped Text
+for (int i = 0; i < 200; i++)
+{
+    int startX = random.Next(0, cx);
+    int startY = random.Next(0, cy);
+    int endX = random.Next(0, cx);
+    int endY = random.Next(0, cy);
+
+    SetTextColor(hdc, (uint)random.Next(0, 0xFFFFFF));
+    SetBkColor(hdc, (uint)random.Next(0, 0xFFFFFF));
+
+    POINT[] points = new POINT[3];
+    points[0].X = startX;
+    points[0].Y = startY;
+    points[1].X = random.Next(startX, endX);
+    points[1].Y = random.Next(startY, endY);
+    points[2].X = endX;
+    points[2].Y = endY;
+
+    PolyBezierTo(hdc, points, 3);
 
     // Delay for 200 milliseconds
     Thread.Sleep(200);
