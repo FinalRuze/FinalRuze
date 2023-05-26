@@ -275,21 +275,37 @@ for (int i = 0; i < glitchCount; i++)
 
 }
 
-// Additional effect 11 - Cursed effect: Random Noise
-Random random = new Random();
+// Additional effect 11 - Cursed effect: Chaotic Rotation
+int rotationAngle = 0;
+int rotationSpeed = 5;
+int rotationDirection = 1;
 
-for (int y = 0; y < cy; y++)
+while (true)
 {
-    for (int x = 0; x < cx; x++)
+    rotationAngle += rotationSpeed * rotationDirection;
+
+    // Create a matrix for rotation
+    System.Drawing.Drawing2D.Matrix matrix = new System.Drawing.Drawing2D.Matrix();
+    matrix.RotateAt(rotationAngle, new System.Drawing.Point(cx / 2, cy / 2));
+
+    // Apply the rotation matrix to the entire screen
+    using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(cx, cy))
     {
-        // Generate a random noise value between 0 and 255
-        byte noise = (byte)random.Next(256);
+        using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(bitmap))
+        {
+            graphics.Transform = matrix;
+            graphics.CopyFromScreen(0, 0, 0, 0, new System.Drawing.Size(cx, cy));
+        }
 
-        // Set the pixel color using the noise value
-        SetPixel(hdc, x, y, (noise << 16) | (noise << 8) | noise);
+        using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromHdc(hdc))
+        {
+            graphics.DrawImage(bitmap, 0, 0);
+        }
     }
-}
 
+    // Delay for 100 milliseconds
+    Thread.Sleep(100);
+}
         }
     }
 }
