@@ -138,24 +138,25 @@ public static class Win32
             // Additional effect 5 - Inverting colors
             BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
 
-            // Additional effect 6 - Filling the screen with a pattern
-            int patternSize = 20;
-            int patternRowCount = cy / patternSize;
-            int patternColumnCount = cx / patternSize;
+            // Additional effect 6 - Cursed pattern using PatBlt
+            int patternSize = 50;
+            int patternRowCount = (cy - patternSize) / patternSize;
+            int patternColumnCount = (cx - patternSize) / patternSize;
 
             for (int row = 0; row < patternRowCount; row++)
             {
                 for (int column = 0; column < patternColumnCount; column++)
                 {
-                    int patternX = column * patternSize;
-                    int patternY = row * patternSize;
+                    int patternX = patternSize * column;
+                    int patternY = patternSize * row;
 
-                    PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x00A000C9);
+                    // Alternate between BLACKNESS and WHITENESS
+                    if ((row + column) % 2 == 0)
+                        PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x000F0000); // BLACKNESS
+                    else
+                        PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x00FF0062); // WHITENESS
                 }
             }
-
-            // Release the device context
-            ReleaseDC(IntPtr.Zero, hdc);
         }
     }
 }
