@@ -202,7 +202,7 @@ for (int i = 0; i < numShapes; i++)
     int shapeX = random.Next(0, cx - shapeSize); // Random X position
     int shapeY = random.Next(0, cy - shapeSize); // Random Y position
 
-    int shapeType = random.Next(0, 3); // Random shape type (0: Rectangle, 1: Ellipse, 2: Rounded Rectangle)
+    int shapeType = random.Next(0, 6); // Random shape type (0: Rectangle, 1: Ellipse, 2: Rounded Rectangle, 3: Triangle, 4: Trapezoid, 5: Diamond)
 
     switch (shapeType)
     {
@@ -215,6 +215,39 @@ for (int i = 0; i < numShapes; i++)
         case 2: // Rounded Rectangle
             int cornerRadius = random.Next(0, 50); // Random corner radius
             RoundRect(hdc, shapeX, shapeY, shapeX + shapeSize, shapeY + shapeSize, cornerRadius, cornerRadius);
+            break;
+        case 3: // Triangle
+            int[] trianglePoints = new int[]
+            {
+                shapeX, shapeY + shapeSize,
+                shapeX + shapeSize / 2, shapeY,
+                shapeX + shapeSize, shapeY + shapeSize
+            };
+            Polygon(hdc, trianglePoints, trianglePoints.Length / 2);
+            break;
+        case 4: // Trapezoid
+            int topWidth = random.Next(0, shapeSize); // Random top width
+            int bottomWidth = random.Next(0, shapeSize); // Random bottom width
+            int trapezoidHeight = random.Next(0, shapeSize); // Random trapezoid height
+
+            int[] trapezoidPoints = new int[]
+            {
+                shapeX, shapeY + trapezoidHeight,
+                shapeX + topWidth, shapeY,
+                shapeX + shapeSize - bottomWidth, shapeY,
+                shapeX + shapeSize, shapeY + trapezoidHeight
+            };
+            Polygon(hdc, trapezoidPoints, trapezoidPoints.Length / 2);
+            break;
+        case 5: // Diamond
+            int[] diamondPoints = new int[]
+            {
+                shapeX + shapeSize / 2, shapeY,
+                shapeX + shapeSize, shapeY + shapeSize / 2,
+                shapeX + shapeSize / 2, shapeY + shapeSize,
+                shapeX, shapeY + shapeSize / 2
+            };
+            Polygon(hdc, diamondPoints, diamondPoints.Length / 2);
             break;
     }
 
