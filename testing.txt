@@ -138,8 +138,8 @@ for (int row = 0; row < roundedRectRowCount; row++)
 // Additional effect 5 - Inverting colors
 BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
 
-// Delay for 0.1 second
-Thread.Sleep(100);
+// Delay for 1 second
+Thread.Sleep(1000);
 
 // Additional effect 6 - Cursed pattern using PatBlt
 int patternSize = 50;
