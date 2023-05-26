@@ -192,21 +192,26 @@ for (int i = 0; i < 10; i++)
     Thread.Sleep(500);
 }
 
-// Additional effect 9 - Cursed effect using SetPixel to create random colored pixels
-Random randomColor = new Random();
+// Additional effect 9 - Cursed effect using TransparentBlt with random positions and transparency
+int randomX = 0;
+int randomY = 0;
+int randomWidth = 0;
+int randomHeight = 0;
 
-for (int i = 0; i < 1000; i++)
+Random random = new Random();
+
+for (int i = 0; i < 10; i++)
 {
-    int x = random.Next(0, cx);
-    int y = random.Next(0, cy);
-    int color = (int)(0x1000000 * randomColor.NextDouble()) | 0xFF000000; // Random ARGB color
+    randomX = random.Next(0, cx);
+    randomY = random.Next(0, cy);
+    randomWidth = random.Next(0, cx - randomX);
+    randomHeight = random.Next(0, cy - randomY);
 
-    SetPixel(hdc, x, y, color);
+    TransparentBlt(hdc, randomX, randomY, randomWidth, randomHeight, hdc, randomX, randomY, randomWidth, randomHeight, 0xFF000000);
 
-    // Delay for 10 milliseconds
-    Thread.Sleep(10);
+    // Delay for 500 milliseconds
+    Thread.Sleep(500);
 }
-
         }
     }
 }
