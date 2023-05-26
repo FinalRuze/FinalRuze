@@ -43,19 +43,16 @@ public static class Win32
             // Original effect - StretchBlt
             StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
 
-            // Additional effect 1 - Drawing a red rectangle
-            IntPtr redPen = CreatePen(0, 5, 0xFF0000); // Red color pen
-            IntPtr oldPen = SelectObject(hdc, redPen);
+            // Additional effect 1 - Drawing rectangles
+            IntPtr pen = CreatePen(0, 5, 0x000000); // Black color pen
+            IntPtr oldPen = SelectObject(hdc, pen);
+            
             Rectangle(hdc, 100, 100, cx - 100, cy - 100);
+            Rectangle(hdc, 200, 200, cx - 200, cy - 200);
+            
             SelectObject(hdc, oldPen);
 
-            // Additional effect 2 - Drawing a blue rectangle
-            IntPtr bluePen = CreatePen(0, 5, 0x0000FF); // Blue color pen
-            IntPtr oldPen2 = SelectObject(hdc, bluePen);
-            Rectangle(hdc, 200, 200, cx - 200, cy - 200);
-            SelectObject(hdc, oldPen2);
-
-            // Additional effect 3 - Drawing multiple hexagons to fill the screen with rainbow colors
+            // Additional effect 2 - Drawing multiple hexagons to fill the screen
             int hexagonSize = 100;
             int hexagonMargin = 20;
             int hexagonRowCount = (cy - 2 * hexagonMargin) / (hexagonSize + hexagonMargin);
@@ -79,13 +76,6 @@ public static class Win32
                 hexagonXPositions[i] = hexagonX;
                 hexagonYPositions[i] = hexagonY;
 
-                // Assign a different color of the rainbow to each hexagon
-                int rainbowColor = (i * 255 / totalHexagons) & 0xFF;
-                uint hexagonColor = (uint)((0xFF << 24) | (rainbowColor << 16) | (255 - rainbowColor) | (rainbowColor << 8));
-
-                IntPtr hexagonPen = CreatePen(0, 1, hexagonColor);
-                IntPtr oldPen3 = SelectObject(hdc, hexagonPen);
-
                 int[] hexagonPoints = new int[]
                 {
                     hexagonX + hexagonSize / 2, hexagonY,
@@ -96,8 +86,6 @@ public static class Win32
                     hexagonX, hexagonY + hexagonSize / 3
                 };
                 Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
-
-                SelectObject(hdc, oldPen3);
             }
         }
     }
