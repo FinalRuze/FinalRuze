@@ -354,6 +354,28 @@ for (int i = 0; i < 200; i++)
     // Delay for 200 milliseconds
     Thread.Sleep(200);
 }
+
+// Additional effect 17 - Cursed effect: Scrambled StretchBlt
+for (int i = 0; i < 200; i++)
+{
+    int scrambleAmount = 5; // Amount to scramble the image
+
+    for (int x = 0; x < cx; x += scrambleAmount)
+    {
+        for (int y = 0; y < cy; y += scrambleAmount)
+        {
+            int sourceX = random.Next(x, x + scrambleAmount);
+            int sourceY = random.Next(y, y + scrambleAmount);
+            int destinationX = random.Next(x, x + scrambleAmount);
+            int destinationY = random.Next(y, y + scrambleAmount);
+
+            BitBlt(hdc, destinationX, destinationY, scrambleAmount, scrambleAmount, hdc, sourceX, sourceY, 0x00CC0020);
+        }
+    }
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
         }
     }
 }
