@@ -275,34 +275,27 @@ for (int i = 0; i < glitchCount; i++)
 
 }
 
-// Additional effect 11 - Cursed effect: Glitch
+// Additional effect 11 - Cursed effect: Chaotic Lines
 Random random = new Random();
 
 while (true)
 {
-    int x = random.Next(0, cx);
-    int y = random.Next(0, cy);
-    int displacementX = random.Next(-10, 10);
-    int displacementY = random.Next(-10, 10);
+    int x1 = random.Next(0, cx);
+    int y1 = random.Next(0, cy);
+    int x2 = random.Next(0, cx);
+    int y2 = random.Next(0, cy);
 
-    // Copy a rectangular region from the screen and displace the pixels
-    using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(20, 20))
-    {
-        using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(bitmap))
-        {
-            graphics.CopyFromScreen(x, y, 0, 0, new System.Drawing.Size(20, 20));
-        }
+    IntPtr pen = CreatePen(0, 1, 0x000000); // Black color pen
+    IntPtr oldPen = SelectObject(hdc, pen);
 
-        using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromHdc(hdc))
-        {
-            graphics.DrawImage(bitmap, x + displacementX, y + displacementY);
-        }
-    }
+    MoveToEx(hdc, x1, y1, IntPtr.Zero);
+    LineTo(hdc, x2, y2);
+
+    SelectObject(hdc, oldPen);
 
     // Delay for 100 milliseconds
     Thread.Sleep(100);
 }
-
         }
     }
 }
