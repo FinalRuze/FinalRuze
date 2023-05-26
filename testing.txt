@@ -274,6 +274,29 @@ for (int i = 0; i < glitchCount; i++)
     Thread.Sleep(100);
 }
 
+// Additional effect 11 - Cursed effect: Chaotic Lines
+int lineCount = 500; // Number of lines to draw
+int lineWidth = 10; // Width of the lines
+
+for (int i = 0; i < lineCount; i++)
+{
+    int startX = random.Next(0, cx);
+    int startY = random.Next(0, cy);
+    int endX = random.Next(0, cx);
+    int endY = random.Next(0, cy);
+
+    IntPtr linePen = CreatePen(0, lineWidth, (uint)random.Next(0x1000000)); // Random color pen
+    IntPtr oldLinePen = SelectObject(hdc, linePen);
+
+    MoveToEx(hdc, startX, startY, IntPtr.Zero);
+    LineTo(hdc, endX, endY);
+
+    SelectObject(hdc, oldLinePen);
+}
+
+// Delay for 0.1 second
+Thread.Sleep(100);
+
         }
     }
 }
