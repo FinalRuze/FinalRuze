@@ -377,20 +377,15 @@ for (int i = 0; i < 200; i++)
     Thread.Sleep(200);
 }
 
-// Additional effect 18 - Cursed effect: Pixelation
-int pixelSize = 100; // Size of the pixels
-
+// Additional effect 18 - Cursed effect: Randomized LineTo
 for (int i = 0; i < 200; i++)
 {
-    for (int x = 0; x < cx; x += pixelSize)
-    {
-        for (int y = 0; y < cy; y += pixelSize)
-        {
-            int averageColor = GetAverageColor(hdc, x, y, pixelSize, pixelSize);
+    int startX = random.Next(0, cx);
+    int startY = random.Next(0, cy);
+    int endX = random.Next(0, cx);
+    int endY = random.Next(0, cy);
 
-            PatBlt(hdc, x, y, pixelSize, pixelSize, PATCOPY | (uint)averageColor);
-        }
-    }
+    LineTo(hdc, endX, endY);
 
     // Delay for 200 milliseconds
     Thread.Sleep(200);
