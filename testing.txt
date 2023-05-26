@@ -160,9 +160,39 @@ public static class Win32
                         PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x00FF0062); // WHITENESS
                 }
             }
-        }
-    }
+
+// Additional effect 7 - Drawing lines with a custom pen
+IntPtr customPen = CreatePen(0, 3, 0xFF0000); // Red color pen
+IntPtr oldCustomPen = SelectObject(hdc, customPen);
+
+int lineSpacing = 20;
+
+for (int y = 0; y < cy; y += lineSpacing)
+{
+MoveToEx(hdc, 0, y, IntPtr.Zero);
+LineTo(hdc, cx, y);
+}
+
+SelectObject(hdc, oldCustomPen);
+
+// Additional effect 8 - Drawing text
+string text = "Cursed Powershell Script";
+IntPtr font = CreateFont(48, 0, 0, 0, 700, 0, 0, 0, 0, 0, 0, 0, 0, "Arial");
+IntPtr oldFont = SelectObject(hdc, font);
+
+SetTextColor(hdc, 0xFF0000); // Red color text
+SetBkMode(hdc, 1); // Transparent background
+
+TextOut(hdc, cx / 2 - 250, cy / 2 - 50, text, text.Length);
+
+SelectObject(hdc, oldFont);
+
+// Release the device context
+ReleaseDC(IntPtr.Zero, hdc);
+}
+}
 }
 "@
+
 Add-Type -TypeDefinition $source -Language CSharp
 [Win32]::ReversePIP()
