@@ -27,7 +27,7 @@ public static class Win32
     static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
     [DllImport("gdi32.dll")]
-    static extern bool Pie(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nXRadial1, int nYRadial1, int nXRadial2, int nYRadial2);
+    static extern bool Polygon(IntPtr hdc, int[] points, int nCount);
 
     public static void ReversePIP()
     {
@@ -55,13 +55,9 @@ public static class Win32
             Rectangle(hdc, 200, 200, cx - 200, cy - 200);
             SelectObject(hdc, oldPen2);
 
-            // Additional effect 3 - Drawing a pie (partial ellipse) with a gradient fill
-            int gradientStartColor = 0xFF00FF; // Start color (magenta)
-            int gradientEndColor = 0xFFFF00; // End color (yellow)
-            int pieX = cx / 2;
-            int pieY = cy / 2;
-            int pieRadius = Math.Min(cx, cy) / 2;
-            Pie(hdc, pieX - pieRadius, pieY - pieRadius, pieX + pieRadius, pieY + pieRadius, 0, 0, cx, cy);
+            // Additional effect 3 - Drawing a custom polygon
+            int[] polygonPoints = new int[] { 50, 200, 250, 200, 150, 400 }; // Custom polygon points (x1, y1, x2, y2, x3, y3)
+            Polygon(hdc, polygonPoints, polygonPoints.Length / 2);
         }
     }
 }
