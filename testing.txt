@@ -258,28 +258,21 @@ for (int i = 0; i < numShapes; i++)
 // Delay for 0.1 second
 Thread.Sleep(10);
 
-// Additional effect 10 - Cursed effect: Random Lines
-int lineCount = 100; // Number of lines to draw
+// Additional effect 10 - Cursed effect: Screen Glitch
+int glitchCount = 20; // Number of glitches to create
 
-for (int i = 0; i < lineCount; i++)
+for (int i = 0; i < glitchCount; i++)
 {
-    int startX = random.Next(0, cx);
-    int startY = random.Next(0, cy);
-    int endX = random.Next(0, cx);
-    int endY = random.Next(0, cy);
+    int glitchWidth = random.Next(100, 300); // Random glitch width
+    int glitchHeight = random.Next(100, 300); // Random glitch height
+    int glitchX = random.Next(0, cx - glitchWidth); // Random X position
+    int glitchY = random.Next(0, cy - glitchHeight); // Random Y position
 
-    IntPtr linePen = CreatePen(0, 1, (uint)random.Next(0x000000, 0xFFFFFF + 1)); // Random color pen
-    IntPtr oldLinePen = SelectObject(hdc, linePen);
+    StretchBlt(hdc, glitchX, glitchY, glitchWidth, glitchHeight, hdc, glitchX + random.Next(-50, 50), glitchY + random.Next(-50, 50), glitchWidth, glitchHeight, 0x00CC0020);
 
-    MoveToEx(hdc, startX, startY, IntPtr.Zero);
-    LineTo(hdc, endX, endY);
-
-    SelectObject(hdc, oldLinePen);
-
-    // Delay for 10 milliseconds
-    Thread.Sleep(10);
+    // Delay for 100 milliseconds
+    Thread.Sleep(100);
 }
-
 
         }
     }
