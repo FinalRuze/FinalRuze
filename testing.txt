@@ -274,8 +274,8 @@ for (int i = 0; i < glitchCount; i++)
     Thread.Sleep(100);
 }
 
-// Additional effect 12 - Cursed effect: Randomized BitBlt
-for (int i = 0; i < 10; i++)
+// Additional effect 11 - Cursed effect: Randomized BitBlt
+for (int i = 0; i < 200; i++)
 {
     int sourceX = random.Next(0, cx);
     int sourceY = random.Next(0, cy);
