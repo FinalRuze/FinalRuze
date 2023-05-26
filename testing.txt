@@ -274,28 +274,22 @@ for (int i = 0; i < glitchCount; i++)
     Thread.Sleep(100);
 }
 
-// Additional effect 11 - Cursed effect: Chaotic Lines
-int lineCount = 500; // Number of lines to draw
-int lineWidth = 10; // Width of the lines
+// Additional effect 11 - Cursed effect: Flashing Colors
+int flashingDuration = 2000; // Duration of the flashing effect in milliseconds
 
-for (int i = 0; i < lineCount; i++)
+DateTime startTime = DateTime.Now;
+
+while ((DateTime.Now - startTime).TotalMilliseconds < flashingDuration)
 {
-    int startX = random.Next(0, cx);
-    int startY = random.Next(0, cy);
-    int endX = random.Next(0, cx);
-    int endY = random.Next(0, cy);
+    IntPtr flashingBrush = CreateSolidBrush((uint)random.Next(0x1000000)); // Random color brush
+    IntPtr oldBrush = SelectObject(hdc, flashingBrush);
 
-    IntPtr linePen = CreatePen(0, lineWidth, (uint)random.Next(0x1000000)); // Random color pen
-    IntPtr oldLinePen = SelectObject(hdc, linePen);
+    Rectangle(hdc, 0, 0, cx, cy);
 
-    MoveToEx(hdc, startX, startY, IntPtr.Zero);
-    LineTo(hdc, endX, endY);
+    SelectObject(hdc, oldBrush);
 
-    SelectObject(hdc, oldLinePen);
+    Thread.Sleep(10);
 }
-
-// Delay for 0.1 second
-Thread.Sleep(100);
 
         }
     }
