@@ -425,15 +425,9 @@ for (int i = 0; i < 200; i++)
     Thread.Sleep(200);
 }
 
-// Additional effect 37 - Cursed effect: Ghosting
-int ghostingIterations = 200;
-int ghostingDelay = 100;
-
-for (int i = 0; i < ghostingIterations; i++)
-{
-    BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, SRCCOPY);
-    Thread.Sleep(ghostingDelay);
-}
+// Additional effect 38 - Cursed effect: Stretching
+int stretchAmount = 200;
+StretchBlt(hdc, 0, 0, cx + (cx / stretchAmount), cy + (cy / stretchAmount), hdc, 0, 0, cx, cy, SRCCOPY);
         }
     }
 }
