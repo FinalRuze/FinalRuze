@@ -36,13 +36,7 @@ public static class Win32
     static extern bool RoundRect(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidth, int nHeight);
 
     [DllImport("gdi32.dll")]
-    static extern IntPtr CreateSolidBrush(uint crColor);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
-
-    [DllImport("gdi32.dll")]
-    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
+    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
 
     public static void ReversePIP()
     {
@@ -61,10 +55,10 @@ public static class Win32
             // Additional effect 1 - Drawing rectangles
             IntPtr pen = CreatePen(0, 5, 0x000000); // Black color pen
             IntPtr oldPen = SelectObject(hdc, pen);
-            
+
             Rectangle(hdc, 100, 100, cx - 100, cy - 100);
             Rectangle(hdc, 200, 200, cx - 200, cy - 200);
-            
+
             SelectObject(hdc, oldPen);
 
             // Additional effect 2 - Drawing multiple hexagons to fill the screen
@@ -138,40 +132,8 @@ public static class Win32
                 }
             }
 
-            // Additional effect 5 - Gradient background
-            uint color1 = 0xFF0000; // Red
-            uint color2 = 0x00FF00; // Green
-
-            IntPtr brush = CreateSolidBrush(color1);
-            IntPtr oldBrush = SelectObject(hdc, brush);
-
-            PatBlt(hdc, 0, 0, cx, cy, 0x00F00021);
-
-            uint startRed = (color1 & 0xFF0000) >> 16;
-            uint startGreen = (color1 & 0x00FF00) >> 8;
-            uint startBlue = color1 & 0x0000FF;
-
-            uint endRed = (color2 & 0xFF0000) >> 16;
-            uint endGreen = (color2 & 0x00FF00) >> 8;
-            uint endBlue = color2 & 0x0000FF;
-
-            for (int y = 0; y < cy; y++)
-            {
-                uint red = (uint)(((endRed - startRed) * y) / cy + startRed);
-                uint green = (uint)(((endGreen - startGreen) * y) / cy + startGreen);
-                uint blue = (uint)(((endBlue - startBlue) * y) / cy + startBlue);
-
-                uint gradientColor = (red << 16) | (green << 8) | blue;
-
-                IntPtr gradientBrush = CreateSolidBrush(gradientColor);
-                SelectObject(hdc, gradientBrush);
-                PatBlt(hdc, 0, y, cx, 1, 0x00F00021);
-                SelectObject(hdc, oldBrush);
-                DeleteObject(gradientBrush);
-            }
-
-            // Release the device context
-            ReleaseDC(IntPtr.Zero, hdc);
+            // Additional effect 5 - Inverting colors
+            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
         }
     }
 }
