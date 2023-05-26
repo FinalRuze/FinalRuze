@@ -138,95 +138,27 @@ public static class Win32
             // Additional effect 5 - Inverting colors
             BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
 
-            // Additional effect 6 - Clearing a portion of the screen with a solid color
-            int clearX = cx / 4;
-            int clearY = cy / 4;
-            int clearWidth = cx / 2;
-            int clearHeight = cy / 2;
+            // Additional effect 6 - Filling the screen with a pattern
+            int patternSize = 20;
+            int patternRowCount = cy / patternSize;
+            int patternColumnCount = cx / patternSize;
 
-            PatBlt(hdc, clearX, clearY, clearWidth, clearHeight, 0x00FA0089); // Solid light blue color
-
-            // Additional effect 7 - Drawing a gradient background
-            uint[] gradientColors = new uint[] { 0x0000FF, 0x00FFFF }; // Blue to cyan gradient
-            int gradientSteps = 50;
-
-            for (int i = 0; i < gradientSteps; i++)
+            for (int row = 0; row < patternRowCount; row++)
             {
-                uint color = InterpolateColor(gradientColors[0], gradientColors[1], (float)i / (gradientSteps - 1));
-                PatBlt(hdc, 0, cy * i / gradientSteps, cx, cy / gradientSteps, 0x00FA0089 | color);
-            }
-
-            // Additional effect 8 - Drawing diagonal lines
-            IntPtr linePen = CreatePen(0, 1, 0x000000); // Black color pen
-            IntPtr oldLinePen = SelectObject(hdc, linePen);
-
-            int lineStep = 20;
-            for (int i = 0; i < cx + cy; i += lineStep)
-            {
-                int startX = i < cy ? 0 : i - cy;
-                int startY = i < cy ? cy - i : 0;
-                int endX = i < cx ? i : cx;
-                int endY = i < cx ? 0 : i - cx;
-
-                MoveToEx(hdc, startX, startY, IntPtr.Zero);
-                LineTo(hdc, endX, endY);
-            }
-
-            SelectObject(hdc, oldLinePen);
-
-            // Additional effect 9 - Drawing a checkered pattern
-            int checkerSize = 50;
-
-            for (int x = 0; x < cx; x += checkerSize)
-            {
-                for (int y = 0; y < cy; y += checkerSize)
+                for (int column = 0; column < patternColumnCount; column++)
                 {
-                    int color = (x / checkerSize + y / checkerSize) % 2 == 0 ? 0xFFFFFF : 0x000000;
-                    PatBlt(hdc, x, y, checkerSize, checkerSize, 0x00FA0089 | (uint)color);
+                    int patternX = column * patternSize;
+                    int patternY = row * patternSize;
+
+                    PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x00A000C9);
                 }
             }
 
-            // Additional effect 10 - Drawing a random scatter of dots
-            Random random = new Random();
-            int dotSize = 5;
-            int dotCount = 500;
-
-            for (int i = 0; i < dotCount; i++)
-            {
-                int dotX = random.Next(0, cx);
-                int dotY = random.Next(0, cy);
-                PatBlt(hdc, dotX, dotY, dotSize, dotSize, 0x00FA0089 | (uint)0x000000);
-            }
-
+            // Release the device context
             ReleaseDC(IntPtr.Zero, hdc);
         }
     }
-
-    private static uint InterpolateColor(uint color1, uint color2, float t)
-    {
-        byte r1 = (byte)(color1 & 0xFF);
-        byte g1 = (byte)((color1 >> 8) & 0xFF);
-        byte b1 = (byte)((color1 >> 16) & 0xFF);
-
-        byte r2 = (byte)(color2 & 0xFF);
-        byte g2 = (byte)((color2 >> 8) & 0xFF);
-        byte b2 = (byte)((color2 >> 16) & 0xFF);
-
-        byte r = (byte)(r1 + (r2 - r1) * t);
-        byte g = (byte)(g1 + (g2 - g1) * t);
-        byte b = (byte)(b1 + (b2 - b1) * t);
-
-        return (uint)((r << 16) | (g << 8) | b);
-    }
-}
-
-public class Program
-{
-    public static void Main()
-    {
-        Win32.ReversePIP();
-    }
 }
 "@
-Add-Type -TypeDefinition $source -ReferencedAssemblies "System.Drawing"
-[Program]::Main()
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::ReversePIP()
