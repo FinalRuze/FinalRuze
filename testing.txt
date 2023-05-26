@@ -192,6 +192,38 @@ for (int i = 0; i < 10; i++)
     Thread.Sleep(500);
 }
 
+// Additional effect 9 - Cursed effect by randomly coloring pixels
+int pixelSize = 5;
+int pixelRowCount = cy / pixelSize;
+int pixelColumnCount = cx / pixelSize;
+
+for (int row = 0; row < pixelRowCount; row++)
+{
+    for (int column = 0; column < pixelColumnCount; column++)
+    {
+        int pixelX = column * pixelSize;
+        int pixelY = row * pixelSize;
+
+        // Generate a random color for each pixel
+        int red = random.Next(0, 256);
+        int green = random.Next(0, 256);
+        int blue = random.Next(0, 256);
+        uint color = (uint)((red << 16) | (green << 8) | blue);
+
+        for (int i = 0; i < pixelSize; i++)
+        {
+            for (int j = 0; j < pixelSize; j++)
+            {
+                SetPixel(hdc, pixelX + i, pixelY + j, color);
+            }
+        }
+    }
+}
+
+// Delay for 1 second
+Thread.Sleep(1000);
+
+
         }
     }
 }
