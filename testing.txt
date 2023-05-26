@@ -391,26 +391,16 @@ for (int i = 0; i < 200; i++)
     Thread.Sleep(200);
 }
 
-// Additional effect 19 - Cursed effect: Warped Text
+// Additional effect 19 - Cursed effect: Rainbow Text
 for (int i = 0; i < 200; i++)
 {
-    int startX = random.Next(0, cx);
-    int startY = random.Next(0, cy);
-    int endX = random.Next(0, cx);
-    int endY = random.Next(0, cy);
-
     SetTextColor(hdc, (uint)random.Next(0, 0xFFFFFF));
     SetBkColor(hdc, (uint)random.Next(0, 0xFFFFFF));
 
-    POINT[] points = new POINT[3];
-    points[0].X = startX;
-    points[0].Y = startY;
-    points[1].X = random.Next(startX, endX);
-    points[1].Y = random.Next(startY, endY);
-    points[2].X = endX;
-    points[2].Y = endY;
+    int x = random.Next(0, cx);
+    int y = random.Next(0, cy);
 
-    PolyBezierTo(hdc, points, 3);
+    TextOut(hdc, x, y, "Hello, World!", 13);
 
     // Delay for 200 milliseconds
     Thread.Sleep(200);
