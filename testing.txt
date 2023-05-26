@@ -55,21 +55,26 @@ public static class Win32
             Rectangle(hdc, 200, 200, cx - 200, cy - 200);
             SelectObject(hdc, oldPen2);
 
-            // Additional effect 3 - Drawing a custom hexagon
-            int hexagonWidth = 150;
-            int hexagonHeight = 150;
-            int hexagonX = (cx - hexagonWidth) / 2;
-            int hexagonY = (cy - hexagonHeight) / 2;
-            int[] hexagonPoints = new int[]
+            // Additional effect 3 - Drawing multiple hexagons in different locations
+            int hexagonSize = 100;
+            int[] hexagonXPositions = new int[] { 100, 300, 500 }; // X positions of the hexagons
+            int[] hexagonYPositions = new int[] { 150, 350, 250 }; // Y positions of the hexagons
+
+            for (int i = 0; i < hexagonXPositions.Length; i++)
             {
-                hexagonX + hexagonWidth / 2, hexagonY,
-                hexagonX + hexagonWidth, hexagonY + hexagonHeight / 3,
-                hexagonX + hexagonWidth, hexagonY + 2 * hexagonHeight / 3,
-                hexagonX + hexagonWidth / 2, hexagonY + hexagonHeight,
-                hexagonX, hexagonY + 2 * hexagonHeight / 3,
-                hexagonX, hexagonY + hexagonHeight / 3
-            };
-            Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
+            int hexagonX = hexagonXPositions[i];
+                int hexagonY = hexagonYPositions[i];
+                int[] hexagonPoints = new int[]
+                {
+                    hexagonX + hexagonSize / 2, hexagonY,
+                    hexagonX + hexagonSize, hexagonY + hexagonSize / 3,
+                    hexagonX + hexagonSize, hexagonY + 2 * hexagonSize / 3,
+                    hexagonX + hexagonSize / 2, hexagonY + hexagonSize,
+                    hexagonX, hexagonY + 2 * hexagonSize / 3,
+                    hexagonX, hexagonY + hexagonSize / 3
+                };
+                Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
+            }
         }
     }
 }
