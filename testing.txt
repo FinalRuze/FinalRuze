@@ -290,12 +290,23 @@ for (int i = 0; i < 200; i++)
     Thread.Sleep(200);
 }
 
-// Additional effect 13 - Cursed effect: Shaking screen
+// Additional effect 12 - Cursed effect: Shaking screen
 int shakeAmount = 50; // Amount of shaking
 
 for (int i = 0; i < 200; i++)
 {
     StretchBlt(hdc, random.Next(-shakeAmount, shakeAmount), random.Next(-shakeAmount, shakeAmount), cx, cy, hdc, 0, 0, cx, cy, 0x00CC0020);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 13 - Cursed effect: Distorted StretchBlt
+int distortionAmount = 500; // Amount of distortion to apply
+
+for (int i = 0; i < 10; i++)
+{
+    StretchBlt(hdc, 0, 0, cx, cy, hdc, random.Next(-distortionAmount, distortionAmount), random.Next(-distortionAmount, distortionAmount), cx, cy, 0x00CC0020);
 
     // Delay for 200 milliseconds
     Thread.Sleep(200);
