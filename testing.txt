@@ -29,15 +29,6 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool Polygon(IntPtr hdc, int[] points, int nCount);
 
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateSolidBrush(uint color);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
-
-    [DllImport("gdi32.dll")]
-    static extern bool DeleteObject(IntPtr hObject);
-
     public static void ReversePIP()
     {
         SetProcessDPIAware();
@@ -77,18 +68,6 @@ public static class Win32
             int startX = hexagonMargin;
             int startY = hexagonMargin;
 
-            // Rainbow colors
-            uint[] rainbowColors = new uint[]
-            {
-                0xFF0000, // Red
-                0xFFA500, // Orange
-                0xFFFF00, // Yellow
-                0x008000, // Green
-                0x0000FF, // Blue
-                0x4B0082, // Indigo
-                0xEE82EE  // Violet
-            };
-
             for (int i = 0; i < totalHexagons; i++)
             {
                 int row = i / hexagonColumnCount;
@@ -100,11 +79,11 @@ public static class Win32
                 hexagonXPositions[i] = hexagonX;
                 hexagonYPositions[i] = hexagonY;
 
-                // Get the corresponding rainbow color
-                uint color = rainbowColors[i % rainbowColors.Length];
+                // Assign a different color of the rainbow to each hexagon
+                int rainbowColor = (i * 255 / totalHexagons) & 0xFF;
+                uint hexagonColor = (uint)((0xFF << 24) | (rainbowColor << 16) | (255 - rainbowColor) | (rainbowColor << 8));
 
-                // Draw the hexagon outline with the rainbow color
-                IntPtr hexagonPen = CreatePen(0, 5, color);
+                IntPtr hexagonPen = CreatePen(0, 1, hexagonColor);
                 IntPtr oldPen3 = SelectObject(hdc, hexagonPen);
 
                 int[] hexagonPoints = new int[]
@@ -116,19 +95,9 @@ public static class Win32
                     hexagonX, hexagonY + 2 * hexagonSize / 3,
                     hexagonX, hexagonY + hexagonSize / 3
                 };
-
                 Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
 
-                // Fill the hexagon with the corresponding rainbow color
-                IntPtr hexagonBrush = CreateSolidBrush(color);
-                IntPtr oldBrush = SelectObject(hdc, hexagonBrush);
-                Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
-                SelectObject(hdc, oldBrush);
-
-                // Cleanup
                 SelectObject(hdc, oldPen3);
-                DeleteObject(hexagonPen);
-                DeleteObject(hexagonBrush);
             }
         }
     }
