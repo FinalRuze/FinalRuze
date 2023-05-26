@@ -337,17 +337,19 @@ for (int i = 0; i < 200; i++)
     Thread.Sleep(200);
 }
 
-// Additional effect 16 - Cursed effect: Randomized PatBlt
+// Additional effect 16 - Cursed effect: Randomized StretchBlt
 for (int i = 0; i < 200; i++)
 {
-    int patternX = random.Next(0, cx);
-    int patternY = random.Next(0, cy);
-    int patternWidth = random.Next(0, cx - patternX);
-    int patternHeight = random.Next(0, cy - patternY);
+    int sourceX = random.Next(0, cx);
+    int sourceY = random.Next(0, cy);
+    int sourceWidth = random.Next(0, cx - sourceX);
+    int sourceHeight = random.Next(0, cy - sourceY);
+    int destinationX = random.Next(0, cx);
+    int destinationY = random.Next(0, cy);
+    int destinationWidth = random.Next(0, cx - destinationX);
+    int destinationHeight = random.Next(0, cy - destinationY);
 
-    uint patternColor = (uint)random.Next(0, 0xFFFFFF + 1); // Random pattern color
-
-    PatBlt(hdc, patternX, patternY, patternWidth, patternHeight, PATCOPY | (uint)patternColor);
+    StretchBlt(hdc, destinationX, destinationY, destinationWidth, destinationHeight, hdc, sourceX, sourceY, sourceWidth, sourceHeight, 0x00CC0020);
 
     // Delay for 200 milliseconds
     Thread.Sleep(200);
