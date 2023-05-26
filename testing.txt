@@ -29,6 +29,12 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool Polygon(IntPtr hdc, int[] points, int nCount);
 
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateSolidBrush(uint crColor);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
     public static void ReversePIP()
     {
         SetProcessDPIAware();
@@ -68,6 +74,7 @@ public static class Win32
             int startX = hexagonMargin;
             int startY = hexagonMargin;
 
+            //
             for (int i = 0; i < totalHexagons; i++)
             {
                 int row = i / hexagonColumnCount;
@@ -79,6 +86,12 @@ public static class Win32
                 hexagonXPositions[i] = hexagonX;
                 hexagonYPositions[i] = hexagonY;
 
+                // Assign a different color of the rainbow to each hexagon
+                int colorIndex = i % 7;
+                uint hexagonColor = GetRainbowColor(colorIndex);
+                IntPtr brush = CreateSolidBrush(hexagonColor);
+                IntPtr oldBrush = SelectObject(hdc, brush);
+
                 int[] hexagonPoints = new int[]
                 {
                     hexagonX + hexagonSize / 2, hexagonY,
@@ -89,7 +102,24 @@ public static class Win32
                     hexagonX, hexagonY + hexagonSize / 3
                 };
                 Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
+
+                SelectObject(hdc, oldBrush);
             }
+        }
+    }
+
+    private static uint GetRainbowColor(int index)
+    {
+        switch (index)
+        {
+            case 0: return 0xFF0000; // Red
+            case 1: return 0xFFA500; // Orange
+            case 2: return 0xFFFF00; // Yellow
+            case 3: return 0x00FF00; // Green
+            case 4: return 0x0000FF; // Blue
+            case 5: return 0x4B0082; // Indigo
+            case 6: return 0x8B00FF; // Violet
+            default: return 0x000000; // Black (fallback)
         }
     }
 }
