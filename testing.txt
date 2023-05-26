@@ -38,6 +38,12 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
 
+    [DllImport("gdi32.dll")]
+    static extern bool SetTextColor(IntPtr hdc, int crColor);
+
+    [DllImport("gdi32.dll")]
+    static extern bool TextOut(IntPtr hdc, int nXStart, int nYStart, string lpString, int cchString);
+
     public static void ReversePIP()
     {
         SetProcessDPIAware();
@@ -134,6 +140,13 @@ public static class Win32
 
             // Additional effect 5 - Inverting colors
             BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
+
+            // Additional effect 6 - Drawing colored text
+            string text = "Hello, GDI+!";
+            int textX = cx / 2 - 100;
+            int textY = cy / 2;
+            SetTextColor(hdc, 0x00FF00); // Green color text
+            TextOut(hdc, textX, textY, text, text.Length);
         }
     }
 }
