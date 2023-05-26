@@ -192,19 +192,32 @@ for (int i = 0; i < 10; i++)
 }
 
 // Additional effect 9 - Cursed effect using custom GDI operation (CURSED OPERATION)
-// Implement your own custom GDI operation here. For example, let's draw a randomly sized and positioned triangle.
-int triangleSize = Math.Min(cx, cy);
-int triangleX = random.Next(0, cx - triangleSize);
-int triangleY = random.Next(0, cy - triangleSize);
+// Implement your own custom GDI operation here. For example, let's draw randomly sized and positioned shapes.
+int numShapes = 5; // Number of shapes to draw
+int maxShapeSize = Math.Min(cx, cy); // Maximum shape size
 
-int[] trianglePoints = new int[]
+for (int i = 0; i < numShapes; i++)
 {
-    triangleX, triangleY + triangleSize,
-    triangleX + triangleSize / 2, triangleY,
-    triangleX + triangleSize, triangleY + triangleSize
-};
+    int shapeSize = random.Next(50, maxShapeSize); // Random shape size
+    int shapeX = random.Next(0, cx - shapeSize); // Random X position
+    int shapeY = random.Next(0, cy - shapeSize); // Random Y position
 
-Polygon(hdc, trianglePoints, trianglePoints.Length / 2);
+    int shapeType = random.Next(0, 3); // Random shape type (0: Rectangle, 1: Ellipse, 2: Rounded Rectangle)
+
+    switch (shapeType)
+    {
+        case 0: // Rectangle
+            Rectangle(hdc, shapeX, shapeY, shapeX + shapeSize, shapeY + shapeSize);
+            break;
+        case 1: // Ellipse
+            Ellipse(hdc, shapeX, shapeY, shapeX + shapeSize, shapeY + shapeSize);
+            break;
+        case 2: // Rounded Rectangle
+            int cornerRadius = random.Next(0, 50); // Random corner radius
+            RoundRect(hdc, shapeX, shapeY, shapeX + shapeSize, shapeY + shapeSize, cornerRadius, cornerRadius);
+            break;
+    }
+}
 
 // Delay for 1 second
 Thread.Sleep(1000);
