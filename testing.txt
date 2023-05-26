@@ -258,8 +258,6 @@ for (int i = 0; i < numShapes; i++)
 // Delay for 0.1 second
 Thread.Sleep(10);
 
-}
-
 // Additional effect 10 - Cursed effect: Random Lines
 int lineCount = 100; // Number of lines to draw
 
