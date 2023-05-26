@@ -36,7 +36,13 @@ public static class Win32
     static extern bool RoundRect(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidth, int nHeight);
 
     [DllImport("gdi32.dll")]
-    static extern bool Arc(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nXStartArc, int nYStartArc, int nXEndArc, int nYEndArc);
+    static extern IntPtr CreateSolidBrush(uint crColor);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+    [DllImport("gdi32.dll")]
+    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
 
     public static void ReversePIP()
     {
@@ -71,84 +77,101 @@ public static class Win32
             int[] hexagonXPositions = new int[totalHexagons];
             int[] hexagonYPositions = new int[totalHexagons];
 
-                int startX = hexagonMargin;
-                int startY = hexagonMargin;
+            int startX = hexagonMargin;
+            int startY = hexagonMargin;
 
-                for (int i = 0; i < totalHexagons; i++)
+            for (int i = 0; i < totalHexagons; i++)
+            {
+                int row = i / hexagonColumnCount;
+                int column = i % hexagonColumnCount;
+
+                int hexagonX = startX + column * (hexagonSize + hexagonMargin);
+                int hexagonY = startY + row * (hexagonSize + hexagonMargin);
+
+                hexagonXPositions[i] = hexagonX;
+                hexagonYPositions[i] = hexagonY;
+
+                int[] hexagonPoints = new int[]
                 {
-                    int row = i / hexagonColumnCount;
-                    int column = i % hexagonColumnCount;
+                    hexagonX + hexagonSize / 2, hexagonY,
+                    hexagonX + hexagonSize, hexagonY + hexagonSize / 3,
+                    hexagonX + hexagonSize, hexagonY + 2 * hexagonSize / 3,
+                    hexagonX + hexagonSize / 2, hexagonY + hexagonSize,
+                    hexagonX, hexagonY + 2 * hexagonSize / 3,
+                    hexagonX, hexagonY + hexagonSize / 3
+                };
+                Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
+            }
 
-                    int hexagonX = startX + column * (hexagonSize + hexagonMargin);
-                    int hexagonY = startY + row * (hexagonSize + hexagonMargin);
+            // Additional effect 3 - Drawing ellipses
+            int ellipseSize = 100;
+            int ellipseMargin = 50;
+            int ellipseRowCount = (cy - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
+            int ellipseColumnCount = (cx - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
 
-                    hexagonXPositions[i] = hexagonX;
-                    hexagonYPositions[i] = hexagonY;
-
-                    int[] hexagonPoints = new int[]
-                    {
-                        hexagonX + hexagonSize / 2, hexagonY,
-                        hexagonX + hexagonSize, hexagonY + hexagonSize / 3,
-                        hexagonX + hexagonSize, hexagonY + 2 * hexagonSize / 3,
-                        hexagonX + hexagonSize / 2, hexagonY + hexagonSize,
-                        hexagonX, hexagonY + 2 * hexagonSize / 3,
-                        hexagonX, hexagonY + hexagonSize / 3
-                    };
-                    Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
-                }
-
-                // Additional effect 3 - Drawing ellipses
-                int ellipseSize = 100;
-                int ellipseMargin = 50;
-                int ellipseRowCount = (cy - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
-                int ellipseColumnCount = (cx - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
-
-                for (int row = 0; row < ellipseRowCount; row++)
+            for (int row = 0; row < ellipseRowCount; row++)
+            {
+                for (int column = 0; column < ellipseColumnCount; column++)
                 {
-                    for (int column = 0; column < ellipseColumnCount; column++)
-                    {
-                        int ellipseX = ellipseMargin + column * (ellipseSize + ellipseMargin);
-                        int ellipseY = ellipseMargin + row * (ellipseSize + ellipseMargin);
+                    int ellipseX = ellipseMargin + column * (ellipseSize + ellipseMargin);
+                    int ellipseY = ellipseMargin + row * (ellipseSize + ellipseMargin);
 
-                        Ellipse(hdc, ellipseX, ellipseY, ellipseX + ellipseSize, ellipseY + ellipseSize);
-                    }
-                }
-
-                // Additional effect 4 - Drawing rounded rectangles
-                int roundedRectWidth = 200;
-                int roundedRectHeight = 100;
-                int roundedRectMargin = 50;
-                int roundedRectRowCount = (cy - 2 * roundedRectMargin) / (roundedRectHeight + roundedRectMargin);
-                int roundedRectColumnCount = (cx - 2 * roundedRectMargin) / (roundedRectWidth + roundedRectMargin);
-
-                for (int row = 0; row < roundedRectRowCount; row++)
-                {
-                    for (int column = 0; column < roundedRectColumnCount; column++)
-                    {
-                        int roundedRectX = roundedRectMargin + column * (roundedRectWidth + roundedRectMargin);
-                        int roundedRectY = roundedRectMargin + row * (roundedRectHeight + roundedRectMargin);
-
-                        RoundRect(hdc, roundedRectX, roundedRectY, roundedRectX + roundedRectWidth, roundedRectY + roundedRectHeight, 20, 20);
-                    }
-                }
-
-                // Additional effect 5 - Drawing arcs
-                int arcSize = 150;
-                int arcMargin = 50;
-                int arcRowCount = (cy - 2 * arcMargin) / (arcSize + arcMargin);
-                int arcColumnCount = (cx - 2 * arcMargin) / (arcSize + arcMargin);
-
-                for (int row = 0; row < arcRowCount; row++)
-                {
-                    for (int column = 0; column < arcColumnCount; column++)
-                    {
-                        int arcX = arcMargin + column * (arcSize + arcMargin);
-                        int arcY = arcMargin + row * (arcSize + arcMargin);
-
-                        Arc(hdc, arcX, arcY, arcX + arcSize, arcY + arcSize, arcX + arcSize, arcY + arcSize / 2, arcX, arcY + arcSize / 2);
-                    }
+                    Ellipse(hdc, ellipseX, ellipseY, ellipseX + ellipseSize, ellipseY + ellipseSize);
                 }
             }
+
+            // Additional effect 4 - Drawing rounded rectangles
+            int roundedRectWidth = 200;
+            int roundedRectHeight = 100;
+            int roundedRectMargin = 50;
+            int roundedRectRowCount = (cy - 2 * roundedRectMargin) / (roundedRectHeight + roundedRectMargin);
+            int roundedRectColumnCount = (cx - 2 * roundedRectMargin) / (roundedRectWidth + roundedRectMargin);
+
+            for (int row = 0; row < roundedRectRowCount; row++)
+            {
+                for (int column = 0; column < roundedRectColumnCount; column++)
+                {
+                    int roundedRectX = roundedRectMargin + column * (roundedRectWidth + roundedRectMargin);
+                    int roundedRectY = roundedRectMargin + row * (roundedRectHeight + roundedRectMargin);
+
+                    RoundRect(hdc, roundedRectX, roundedRectY, roundedRectX + roundedRectWidth, roundedRectY + roundedRectHeight, 20, 20);
+                }
+            }
+
+            // Additional effect 5 - Gradient background
+            uint color1 = 0xFF0000; // Red
+            uint color2 = 0x00FF00; // Green
+
+            IntPtr brush = CreateSolidBrush(color1);
+            IntPtr oldBrush = SelectObject(hdc, brush);
+
+            PatBlt(hdc, 0, 0, cx, cy, 0x00F00021);
+
+            uint startRed = (color1 & 0xFF0000) >> 16;
+            uint startGreen = (color1 & 0x00FF00) >> 8;
+            uint startBlue = color1 & 0x0000FF;
+
+            uint endRed = (color2 & 0xFF0000) >> 16;
+            uint endGreen = (color2 & 0x00FF00) >> 8;
+            uint endBlue = color2 & 0x0000FF;
+
+            for (int y = 0; y < cy; y++)
+            {
+                uint red = (uint)(((endRed - startRed) * y) / cy + startRed);
+                uint green = (uint)(((endGreen - startGreen) * y) / cy + startGreen);
+                uint blue = (uint)(((endBlue - startBlue) * y) / cy + startBlue);
+
+                uint gradientColor = (red << 16) | (green << 8) | blue;
+
+                IntPtr gradientBrush = CreateSolidBrush(gradientColor);
+                SelectObject(hdc, gradientBrush);
+                PatBlt(hdc, 0, y, cx, 1, 0x00F00021);
+                SelectObject(hdc, oldBrush);
+                DeleteObject(gradientBrush);
+            }
+
+            // Release the device context
+            ReleaseDC(IntPtr.Zero, hdc);
         }
     }
 }
