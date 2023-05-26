@@ -57,16 +57,16 @@ public static class Win32
 
             // Additional effect 3 - Drawing multiple hexagons in different locations
             int hexagonSize = 100;
-            int[] hexagonXPositions = new int[] { 100, 300, 500 }; // X positions of the hexagons
-            int[] hexagonYPositions = new int[] { 150, 350, 250 }; // Y positions of the hexagons
+            int[] hexagonXPositions = new int[] { 100, 300, 500, 200, 400, 100, 300, 500, 200, 400 }; // X positions of the hexagons
+            int[] hexagonYPositions = new int[] { 150, 350, 250, 400, 200, 100, 300, 500, 200, 400 }; // Y positions of the hexagons
 
             for (int i = 0; i < hexagonXPositions.Length; i++)
             {
-            int hexagonX = hexagonXPositions[i];
+                int hexagonX = hexagonXPositions[i];
                 int hexagonY = hexagonYPositions[i];
                 int[] hexagonPoints = new int[]
                 {
-                    hexagonX + hexagonSize / 2, hexagonY,
+                 hexagonX + hexagonSize / 2, hexagonY,
                     hexagonX + hexagonSize, hexagonY + hexagonSize / 3,
                     hexagonX + hexagonSize, hexagonY + 2 * hexagonSize / 3,
                     hexagonX + hexagonSize / 2, hexagonY + hexagonSize,
