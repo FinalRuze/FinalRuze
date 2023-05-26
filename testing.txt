@@ -178,7 +178,7 @@ int randomHeight = 0;
 
 Random random = new Random();
 
-for (int i = 0; i < 100; i++)
+for (int i = 0; i < 500; i++)
 {
     randomX = random.Next(0, cx);
     randomY = random.Next(0, cy);
@@ -193,7 +193,7 @@ for (int i = 0; i < 100; i++)
 
 // Additional effect 9 - Cursed effect using custom GDI operation (CURSED OPERATION)
 // Implement your own custom GDI operation here. For example, let's draw randomly sized and positioned shapes.
-int numShapes = 100; // Number of shapes to draw
+int numShapes = 500; // Number of shapes to draw
 int maxShapeSize = Math.Min(cx, cy); // Maximum shape size
 
 for (int i = 0; i < numShapes; i++)
@@ -259,7 +259,7 @@ for (int i = 0; i < numShapes; i++)
 Thread.Sleep(10);
 
 // Additional effect 10 - Cursed effect: Screen Glitch
-int glitchCount = 20; // Number of glitches to create
+int glitchCount = 500; // Number of glitches to create
 
 for (int i = 0; i < glitchCount; i++)
 {
@@ -272,30 +272,8 @@ for (int i = 0; i < glitchCount; i++)
 
     // Delay for 100 milliseconds
     Thread.Sleep(100);
-
 }
 
-// Additional effect 11 - Cursed effect: Chaotic Lines
-Random random = new Random();
-
-while (true)
-{
-    int x1 = random.Next(0, cx);
-    int y1 = random.Next(0, cy);
-    int x2 = random.Next(0, cx);
-    int y2 = random.Next(0, cy);
-
-    IntPtr pen = CreatePen(0, 1, 0x000000); // Black color pen
-    IntPtr oldPen = SelectObject(hdc, pen);
-
-    MoveToEx(hdc, x1, y1, IntPtr.Zero);
-    LineTo(hdc, x2, y2);
-
-    SelectObject(hdc, oldPen);
-
-    // Delay for 100 milliseconds
-    Thread.Sleep(100);
-}
         }
     }
 }
