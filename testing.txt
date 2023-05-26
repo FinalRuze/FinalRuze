@@ -29,6 +29,9 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool Polygon(IntPtr hdc, int[] points, int nCount);
 
+    [DllImport("gdi32.dll")]
+    static extern bool Ellipse(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
     public static void ReversePIP()
     {
         SetProcessDPIAware();
@@ -86,6 +89,23 @@ public static class Win32
                     hexagonX, hexagonY + hexagonSize / 3
                 };
                 Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
+            }
+
+            // Additional effect 3 - Drawing ellipses
+            int ellipseSize = 100;
+            int ellipseMargin = 50;
+            int ellipseRowCount = (cy - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
+            int ellipseColumnCount = (cx - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
+
+            for (int row = 0; row < ellipseRowCount; row++)
+            {
+                for (int column = 0; column < ellipseColumnCount; column++)
+                {
+                    int ellipseX = ellipseMargin + column * (ellipseSize + ellipseMargin);
+                    int ellipseY = ellipseMargin + row * (ellipseSize + ellipseMargin);
+
+                    Ellipse(hdc, ellipseX, ellipseY, ellipseX + ellipseSize, ellipseY + ellipseSize);
+                }
             }
         }
     }
