@@ -425,21 +425,23 @@ for (int i = 0; i < 200; i++)
     Thread.Sleep(200);
 }
 
-// Additional effect 31 - Cursed effect: Drawing lines with different pen styles
-int lineY = cy / 2;
-int lineMargin = 50;
-int lineLength = cx - 2 * lineMargin;
-int lineCount = 200;
+// Additional effect 32 - Cursed effect: Drawing arcs with different pen styles
+int arcRadius = Math.Min(cx, cy) / 4;
+int arcX = cx / 2;
+int arcY = cy / 2;
+int arcStartAngle = 0;
+int arcEndAngle = 90;
+int arcCount = 200;
 
-for (int i = 0; i < lineCount; i++)
+for (int i = 0; i < arcCount; i++)
 {
-    int lineX = lineMargin + i * (lineLength / lineCount);
+    int arcStart = arcStartAngle + i * (360 / arcCount);
+    int arcEnd = arcEndAngle + i * (360 / arcCount);
 
     IntPtr penStyle = CreatePen(i, 1, 0x000000); // Varying pen style
     IntPtr oldPenStyle = SelectObject(hdc, penStyle);
 
-    MoveToEx(hdc, lineX, lineY, IntPtr.Zero);
-    LineTo(hdc, lineX + lineLength / lineCount, lineY);
+    Arc(hdc, arcX - arcRadius, arcY - arcRadius, arcX + arcRadius, arcY + arcRadius, arcStart, arcEnd);
 
     SelectObject(hdc, oldPenStyle);
 }
