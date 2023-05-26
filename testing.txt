@@ -272,6 +272,43 @@ for (int i = 0; i < glitchCount; i++)
 
     // Delay for 100 milliseconds
     Thread.Sleep(100);
+
+// Additional effect 11 - Cursed effect: Pixel Displacement
+int displacementDuration = 5000; // Duration of the displacement effect in milliseconds
+int displacementAmount = 100; // Maximum displacement amount
+
+DateTime startTime = DateTime.Now;
+
+while ((DateTime.Now - startTime).TotalMilliseconds < displacementDuration)
+{
+    IntPtr hdcTemp = CreateCompatibleDC(hdc);
+    IntPtr hbitmap = CreateCompatibleBitmap(hdc, cx, cy);
+    IntPtr hbitmapOld = SelectObject(hdcTemp, hbitmap);
+
+    BitBlt(hdcTemp, 0, 0, cx, cy, hdc, 0, 0, 0x00CC0020);
+
+    for (int x = 0; x < cx; x++)
+    {
+        for (int y = 0; y < cy; y++)
+        {
+            int offsetX = random.Next(-displacementAmount, displacementAmount + 1);
+            int offsetY = random.Next(-displacementAmount, displacementAmount + 1);
+
+            int srcX = x + offsetX;
+            int srcY = y + offsetY;
+
+            if (srcX < 0 || srcX >= cx || srcY < 0 || srcY >= cy)
+                continue;
+
+            SetPixel(hdc, x, y, GetPixel(hdcTemp, srcX, srcY));
+        }
+    }
+
+    SelectObject(hdcTemp, hbitmapOld);
+    DeleteObject(hbitmap);
+    DeleteDC(hdcTemp);
+
+    Thread.Sleep(10);
 }
 
         }
