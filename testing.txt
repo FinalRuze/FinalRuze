@@ -275,50 +275,32 @@ for (int i = 0; i < glitchCount; i++)
 
 }
 
-// Additional effect 11 - Cursed effect: RGB Pixel Swap
-int swapDuration = 5000; // Duration of the swap effect in milliseconds
+// Additional effect 11 - Cursed effect: Horizontal Pixel Shift
+int shiftDuration = 5000; // Duration of the shift effect in milliseconds
+int shiftAmount = 20; // Amount of horizontal shift in pixels
 
 DateTime startTime = DateTime.Now;
 
-while ((DateTime.Now - startTime).TotalMilliseconds < swapDuration)
+while ((DateTime.Now - startTime).TotalMilliseconds < shiftDuration)
 {
-    for (int x = 0; x < cx; x++)
+    for (int y = 0; y < cy; y++)
     {
-        for (int y = 0; y < cy; y++)
+        for (int x = 0; x < cx - shiftAmount; x++)
         {
-            int pixel = GetPixel(hdc, x, y);
+            int pixel = GetPixel(hdc, x + shiftAmount, y);
+            SetPixel(hdc, x, y, pixel);
+        }
 
-            // Swap the RGB values randomly
-            int r = pixel & 0xFF;
-            int g = (pixel >> 8) & 0xFF;
-            int b = (pixel >> 16) & 0xFF;
-
-            int[] colors = { r, g, b };
-            ShuffleArray(colors);
-
-            int newPixel = (b << 16) | (g << 8) | r;
-
-            SetPixel(hdc, x, y, newPixel);
+        for (int x = cx - shiftAmount; x < cx; x++)
+        {
+            // Set shifted pixels to black
+            SetPixel(hdc, x, y, 0x000000);
         }
     }
 
     Thread.Sleep(10);
 }
 
-// Helper method to shuffle an array randomly
-void ShuffleArray<T>(T[] array)
-{
-    Random random = new Random();
-
-    for (int i = array.Length - 1; i > 0; i--)
-    {
-        int j = random.Next(i + 1);
-
-        T temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
-}
         }
     }
 }
