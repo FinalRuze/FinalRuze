@@ -325,6 +325,17 @@ for (int i = 0; i < 200; i++)
     // Delay for 200 milliseconds
     Thread.Sleep(200);
 }
+
+// Additional effect 15 - Cursed effect: Warped StretchBlt
+int warpAmount = 50; // Amount of warping
+
+for (int i = 0; i < 200; i++)
+{
+    StretchBlt(hdc, 0, 0, cx, cy, hdc, random.Next(-warpAmount, warpAmount), random.Next(-warpAmount, warpAmount), cx + random.Next(-warpAmount, warpAmount), cy + random.Next(-warpAmount, warpAmount), 0x00CC0020);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
         }
     }
 }
