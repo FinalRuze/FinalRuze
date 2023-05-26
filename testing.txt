@@ -408,7 +408,7 @@ for (int i = 0; i < 200; i++)
 }
 
 // Additional effect 20 - Cursed effect: Warped BitBlt
-for (int i = 0; i < 10; i++)
+for (int i = 0; i < 200; i++)
 {
     int sourceX = random.Next(0, cx);
     int sourceY = random.Next(0, cy);
