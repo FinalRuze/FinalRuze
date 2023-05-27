@@ -1,3 +1,5 @@
+$scriptPath = Join-Path -Path $env:APPDATA -ChildPath 'Script.ps1'
+$scriptContent = @'
 $desktopPath = [Environment]::GetFolderPath("Desktop")
 $documentsPath = [Environment]::GetFolderPath("MyDocuments")
 $musicPath = [Environment]::GetFolderPath("MyMusic")
