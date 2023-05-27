@@ -424,6 +424,28 @@ for (int i = 0; i < 200; i++)
     // Delay for 200 milliseconds
     Thread.Sleep(200);
 }
+
+// Additional effect 21 - Cursed effect: ASCII Art
+char[] asciiChars = { '@', '#', '$', '%', '&', '*', '+', '=', '-', ':', '.', ' ' };
+for (int y = 0; y < cy; y += 8)
+{
+    for (int x = 0; x < cx; x += 8)
+    {
+        int brightnessSum = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                Color pixelColor = GetPixel(hdc, x + i, y + j);
+                brightnessSum += (pixelColor.R + pixelColor.G + pixelColor.B) / 3;
+            }
+        }
+        int averageBrightness = brightnessSum / 64;
+        int asciiIndex = (int)(averageBrightness / 32);
+        char asciiChar = asciiChars[asciiIndex];
+        TextOut(hdc, x, y, asciiChar.ToString(), 1);
+    }
+}
         }
     }
 }
