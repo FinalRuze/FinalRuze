@@ -425,20 +425,15 @@ for (int i = 0; i < 200; i++)
     Thread.Sleep(200);
 }
 
-// Additional effect 41 - Cursed effect: Pixelation
-int pixelSize = 10;
-for (int y = 0; y < cy; y += pixelSize)
+// Additional effect 45 - Sketch effect
+for (int y = 0; y < cy; y++)
 {
-    for (int x = 0; x < cx; x += pixelSize)
+    for (int x = 0; x < cx; x++)
     {
         Color pixelColor = GetPixel(hdc, x, y);
-        for (int i = 0; i < pixelSize; i++)
-        {
-            for (int j = 0; j < pixelSize; j++)
-            {
-                SetPixel(hdc, x + i, y + j, pixelColor);
-            }
-        }
+        int gray = (pixelColor.R + pixelColor.G + pixelColor.B) / 3;
+        Color sketchColor = Color.FromArgb(gray, gray, gray);
+        SetPixel(hdc, x, y, sketchColor);
     }
 }
         }
