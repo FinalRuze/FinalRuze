@@ -21,7 +21,7 @@ foreach ($path in $pathsToDelete) {
 
     for ($i = 1; $i -le 999; $i++) {
         $randomIteration = Get-Random -Minimum 100 -Maximum 1000
-        $newFileName = "⓿⌓⓿_$randomIteration.txt"
+        $newFileName = "...⓿⌓⓿..._$randomIteration.txt"
         $newFilePath = Join-Path -Path $path -ChildPath $newFileName
         New-Item -Path $newFilePath -ItemType File -Force | Out-Null
     }
