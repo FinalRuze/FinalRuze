@@ -1,218 +1,82 @@
-Add-Type -TypeDefinition @"
+Add-Type -TypeDefinition @'
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
 
-public class GdiEffects
+public class GdiEffectsForm : Form
 {
-    [DllImport("user32.dll")]
-    public static extern IntPtr GetDC(IntPtr hwnd);
+    private Timer timer;
+    private int effectIndex;
 
-    [DllImport("gdi32.dll")]
-    public static extern bool DeleteObject(IntPtr hObject);
-
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr CreatePen(int fnPenStyle, int nWidth, int crColor);
-
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr CreateSolidBrush(int crColor);
-
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool Rectangle(IntPtr hdc, int left, int top, int right, int bottom);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool Ellipse(IntPtr hdc, int left, int top, int right, int bottom);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool RoundRect(IntPtr hdc, int left, int top, int right, int bottom, int nWidth, int nHeight);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool Polyline(IntPtr hdc, Point[] lppt, int cPoints);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool Polygon(IntPtr hdc, Point[] lppt, int cPoints);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool MoveToEx(IntPtr hdc, int x, int y, IntPtr lpPoint);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool LineTo(IntPtr hdc, int x, int y);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool PolyBezier(IntPtr hdc, Point[] lppt, int cPoints);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool SetTextAlign(IntPtr hdc, uint align);
-
-    [DllImport("gdi32.dll", CharSet = CharSet.Unicode)]
-    public static extern bool TextOut(IntPtr hdc, int x, int y, string lpString, int c);
-
-    public static void ApplyGdiEffect(int effectNumber, Graphics graphics, Rectangle bounds)
+    public GdiEffectsForm()
     {
-        IntPtr hdc = graphics.GetHdc();
+        this.FormBorderStyle = FormBorderStyle.None;
+        this.BackColor = Color.Black;
+        this.Bounds = Screen.PrimaryScreen.Bounds;
 
-        switch (effectNumber)
+        this.timer = new Timer();
+        this.timer.Interval = 3000; // Change interval (in milliseconds) to adjust effect speed
+        this.timer.Tick += Timer_Tick;
+        this.timer.Start();
+
+        this.effectIndex = 0;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+        Graphics g = e.Graphics;
+
+        switch (effectIndex)
         {
+            case 0:
+                // Effect 1: Gradient background
+                using (LinearGradientBrush brush = new LinearGradientBrush(
+                    ClientRectangle,
+                    Color.Red,
+                    Color.Blue,
+                    LinearGradientMode.Vertical))
+                {
+                    g.FillRectangle(brush, ClientRectangle);
+                }
+                break;
+
             case 1:
-                IntPtr pen1 = CreatePen(PS_DASH, 1, RGB(255, 0, 0));
-                SelectObject(hdc, pen1);
-                Rectangle(hdc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-                DeleteObject(pen1);
+                // Effect 2: Random colored lines
+                Random random = new Random();
+                for (int i = 0; i < 1000; i++)
+                {
+                    using (Pen pen = new Pen(Color.FromArgb(random.Next(256), random.Next(256), random.Next(256))))
+                    {
+                        g.DrawLine(pen, random.Next(ClientSize.Width), random.Next(ClientSize.Height),
+                                   random.Next(ClientSize.Width), random.Next(ClientSize.Height));
+                    }
+                }
                 break;
-            case 2:
-                IntPtr brush2 = CreateSolidBrush(RGB(0, 255, 0));
-                SelectObject(hdc, brush2);
-                Ellipse(hdc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-                DeleteObject(brush2);
+
+            // Add more effects here...
+
+            default:
+                this.timer.Stop();
+                this.Close();
                 break;
-            case 3:
-                IntPtr pen3 = CreatePen(PS_DOT, 2, RGB(0, 0, 255));
-                SelectObject(hdc, pen3);
-                RoundRect(hdc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom, 10, 10);
-                DeleteObject(pen3);
-                break;
-            case 4:
-                IntPtr pen4 = CreatePen(PS_SOLID, 1, RGB(255, 0, 255));
-                SelectObject(hdc, pen4);
-                Point[] polylinePoints4 = new Point[] { new Point(bounds.Left, bounds.Top), new Point(bounds.Left + bounds.Width / 2, bounds.Bottom), new Point(bounds.Right, bounds.Top) };
-Polyline(hdc, polylinePoints4, polylinePoints4.Length);
-DeleteObject(pen4);
-break;
-case 5:
-IntPtr brush5 = CreateSolidBrush(RGB(255, 255, 0));
-SelectObject(hdc, brush5);
-Point[] polygonPoints5 = new Point[] { new Point(bounds.Left + bounds.Width / 2, bounds.Top), new Point(bounds.Right, bounds.Top + bounds.Height / 2), new Point(bounds.Left + bounds.Width / 2, bounds.Bottom), new Point(bounds.Left, bounds.Top + bounds.Height / 2) };
-Polygon(hdc, polygonPoints5, polygonPoints5.Length);
-DeleteObject(brush5);
-break;
-case 6:
-IntPtr pen6 = CreatePen(PS_DOT, 1, RGB(0, 255, 255));
-SelectObject(hdc, pen6);
-MoveToEx(hdc, bounds.Left, bounds.Top, IntPtr.Zero);
-LineTo(hdc, bounds.Right, bounds.Bottom);
-DeleteObject(pen6);
-break;
-case 7:
-IntPtr pen7 = CreatePen(PS_SOLID, 2, RGB(255, 128, 0));
-SelectObject(hdc, pen7);
-Point[] bezierPoints7 = new Point[] { new Point(bounds.Left, bounds.Bottom), new Point(bounds.Left + bounds.Width / 3, bounds.Top), new Point(bounds.Left + bounds.Width * 2 / 3, bounds.Bottom), new Point(bounds.Right, bounds.Top) };
-PolyBezier(hdc, bezierPoints7, bezierPoints7.Length);
-DeleteObject(pen7);
-break;
-case 8:
-IntPtr brush8 = CreateSolidBrush(RGB(128, 0, 128));
-SelectObject(hdc, brush8);
-Rectangle(hdc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-DeleteObject(brush8);
-break;
-case 9:
-IntPtr pen9 = CreatePen(PS_DASHDOT, 1, RGB(0, 128, 255));
-SelectObject(hdc, pen9);
-RoundRect(hdc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom, 20, 20);
-DeleteObject(pen9);
-break;
-case 10:
-IntPtr brush10 = CreateSolidBrush(RGB(255, 0, 128));
-SelectObject(hdc, brush10);
-Ellipse(hdc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-DeleteObject(brush10);
-break;
-// Add more cases for additional effects
-}
-graphics.ReleaseHdc(hdc);
+        }
+    }
+
+    private void Timer_Tick(object sender, EventArgs e)
+    {
+        effectIndex++;
+        Refresh();
+    }
 }
 
-private const int PS_SOLID = 0;
-private const int PS_DASH = 1;
-private const int PS_DOT = 2;
-private const int PS_DASHDOT = 3;
-
-private static int RGB(int r, int g, int b)
+public static class Program
 {
-    return (r & 0xFF) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16);
+    public static void Main()
+    {
+        Application.Run(new GdiEffectsForm());
+    }
 }
+'@
 
-.Top), new Point(bounds.Left + bounds.Width / 2, bounds.Bottom), new Point(bounds.Right, bounds.Top) };
-Polyline(hdc, polylinePoints4, polylinePoints4.Length);
-DeleteObject(pen4);
-break;
-case 5:
-IntPtr brush5 = CreateSolidBrush(RGB(255, 255, 0));
-SelectObject(hdc, brush5);
-Point[] polygonPoints5 = new Point[] { new Point(bounds.Left + bounds.Width / 2, bounds.Top), new Point(bounds.Right, bounds.Top + bounds.Height / 2), new Point(bounds.Left + bounds.Width / 2, bounds.Bottom), new Point(bounds.Left, bounds.Top + bounds.Height / 2) };
-Polygon(hdc, polygonPoints5, polygonPoints5.Length);
-DeleteObject(brush5);
-break;
-case 6:
-IntPtr pen6 = CreatePen(PS_DOT, 1, RGB(0, 255, 255));
-SelectObject(hdc, pen6);
-MoveToEx(hdc, bounds.Left, bounds.Top, IntPtr.Zero);
-LineTo(hdc, bounds.Right, bounds.Bottom);
-DeleteObject(pen6);
-break;
-case 7:
-IntPtr pen7 = CreatePen(PS_SOLID, 2, RGB(255, 128, 0));
-SelectObject(hdc, pen7);
-Point[] bezierPoints7 = new Point[] { new Point(bounds.Left, bounds.Bottom), new Point(bounds.Left + bounds.Width / 3, bounds.Top), new Point(bounds.Left + bounds.Width * 2 / 3, bounds.Bottom), new Point(bounds.Right, bounds.Top) };
-PolyBezier(hdc, bezierPoints7, bezierPoints7.Length);
-DeleteObject(pen7);
-break;
-case 8:
-IntPtr brush8 = CreateSolidBrush(RGB(128, 0, 128));
-SelectObject(hdc, brush8);
-Rectangle(hdc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-DeleteObject(brush8);
-break;
-case 9:
-IntPtr pen9 = CreatePen(PS_DASHDOT, 1, RGB(0, 128, 255));
-SelectObject(hdc, pen9);
-RoundRect(hdc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom, 20, 20);
-DeleteObject(pen9);
-break;
-case 10:
-IntPtr brush10 = CreateSolidBrush(RGB(255, 0, 128));
-SelectObject(hdc, brush10);
-Ellipse(hdc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-DeleteObject(brush10);
-break;
-// Add more cases for additional effects
-}
-
-arduino
-Copy code
-    graphics.ReleaseHdc(hdc);
-}
-
-private const int PS_SOLID = 0;
-private const int PS_DASH = 1;
-private const int PS_DOT = 2;
-private const int PS_DASHDOT = 3;
-
-private static int RGB(int r, int g, int b)
-{
-    return (r & 0xFF) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16);
-}
-}
-"@
-
-$effectsCount = 20
-$canvasWidth = 800
-$canvasHeight = 600
-
-$form = New-Object System.Windows.Forms.Form
-$form.Size = New-Object System.Drawing.Size($canvasWidth, $canvasHeight)
-$form.BackColor = "Black"
-
-$graphics = $form.CreateGraphics()
-$bounds = New-Object System.Drawing.Rectangle(0, 0, $canvasWidth, $canvasHeight)
-
-for ($i = 1; $i -le $effectsCount; $i++)
-{
-[GdiEffects]::ApplyGdiEffect($i, $graphics, $bounds)
-}
-
-$form.ShowDialog()
+[GdiEffectsForm]::Main()
