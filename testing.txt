@@ -1,5 +1,439 @@
 $source = @"
 using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+public static class Win32
+{
+    [DllImport("user32.dll")]
+    static extern int GetSystemMetrics(int smIndex);
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SetProcessDPIAware();
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreatePen(int fnPenStyle, int nWidth, uint crColor);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+    [DllImport("gdi32.dll")]
+    static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
+    [DllImport("gdi32.dll")]
+    static extern bool Polygon(IntPtr hdc, int[] points, int nCount);
+
+    [DllImport("gdi32.dll")]
+    static extern bool Ellipse(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
+    [DllImport("gdi32.dll")]
+    static extern bool RoundRect(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidth, int nHeight);
+
+    [DllImport("gdi32.dll")]
+    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
+
+    [DllImport("gdi32.dll")]
+    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
+
+    public static void ReversePIP()
+    {
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
+
+        while (true)
+        {
+            Thread.Sleep(100);
+            IntPtr hdc = GetDC(IntPtr.Zero);
+
+            // Original effect - StretchBlt
+            StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
+
+            // Additional effect 1 - Drawing rectangles
+            IntPtr pen = CreatePen(0, 5, 0x000000); // Black color pen
+            IntPtr oldPen = SelectObject(hdc, pen);
+
+            Rectangle(hdc, 100, 100, cx - 100, cy - 100);
+            Rectangle(hdc, 200, 200, cx - 200, cy - 200);
+
+            SelectObject(hdc, oldPen);
+
+            // Additional effect 2 - Drawing multiple hexagons to fill the screen
+            int hexagonSize = 100;
+            int hexagonMargin = 20;
+            int hexagonRowCount = (cy - 2 * hexagonMargin) / (hexagonSize + hexagonMargin);
+            int hexagonColumnCount = (cx - 2 * hexagonMargin) / (hexagonSize + hexagonMargin);
+            int totalHexagons = hexagonRowCount * hexagonColumnCount;
+
+int[] hexagonXPositions = new int[totalHexagons];
+int[] hexagonYPositions = new int[totalHexagons];
+
+int startX = hexagonMargin;
+int startY = hexagonMargin;
+
+for (int i = 0; i < totalHexagons; i++)
+{
+    int row = i / hexagonColumnCount;
+    int column = i % hexagonColumnCount;
+
+    int hexagonX = startX + column * (hexagonSize + hexagonMargin);
+    int hexagonY = startY + row * (hexagonSize + hexagonMargin);
+
+    hexagonXPositions[i] = hexagonX;
+    hexagonYPositions[i] = hexagonY;
+
+    int[] hexagonPoints = new int[]
+    {
+        hexagonX + hexagonSize / 2, hexagonY,
+        hexagonX + hexagonSize, hexagonY + hexagonSize / 3,
+        hexagonX + hexagonSize, hexagonY + 2 * hexagonSize / 3,
+        hexagonX + hexagonSize / 2, hexagonY + hexagonSize,
+        hexagonX, hexagonY + 2 * hexagonSize / 3,
+        hexagonX, hexagonY + hexagonSize / 3
+    };
+    Polygon(hdc, hexagonPoints, hexagonPoints.Length / 2);
+}
+
+// Additional effect 3 - Drawing ellipses
+int ellipseSize = 100;
+int ellipseMargin = 50;
+int ellipseRowCount = (cy - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
+int ellipseColumnCount = (cx - 2 * ellipseMargin) / (ellipseSize + ellipseMargin);
+
+for (int row = 0; row < ellipseRowCount; row++)
+{
+    for (int column = 0; column < ellipseColumnCount; column++)
+    {
+        int ellipseX = ellipseMargin + column * (ellipseSize + ellipseMargin);
+        int ellipseY = ellipseMargin + row * (ellipseSize + ellipseMargin);
+
+        Ellipse(hdc, ellipseX, ellipseY, ellipseX + ellipseSize, ellipseY + ellipseSize);
+    }
+}
+
+// Additional effect 4 - Drawing rounded rectangles
+int roundedRectWidth = 200;
+int roundedRectHeight = 100;
+int roundedRectMargin = 50;
+int roundedRectRowCount = (cy - 2 * roundedRectMargin) / (roundedRectHeight + roundedRectMargin);
+int roundedRectColumnCount = (cx - 2 * roundedRectMargin) / (roundedRectWidth + roundedRectMargin);
+
+for (int row = 0; row < roundedRectRowCount; row++)
+{
+    for (int column = 0; column < roundedRectColumnCount; column++)
+    {
+        int roundedRectX = roundedRectMargin + column * (roundedRectWidth + roundedRectMargin);
+        int roundedRectY = roundedRectMargin + row * (roundedRectHeight + roundedRectMargin);
+
+        RoundRect(hdc, roundedRectX, roundedRectY, roundedRectX + roundedRectWidth, roundedRectY + roundedRectHeight, 20, 20);
+    }
+}
+
+// Additional effect 5 - Inverting colors
+BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
+
+// Delay for 1 second
+Thread.Sleep(1000);
+
+// Additional effect 6 - Cursed pattern using PatBlt
+int patternSize = 50;
+int patternRowCount = (cy - patternSize) / patternSize;
+int patternColumnCount = (cx - patternSize) / patternSize;
+
+for (int row = 0; row < patternRowCount; row++)
+{
+    for (int column = 0; column < patternColumnCount; column++)
+    {
+        int patternX = patternSize * column;
+        int patternY = patternSize * row;
+
+        // Alternate between BLACKNESS and WHITENESS
+        if ((row + column) % 2 == 0)
+            PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x000F0000); // BLACKNESS
+        else
+            PatBlt(hdc, patternX, patternY, patternSize, patternSize, 0x00FF0062); // WHITENESS
+    }
+}
+
+// Delay for 0.1 second
+Thread.Sleep(100);
+
+// Additional effect 7 - Cursed effect using StretchBlt with inverted coordinates
+StretchBlt(hdc, cx, cy, -cx, -cy, hdc, 0, 0, cx, cy, 0x00CC0020);
+
+// Delay for 1 second
+Thread.Sleep(1000);
+
+// Additional effect 8 - Cursed effect using BitBlt with random positions
+int randomX = 0;
+int randomY = 0;
+int randomWidth = 0;
+int randomHeight = 0;
+
+Random random = new Random();
+
+for (int i = 0; i < 200; i++)
+{
+    randomX = random.Next(0, cx);
+    randomY = random.Next(0, cy);
+    randomWidth = random.Next(0, cx - randomX);
+    randomHeight = random.Next(0, cy - randomY);
+
+    BitBlt(hdc, randomX, randomY, randomWidth, randomHeight, hdc, randomX, randomY, 0x00BB0226);
+
+    // Delay for 10 milliseconds
+    Thread.Sleep(10);
+}
+
+// Additional effect 9 - Cursed effect using custom GDI operation (CURSED OPERATION)
+// Implement your own custom GDI operation here. For example, let's draw randomly sized and positioned shapes.
+int numShapes = 500; // Number of shapes to draw
+int maxShapeSize = Math.Min(cx, cy); // Maximum shape size
+
+for (int i = 0; i < numShapes; i++)
+{
+    int shapeSize = random.Next(50, maxShapeSize); // Random shape size
+    int shapeX = random.Next(0, cx - shapeSize); // Random X position
+    int shapeY = random.Next(0, cy - shapeSize); // Random Y position
+
+    int shapeType = random.Next(0, 6); // Random shape type (0: Rectangle, 1: Ellipse, 2: Rounded Rectangle, 3: Triangle, 4: Trapezoid, 5: Diamond)
+
+    switch (shapeType)
+    {
+        case 0: // Rectangle
+            Rectangle(hdc, shapeX, shapeY, shapeX + shapeSize, shapeY + shapeSize);
+            break;
+        case 1: // Ellipse
+            Ellipse(hdc, shapeX, shapeY, shapeX + shapeSize, shapeY + shapeSize);
+            break;
+        case 2: // Rounded Rectangle
+            int cornerRadius = random.Next(0, 50); // Random corner radius
+            RoundRect(hdc, shapeX, shapeY, shapeX + shapeSize, shapeY + shapeSize, cornerRadius, cornerRadius);
+            break;
+        case 3: // Triangle
+            int[] trianglePoints = new int[]
+            {
+                shapeX, shapeY + shapeSize,
+                shapeX + shapeSize / 2, shapeY,
+                shapeX + shapeSize, shapeY + shapeSize
+            };
+            Polygon(hdc, trianglePoints, trianglePoints.Length / 2);
+            break;
+        case 4: // Trapezoid
+            int topWidth = random.Next(0, shapeSize); // Random top width
+            int bottomWidth = random.Next(0, shapeSize); // Random bottom width
+            int trapezoidHeight = random.Next(0, shapeSize); // Random trapezoid height
+
+            int[] trapezoidPoints = new int[]
+            {
+                shapeX, shapeY + trapezoidHeight,
+                shapeX + topWidth, shapeY,
+                shapeX + shapeSize - bottomWidth, shapeY,
+                shapeX + shapeSize, shapeY + trapezoidHeight
+            };
+            Polygon(hdc, trapezoidPoints, trapezoidPoints.Length / 2);
+            break;
+        case 5: // Diamond
+            int[] diamondPoints = new int[]
+            {
+                shapeX + shapeSize / 2, shapeY,
+                shapeX + shapeSize, shapeY + shapeSize / 2,
+                shapeX + shapeSize / 2, shapeY + shapeSize,
+                shapeX, shapeY + shapeSize / 2
+            };
+            Polygon(hdc, diamondPoints, diamondPoints.Length / 2);
+            break;
+    }
+
+    // Delay for 0.1 seconds
+    Thread.Sleep(10);
+}
+
+// Delay for 0.1 second
+Thread.Sleep(10);
+
+// Additional effect 10 - Cursed effect: Screen Glitch
+int glitchCount = 500; // Number of glitches to create
+
+for (int i = 0; i < glitchCount; i++)
+{
+    int glitchWidth = random.Next(100, 300); // Random glitch width
+    int glitchHeight = random.Next(100, 300); // Random glitch height
+    int glitchX = random.Next(0, cx - glitchWidth); // Random X position
+    int glitchY = random.Next(0, cy - glitchHeight); // Random Y position
+
+    StretchBlt(hdc, glitchX, glitchY, glitchWidth, glitchHeight, hdc, glitchX + random.Next(-50, 50), glitchY + random.Next(-50, 50), glitchWidth, glitchHeight, 0x00CC0020);
+
+    // Delay for 100 milliseconds
+    Thread.Sleep(100);
+}
+
+// Additional effect 11 - Cursed effect: Randomized BitBlt
+for (int i = 0; i < 200; i++)
+{
+    int sourceX = random.Next(0, cx);
+    int sourceY = random.Next(0, cy);
+    int destinationX = random.Next(0, cx);
+    int destinationY = random.Next(0, cy);
+    int width = random.Next(0, cx - destinationX);
+    int height = random.Next(0, cy - destinationY);
+
+    BitBlt(hdc, destinationX, destinationY, width, height, hdc, sourceX, sourceY, 0x00BB0226);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 12 - Cursed effect: Shaking screen
+int shakeAmount = 50; // Amount of shaking
+
+for (int i = 0; i < 200; i++)
+{
+    StretchBlt(hdc, random.Next(-shakeAmount, shakeAmount), random.Next(-shakeAmount, shakeAmount), cx, cy, hdc, 0, 0, cx, cy, 0x00CC0020);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 13 - Cursed effect: Distorted StretchBlt
+int distortionAmount = 500; // Amount of distortion to apply
+
+for (int i = 0; i < 200; i++)
+{
+    StretchBlt(hdc, 0, 0, cx, cy, hdc, random.Next(-distortionAmount, distortionAmount), random.Next(-distortionAmount, distortionAmount), cx, cy, 0x00CC0020);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 14 - Cursed effect: Randomized color inversion
+for (int i = 0; i < 200; i++)
+{
+    int inversionX = random.Next(0, cx);
+    int inversionY = random.Next(0, cy);
+    int inversionWidth = random.Next(0, cx - inversionX);
+    int inversionHeight = random.Next(0, cy - inversionY);
+
+    BitBlt(hdc, inversionX, inversionY, inversionWidth, inversionHeight, hdc, inversionX, inversionY, 0x00550009);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 15 - Cursed effect: Warped StretchBlt
+int warpAmount = 50; // Amount of warping
+
+for (int i = 0; i < 200; i++)
+{
+    StretchBlt(hdc, 0, 0, cx, cy, hdc, random.Next(-warpAmount, warpAmount), random.Next(-warpAmount, warpAmount), cx + random.Next(-warpAmount, warpAmount), cy + random.Next(-warpAmount, warpAmount), 0x00CC0020);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 16 - Cursed effect: Randomized StretchBlt
+for (int i = 0; i < 200; i++)
+{
+    int sourceX = random.Next(0, cx);
+    int sourceY = random.Next(0, cy);
+    int sourceWidth = random.Next(0, cx - sourceX);
+    int sourceHeight = random.Next(0, cy - sourceY);
+    int destinationX = random.Next(0, cx);
+    int destinationY = random.Next(0, cy);
+    int destinationWidth = random.Next(0, cx - destinationX);
+    int destinationHeight = random.Next(0, cy - destinationY);
+
+    StretchBlt(hdc, destinationX, destinationY, destinationWidth, destinationHeight, hdc, sourceX, sourceY, sourceWidth, sourceHeight, 0x00CC0020);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 17 - Cursed effect: Scrambled StretchBlt
+for (int i = 0; i < 200; i++)
+{
+    int scrambleAmount = 500; // Amount to scramble the image
+
+    for (int x = 0; x < cx; x += scrambleAmount)
+    {
+        for (int y = 0; y < cy; y += scrambleAmount)
+        {
+            int sourceX = random.Next(x, x + scrambleAmount);
+            int sourceY = random.Next(y, y + scrambleAmount);
+            int destinationX = random.Next(x, x + scrambleAmount);
+            int destinationY = random.Next(y, y + scrambleAmount);
+
+            BitBlt(hdc, destinationX, destinationY, scrambleAmount, scrambleAmount, hdc, sourceX, sourceY, 0x00CC0020);
+        }
+    }
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 18 - Cursed effect: Randomized Ellipse
+for (int i = 0; i < 200; i++)
+{
+    int left = random.Next(0, cx);
+    int top = random.Next(0, cy);
+    int right = random.Next(left, cx);
+    int bottom = random.Next(top, cy);
+
+    Ellipse(hdc, left, top, right, bottom);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 19 - Cursed effect: Randomized BitBlt
+for (int i = 0; i < 200; i++)
+{
+    int sourceX = random.Next(0, cx);
+    int sourceY = random.Next(0, cy);
+    int sourceWidth = random.Next(0, cx - sourceX);
+    int sourceHeight = random.Next(0, cy - sourceY);
+    int destinationX = random.Next(0, cx);
+    int destinationY = random.Next(0, cy);
+
+    BitBlt(hdc, destinationX, destinationY, sourceWidth, sourceHeight, hdc, sourceX, sourceY, 0x00CC0020);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+
+// Additional effect 20 - Cursed effect: Randomized StretchBlt
+for (int i = 0; i < 200; i++)
+{
+    int sourceX = random.Next(0, cx);
+    int sourceY = random.Next(0, cy);
+    int sourceWidth = random.Next(0, cx - sourceX);
+    int sourceHeight = random.Next(0, cy - sourceY);
+    int destinationX = random.Next(0, cx);
+    int destinationY = random.Next(0, cy);
+    int destinationWidth = random.Next(0, cx - destinationX);
+    int destinationHeight = random.Next(0, cy - destinationY);
+
+    StretchBlt(hdc, destinationX, destinationY, destinationWidth, destinationHeight, hdc, sourceX, sourceY, sourceWidth, sourceHeight, 0x00CC0020);
+
+    // Delay for 200 milliseconds
+    Thread.Sleep(200);
+}
+        }
+    }
+}
+"@
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::ReversePIP()
+
+
+$source = @"
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -15,203 +449,182 @@ using System.Threading;
 
 public static class Win32
 {
-    [DllImport("user32.dll")]
-    static extern int GetSystemMetrics(SystemMetric smIndex);
-
-    [DllImport("user32.dll")]
-    static extern IntPtr GetWindowDC(IntPtr hWnd);
-
-    [DllImport("user32.dll")]
-    static extern IntPtr GetDesktopWindow();
-
-    [DllImport("user32.dll", SetLastError = true)]
-    public static extern bool SetProcessDPIAware();
-
-    [DllImport("user32.dll", SetLastError = true)]
-    public static extern bool DrawIconEx(IntPtr hdc, int xLeft, int yTop, IntPtr hIcon, int cxWidth, int cyHeight, uint istepIfAniCur, IntPtr hbrFlickerFreeDraw, uint diFlags);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool GetCursorPos(out POINT lpPoint);
-
-    [DllImport("user32.dll")]
-    public static extern bool GetCursorInfo(ref CURSORINFO pci);
-
-    [DllImport("user32.dll")]
-    public static extern IntPtr CreateSolidBrush(int crColor);
-
-    public const int CURSOR_SHOWING = 0x00000001;
-    public const int CURSOR_SUPPRESSED = 0x00000002;
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct POINT
-    {
-        public int x;
-        public int y;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct CURSORINFO
-    {
-        public int cbSize;        // Specifies the size, in bytes, of the structure.
-        // The caller must set this to Marshal.SizeOf(typeof(CURSORINFO)).
-        public int flags;         // Specifies the cursor state. This parameter can be one of the following values:
-        //    0             The cursor is hidden.
-        //    CURSOR_SHOWING    The cursor is showing.
-        //    CURSOR_SUPPRESSED    (Windows 8 and above.) The cursor is suppressed. This flag indicates that the system is not drawing the cursor because the user is providing input through touch or pen instead of the mouse.
-        public IntPtr hCursor;          // Handle to the cursor.
-        public POINT ptScreenPos;       // A POINT structure that receives the screen coordinates of the cursor.
-    }
-
-    [DllImport("user32.dll")]
-    static extern IntPtr LoadIcon(IntPtr hInstance, SystemIcons lpIconName);
-
-    [DllImport("user32.dll")]
-    static extern bool DestroyIcon(IntPtr hIcon);
+ [DllImport( "user32.dll" )]
+ static extern int GetSystemMetrics( SystemMetric smIndex );
 
     public enum SystemMetric : int
     {
-        SM_CXSCREEN = 0,
-        SM_CYSCREEN = 1,
-        SM_CYVSCROLL = 2,
-        SM_CXVSCROLL = 3,
-        SM_CYCAPTION = 4,
-        SM_CXBORDER = 5,
-        SM_CYBORDER = 6,
-        SM_CXDLGFRAME = 7,
-        SM_CYDLGFRAME = 8,
-        SM_CYVTHUMB = 9,
-        SM_CXHTHUMB = 10,
-        SM_CXICON = 11,
-        SM_CYICON = 12,
-        SM_CXCURSOR = 13,
-        SM_CYCURSOR = 14,
-        SM_CYMENU = 15,
-        SM_CXFULLSCREEN = 16,
-        SM_CYFULLSCREEN = 17,
-        SM_CYKANJIWINDOW = 18,
-        SM_MOUSEWHEELPRESENT = 75,
-        SM_CYHSCROLL = 20,
-        SM_CXHSCROLL = 21,
-        SM_DEBUG = 22,
-        SM_SWAPBUTTON = 23,
-        SM_RESERVED1 = 24,
-        SM_RESERVED2 = 25,
-        SM_RESERVED3 = 26,
-        SM_RESERVED4 = 27,
-        SM_CXMIN = 28,
-        SM_CYMIN = 29,
-        SM_CXSIZE = 30,
-        SM_CYSIZE = 31,
-        SM_CXFRAME = 32,
-        SM_CYFRAME = 33,
-        SM_CXMINTRACK = 34,
-        SM_CYMINTRACK = 35,
-        SM_CXDOUBLECLK = 36,
-        SM_CYDOUBLECLK = 37,
-        SM_CXICONSPACING = 38,
-        SM_CYICONSPACING = 39,
-        SM_MENUDROPALIGNMENT = 40,
-        SM_PENWINDOWS = 41,
-        SM_DBCSENABLED = 42,
-        SM_CMOUSEBUTTONS = 43,
-        SM_CXFIXEDFRAME = SM_CXDLGFRAME,
-        SM_CYFIXEDFRAME = SM_CYDLGFRAME,
-        SM_CXSIZEFRAME = SM_CXFRAME,
-        SM_CYSIZEFRAME = SM_CYFRAME,
-        SM_SECURE = 44,
-        SM_CXEDGE = 45,
-        SM_CYEDGE = 46,
-        SM_CXMINSPACING = 47,
-        SM_CYMINSPACING = 48,
-        SM_CXSMICON = 49,
-        SM_CYSMICON = 50,
-        SM_CYSMCAPTION = 51,
-        SM_CXSMSIZE = 52,
-        SM_CYSMSIZE = 53,
-        SM_CXMENUSIZE = 54,
-        SM_CYMENUSIZE = 55,
-        SM_ARRANGE = 56,
-        SM_CXMINIMIZED = 57,
-        SM_CYMINIMIZED = 58,
-        SM_CXMAXTRACK = 59,
-        SM_CYMAXTRACK = 60,
-        SM_CXMAXIMIZED = 61,
-        SM_CYMAXIMIZED = 62,
-        SM_NETWORK = 63,
-        SM_CLEANBOOT = 67,
-        SM_CXDRAG = 68,
-        SM_CYDRAG = 69,
-        SM_SHOWSOUNDS = 70,
-        SM_CXMENUCHECK = 71,
-        SM_CYMENUCHECK = 72,
-        SM_SLOWMACHINE = 73,
-        SM_MIDEASTENABLED = 74,
-        SM_MOUSEPRESENT = 19,
-        SM_XVIRTUALSCREEN = 76,
-        SM_YVIRTUALSCREEN = 77,
-        SM_CXVIRTUALSCREEN = 78,
-        SM_CYVIRTUALSCREEN = 79,
-        SM_CMONITORS = 80,
-        SM_SAMEDISPLAYFORMAT = 81,
-        SM_IMMENABLED = 82,
-        SM_CXFOCUSBORDER = 83,
-        SM_CYFOCUSBORDER = 84,
-        SM_TABLETPC = 86,
-        SM_MEDIACENTER = 87,
-        SM_CMETRICS_OTHER = 76,
-        SM_CMETRICS_2000 = 83,
-        SM_CMETRICS_NT = 88,
-        SM_REMOTESESSION = 0x1000,
-        SM_SHUTTINGDOWN = 0x2000,
-        SM_REMOTECONTROL = 0x2001,
+      SM_CXSCREEN = 0,
+      SM_CYSCREEN = 1,
+      SM_CYVSCROLL = 2,
+      SM_CXVSCROLL = 3,
+      SM_CYCAPTION = 4,
+      SM_CXBORDER = 5,
+      SM_CYBORDER = 6,
+      SM_CXDLGFRAME = 7,
+      SM_CYDLGFRAME = 8,
+      SM_CYVTHUMB = 9,
+      SM_CXHTHUMB = 10,
+      SM_CXICON = 11,
+      SM_CYICON = 12,
+      SM_CXCURSOR = 13,
+      SM_CYCURSOR = 14,
+      SM_CYMENU = 15,
+      SM_CXFULLSCREEN = 16,
+      SM_CYFULLSCREEN = 17,
+      SM_CYKANJIWINDOW = 18,
+      SM_MOUSEWHEELPRESENT = 75,
+      SM_CYHSCROLL = 20,
+      SM_CXHSCROLL = 21,
+      SM_DEBUG = 22,
+      SM_SWAPBUTTON = 23,
+      SM_RESERVED1 = 24,
+      SM_RESERVED2 = 25,
+      SM_RESERVED3 = 26,
+      SM_RESERVED4 = 27,
+      SM_CXMIN = 28,
+      SM_CYMIN = 29,
+      SM_CXSIZE = 30,
+      SM_CYSIZE = 31,
+      SM_CXFRAME = 32,
+      SM_CYFRAME = 33,
+      SM_CXMINTRACK = 34,
+      SM_CYMINTRACK = 35,
+      SM_CXDOUBLECLK = 36,
+      SM_CYDOUBLECLK = 37,
+      SM_CXICONSPACING = 38,
+      SM_CYICONSPACING = 39,
+      SM_MENUDROPALIGNMENT = 40,
+      SM_PENWINDOWS = 41,
+      SM_DBCSENABLED = 42,
+      SM_CMOUSEBUTTONS = 43,
+      SM_CXFIXEDFRAME = SM_CXDLGFRAME,
+      SM_CYFIXEDFRAME = SM_CYDLGFRAME,
+      SM_CXSIZEFRAME = SM_CXFRAME,
+      SM_CYSIZEFRAME = SM_CYFRAME,
+      SM_SECURE = 44,
+      SM_CXEDGE = 45,
+      SM_CYEDGE = 46,
+      SM_CXMINSPACING = 47,
+      SM_CYMINSPACING = 48,
+      SM_CXSMICON = 49,
+      SM_CYSMICON = 50,
+      SM_CYSMCAPTION = 51,
+      SM_CXSMSIZE = 52,
+      SM_CYSMSIZE = 53,
+      SM_CXMENUSIZE = 54,
+      SM_CYMENUSIZE = 55,
+      SM_ARRANGE = 56,
+      SM_CXMINIMIZED = 57,
+      SM_CYMINIMIZED = 58,
+      SM_CXMAXTRACK = 59,
+      SM_CYMAXTRACK = 60,
+      SM_CXMAXIMIZED = 61,
+      SM_CYMAXIMIZED = 62,
+      SM_NETWORK = 63,
+      SM_CLEANBOOT = 67,
+      SM_CXDRAG = 68,
+      SM_CYDRAG = 69,
+      SM_SHOWSOUNDS = 70,
+      SM_CXMENUCHECK = 71,
+      SM_CYMENUCHECK = 72,
+      SM_SLOWMACHINE = 73,
+      SM_MIDEASTENABLED = 74,
+      SM_MOUSEPRESENT = 19,
+      SM_XVIRTUALSCREEN = 76,
+      SM_YVIRTUALSCREEN = 77,
+      SM_CXVIRTUALSCREEN = 78,
+      SM_CYVIRTUALSCREEN = 79,
+      SM_CMONITORS = 80,
+      SM_SAMEDISPLAYFORMAT = 81,
+      SM_IMMENABLED = 82,
+      SM_CXFOCUSBORDER = 83,
+      SM_CYFOCUSBORDER = 84,
+      SM_TABLETPC = 86,
+      SM_MEDIACENTER = 87,
+      SM_CMETRICS_OTHER = 76,
+      SM_CMETRICS_2000 = 83,
+      SM_CMETRICS_NT = 88,
+      SM_REMOTESESSION = 0x1000,
+      SM_SHUTTINGDOWN = 0x2000,
+      SM_REMOTECONTROL = 0x2001,
     }
+  [DllImport("user32.dll")]
+        static extern IntPtr GetWindowDC(IntPtr hWnd);
 
-    public enum SystemIcons
-    {
-        IDI_APPLICATION = 32512,
-        IDI_HAND = 32513,
-        IDI_QUESTION = 32514,
-        IDI_EXCLAMATION = 32515,
-        IDI_ASTERISK = 32516,
-        IDI_WINLOGO = 32517,
-        IDI_WARNING = IDI_EXCLAMATION,
-        IDI_ERROR = IDI_HAND,
-        IDI_INFORMATION = IDI_ASTERISK,
-    }
+        [DllImport("user32.dll")]
+        static extern IntPtr GetDesktopWindow();
 
-    public static void Draw()
-    {
-        SetProcessDPIAware();
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool SetProcessDPIAware();
+ [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool DrawIcon(IntPtr hdc, int xLeft, int yTop, IntPtr hIcon);
 
-        while (true)
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetCursorPos(out POINT lpPoint);
+        [DllImport("user32.dll")]
+        public static extern bool GetCursorInfo(ref CURSORINFO pci);
+
+        public const Int32 CURSOR_SHOWING = 0x00000001;
+        public const Int32 CURSOR_SUPPRESSED = 0x00000002;
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
         {
-            CURSORINFO cursorinfo = new CURSORINFO();
-            POINT point;
-            int iconSize = Math.Min(GetSystemMetrics(SystemMetric.SM_CXICON), GetSystemMetrics(SystemMetric.SM_CYICON));
-            int iconHalfSize = iconSize / 2;
-
-            GetCursorPos(out point);
-            cursorinfo.cbSize = Marshal.SizeOf(typeof(CURSORINFO));
-            GetCursorInfo(ref cursorinfo);
-
-            Thread.Sleep(10);
-            IntPtr hwnd = GetDesktopWindow();
-            IntPtr hdc = GetWindowDC(hwnd);
-
-            IntPtr hIcon = LoadIcon(IntPtr.Zero, SystemIcons.IDI_ERROR);
-            IntPtr hBrush = CreateSolidBrush(0xFF0000); // Red color brush
-
-            DrawIconEx(hdc, point.x - iconHalfSize, point.y - iconHalfSize, hIcon, iconSize, iconSize, 0, hBrush, 0x0003); // Draw the icon with red color brush
-
-            DestroyIcon(hIcon); // Clean up resources
-            DestroyIcon(hBrush);
+            public Int32 x;
+            public Int32 y;
         }
-    }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct CURSORINFO
+        {
+            public Int32 cbSize;        // Specifies the size, in bytes, of the structure.
+                                        // The caller must set this to Marshal.SizeOf(typeof(CURSORINFO)).
+            public Int32 flags;         // Specifies the cursor state. This parameter can be one of the following values:
+                                        //    0             The cursor is hidden.
+                                        //    CURSOR_SHOWING    The cursor is showing.
+                                        //    CURSOR_SUPPRESSED    (Windows 8 and above.) The cursor is suppressed. This flag indicates that the system is not drawing the cursor because the user is providing input through touch or pen instead of the mouse.
+            public IntPtr hCursor;          // Handle to the cursor.
+            public POINT ptScreenPos;       // A POINT structure that receives the screen coordinates of the cursor.
+        }
+
+[DllImport("user32.dll")]
+static extern IntPtr LoadIcon(IntPtr hInstance, SystemIcons lpIconName);
+public enum SystemIcons
+{
+    IDI_APPLICATION = 32512,
+    IDI_HAND = 32513,
+    IDI_QUESTION = 32514,
+    IDI_EXCLAMATION = 32515,
+    IDI_ASTERISK = 32516,
+    IDI_WINLOGO = 32517,
+    IDI_WARNING = IDI_EXCLAMATION,
+    IDI_ERROR = IDI_HAND,
+    IDI_INFORMATION = IDI_ASTERISK,
 }
-"@
 
+  public static void draw()
+  {
+
+                SetProcessDPIAware();
+                while(true)
+            {
+                CURSORINFO cursorinfo = new CURSORINFO();
+                POINT point;
+                int ix = GetSystemMetrics(SystemMetric.SM_CXICON) / 2;
+	        int iy = GetSystemMetrics(SystemMetric.SM_CYICON) / 2;
+                GetCursorPos(out point);
+                cursorinfo.cbSize = 0x14;
+                GetCursorInfo(ref cursorinfo);
+
+                Thread.Sleep(10);
+                IntPtr hwnd = GetDesktopWindow();
+                IntPtr hdc = GetWindowDC(hwnd);
+                DrawIcon(hdc, point.x - ix, point.y - iy, LoadIcon(IntPtr.Zero, SystemIcons.IDI_ERROR));
+            }
+  }
+}
+
+"@ 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::Draw()
-
-
+ [Win32]::draw()
