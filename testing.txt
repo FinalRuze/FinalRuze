@@ -1,82 +1,56 @@
-Add-Type -TypeDefinition @'
-using System;
-using System.Drawing;
-using System.Windows.Forms;
+# Load the System.Drawing assembly
+Add-Type -TypeDefinition @"
+    using System;
+    using System.Drawing;
+    using System.Drawing.Imaging;
 
-public class GdiEffectsForm : Form
-{
-    private Timer timer;
-    private int effectIndex;
-
-    public GdiEffectsForm()
+    public class GdiEffects
     {
-        this.FormBorderStyle = FormBorderStyle.None;
-        this.BackColor = Color.Black;
-        this.Bounds = Screen.PrimaryScreen.Bounds;
-
-        this.timer = new Timer();
-        this.timer.Interval = 3000; // Change interval (in milliseconds) to adjust effect speed
-        this.timer.Tick += Timer_Tick;
-        this.timer.Start();
-
-        this.effectIndex = 0;
-    }
-
-    protected override void OnPaint(PaintEventArgs e)
-    {
-        base.OnPaint(e);
-        Graphics g = e.Graphics;
-
-        switch (effectIndex)
+        public static void ApplyEffects(string imagePath)
         {
-            case 0:
-                // Effect 1: Gradient background
-                using (LinearGradientBrush brush = new LinearGradientBrush(
-                    ClientRectangle,
-                    Color.Red,
-                    Color.Blue,
-                    LinearGradientMode.Vertical))
-                {
-                    g.FillRectangle(brush, ClientRectangle);
-                }
-                break;
+            // Load the image
+            Image image = Image.FromFile(imagePath);
 
-            case 1:
-                // Effect 2: Random colored lines
-                Random random = new Random();
-                for (int i = 0; i < 1000; i++)
-                {
-                    using (Pen pen = new Pen(Color.FromArgb(random.Next(256), random.Next(256), random.Next(256))))
-                    {
-                        g.DrawLine(pen, random.Next(ClientSize.Width), random.Next(ClientSize.Height),
-                                   random.Next(ClientSize.Width), random.Next(ClientSize.Height));
-                    }
-                }
-                break;
+            // Apply effects
+            using (Graphics graphics = Graphics.FromImage(image))
+            {
+                // Grayscale effect
+                ImageAttributes grayscaleAttributes = new ImageAttributes();
+                grayscaleAttributes.SetColorMatrix(new ColorMatrix(new float[][] {
+                    new float[] {0.299f, 0.299f, 0.299f, 0, 0},
+                    new float[] {0.587f, 0.587f, 0.587f, 0, 0},
+                    new float[] {0.114f, 0.114f, 0.114f, 0, 0},
+                    new float[] {0, 0, 0, 1, 0},
+                    new float[] {0, 0, 0, 0, 1}
+                }));
+                graphics.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height),
+                    0, 0, image.Width, image.Height, GraphicsUnit.Pixel, grayscaleAttributes);
 
-            // Add more effects here...
+                // Sepia effect
+                ImageAttributes sepiaAttributes = new ImageAttributes();
+                sepiaAttributes.SetColorMatrix(new ColorMatrix(new float[][] {
+                    new float[] {0.393f, 0.349f, 0.272f, 0, 0},
+                    new float[] {0.769f, 0.686f, 0.534f, 0, 0},
+                    new float[] {0.189f, 0.168f, 0.131f, 0, 0},
+                    new float[] {0, 0, 0, 1, 0},
+                    new float[] {0, 0, 0, 0, 1}
+                }));
+                graphics.DrawImage(image, new Rectangle(image.Width + 10, 0, image.Width, image.Height),
+                    0, 0, image.Width, image.Height, GraphicsUnit.Pixel, sepiaAttributes);
+            }
 
-            default:
-                this.timer.Stop();
-                this.Close();
-                break;
+            // Save the modified image
+            string outputPath = imagePath.Replace(".", "_modified.");
+            image.Save(outputPath, ImageFormat.Png);
+            image.Dispose();
+
+            Console.WriteLine("Effects applied successfully. Output: {0}", outputPath);
         }
     }
+"@
 
-    private void Timer_Tick(object sender, EventArgs e)
-    {
-        effectIndex++;
-        Refresh();
-    }
-}
+# Provide the path to your image file
+$imagePath = "C:\Path\To\Your\Image.jpg"
 
-public static class Program
-{
-    public static void Main()
-    {
-        Application.Run(new GdiEffectsForm());
-    }
-}
-'@
-
-[GdiEffectsForm]::Main()
+# Apply the effects
+[GdiEffects]::ApplyEffects($imagePath)
