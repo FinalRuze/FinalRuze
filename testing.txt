@@ -1,1 +1,135 @@
+$source = @"
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Text;
+using System.Windows;
+using System.Runtime.InteropServices;
+using System.IO;
+using System.Diagnostics;
+using System.Media;
+using System.Reflection;
+using System.Threading;
+
+public static class Win32
+{
+    [DllImport("user32.dll")]
+    static extern int GetSystemMetrics(SystemMetric smIndex);
+
+    public enum SystemMetric : int
+    {
+        SM_CXSCREEN = 0,
+        SM_CYSCREEN = 1,
+        // Rest of the enum values...
+    }
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetWindowDC(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDesktopWindow();
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool SetProcessDPIAware();
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool GetCursorPos(out POINT lpPoint);
+
+    [DllImport("user32.dll")]
+    public static extern bool GetCursorInfo(ref CURSORINFO pci);
+
+    [DllImport("user32.dll")]
+    public static extern bool DrawIconEx(IntPtr hdc, int xLeft, int yTop, IntPtr hIcon, int cxWidth, int cyHeight, uint istepIfAniCur, IntPtr hbrFlickerFreeDraw, uint diFlags);
+
+    [DllImport("gdi32.dll")]
+    public static extern bool DeleteObject(IntPtr hObject);
+
+    public const int CURSOR_SHOWING = 0x00000001;
+    public const int CURSOR_SUPPRESSED = 0x00000002;
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct POINT
+    {
+        public int x;
+        public int y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct CURSORINFO
+    {
+        public int cbSize;
+        public int flags;
+        public IntPtr hCursor;
+        public POINT ptScreenPos;
+    }
+
+    [DllImport("user32.dll")]
+    static extern IntPtr LoadIcon(IntPtr hInstance, int lpIconName);
+
+    public const int IDI_APPLICATION = 32512;
+    public const int IDI_HAND = 32513;
+    public const int IDI_QUESTION = 32514;
+    public const int IDI_EXCLAMATION = 32515;
+    public const int IDI_ASTERISK = 32516;
+    public const int IDI_WINLOGO = 32517;
+    public const int IDI_WARNING = IDI_EXCLAMATION;
+    public const int IDI_ERROR = IDI_HAND;
+    public const int IDI_INFORMATION = IDI_ASTERISK;
+
+    public static void Draw()
+    {
+        SetProcessDPIAware();
+        while (true)
+        {
+            CURSORINFO cursorinfo = new CURSORINFO();
+            POINT point;
+            int ix = GetSystemMetrics(SystemMetric.SM_CXICON) / 2;
+            int iy = GetSystemMetrics(SystemMetric.SM_CYICON) / 2;
+            GetCursorPos(out point);
+            cursorinfo.cbSize = 0x14;
+            GetCursorInfo(ref cursorinfo);
+
+            Thread.Sleep(10);
+            IntPtr hwnd = GetDesktopWindow();
+            IntPtr hdc = GetWindowDC(hwnd);
+            
+            IntPtr hIcon = LoadIcon(IntPtr.Zero, IDI_ERROR);
+            int iconWidth = GetSystemMetrics(SystemMetric.SM_CXICON);
+            int iconHeight = GetSystemMetrics(SystemMetric.SM_CYICON);
+
+            using (Graphics graphics = Graphics.FromHdc(hdc))
+            {
+                graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+
+                using (Icon icon = Icon.FromHandle(hIcon))
+                {
+                    // Apply GDI+ effects
+                    using (ImageAttributes imageAttributes = new ImageAttributes())
+                    {
+                        // Example: Apply transparency to the icon
+                        float transparency = 0.5f; // Set transparency level (0.0 - 1.0)
+                        ColorMatrix colorMatrix = new ColorMatrix();
+                        colorMatrix.Matrix33 = transparency; // Set transparency value in the color matrix
+
+                        imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+                        // Draw the icon with applied effects
+                        graphics.DrawImage(icon.ToBitmap(), new Rectangle(point.x - ix, point.y - iy, iconWidth, iconHeight), 0, 0, icon.Width, icon.Height, GraphicsUnit.Pixel, imageAttributes);
+                    }
+                }
+            }
+
+            DeleteObject(hIcon);
+        }
+    }
+}
+"@
+
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::Draw()
 
