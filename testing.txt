@@ -42,6 +42,13 @@ $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
 Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 
+# Set solid black image as desktop wallpaper
+$wallpaperPath = Join-Path -Path $env:TEMP -ChildPath "black.jpg"
+$blackImage = New-Object System.Drawing.Bitmap(1, 1)
+$blackImage.SetPixel(0, 0, [System.Drawing.Color]::Black)
+$blackImage.Save($wallpaperPath, [System.Drawing.Imaging.ImageFormat]::Jpeg)
+[SystemParameters]::SetWallpaper($wallpaperPath, 0)
+
 $source = @"
 using System;
 using System.Runtime.InteropServices;
