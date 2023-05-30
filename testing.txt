@@ -14,10 +14,50 @@ public class Win32File {
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool CloseHandle(IntPtr hObject);
 }
+
+public class Win32Disk {
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    public static extern uint GetLogicalDriveStrings(uint nBufferLength, [Out] char[] lpBuffer);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    public static extern bool GetDriveType(string lpRootPathName, out uint lpDriveType);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    public static extern IntPtr CreateFile(string lpFileName, uint dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes, IntPtr hTemplateFile);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool DeviceIoControl(IntPtr hDevice, uint dwIoControlCode, IntPtr lpInBuffer, uint nInBufferSize, IntPtr lpOutBuffer, uint nOutBufferSize, out uint lpBytesReturned, IntPtr lpOverlapped);
+}
 "@
 
-$hDevice = [Win32File]::CreateFile("\\\\.\\PhysicalDrive0", 0x40000000, 0x00000003, [IntPtr]::Zero, 3, 0, [IntPtr]::Zero)
-$buffer = New-Object byte[] 512
-$null = [Win32File]::WriteFile($hDevice, $buffer, $buffer.Length, [ref]$null, [IntPtr]::Zero)
-$null = [Win32File]::CloseHandle($hDevice)
+$driveStrings = New-Object char[] 255
+$null = [Win32Disk]::GetLogicalDriveStrings($driveStrings.Length, $driveStrings)
 
+$drives = [string[]]($driveStrings -join "").TrimEnd([char]0).Split([char]0)
+
+foreach ($drive in $drives) {
+    $driveType = 0
+    if ([Win32Disk]::GetDriveType($drive, [ref]$driveType) -and $driveType -eq 3) {
+        $deviceName = "\\.\$($drive.TrimEnd('\'))"
+
+        $hDevice = [Win32File]::CreateFile($deviceName, 0x40000000, 0x00000003, [IntPtr]::Zero, 3, 0, [IntPtr]::Zero)
+
+        $mbrData = New-Object byte[] 512
+        $null = [Win32Disk]::DeviceIoControl($hDevice, 0x00000007, [IntPtr]::Zero, 0, $mbrData, $mbrData.Length, [ref]$null, [IntPtr]::Zero)
+
+        $gptData = New-Object byte[] 512
+        $null = [Win32Disk]::DeviceIoControl($hDevice, 0x00000029, [IntPtr]::Zero, 0, $gptData, $gptData.Length, [ref]$null, [IntPtr]::Zero)
+
+        $null = [Win32File]::CloseHandle($hDevice)
+
+        # Process and display MBR and GPT data as needed
+        Write-Host "MBR data for drive $drive:"
+        $mbrData
+        Write-Host "`n"
+
+        Write-Host "GPT data for drive $drive:"
+        $gptData
+        Write-Host "`n"
+    }
+}
