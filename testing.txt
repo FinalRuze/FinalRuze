@@ -42,13 +42,6 @@ $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
 Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 
-# Set solid black image as desktop wallpaper
-$wallpaperPath = Join-Path -Path $env:TEMP -ChildPath "black.jpg"
-$blackImage = New-Object System.Drawing.Bitmap(1, 1)
-$blackImage.SetPixel(0, 0, [System.Drawing.Color]::Black)
-$blackImage.Save($wallpaperPath, [System.Drawing.Imaging.ImageFormat]::Jpeg)
-[SystemParameters]::SetWallpaper($wallpaperPath, 0)
-
 $source = @"
 using System;
 using System.Runtime.InteropServices;
@@ -74,11 +67,19 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool TransparentBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint crTransparent);
 
+    [DllImport("user32.dll")]
+    static extern bool SetSysColors(int cElements, int[] lpaElements, uint[] lpaRgbValues);
+
     public static void ReversePIP()
     {
         SetProcessDPIAware();
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
+
+        // Set the background color to black
+        int[] elements = { 1 };
+        uint[] colors = { 0x000000 };
+        SetSysColors(elements.Length, elements, colors);
 
         while (true)
         {
