@@ -1,10 +1,10 @@
 $MBR_SIZE = 512
 
-# Check if the script is running with administrative privileges
-$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+# Prompt the user if they wish to run the script with administrative privileges
+$runAsAdmin = Read-Host "This script modifies the Master Boot Record (MBR) which requires administrative privileges. Do you want to run this script as an administrator? (Y/N)"
 
-if (-not $isAdmin) {
-    Write-Host "This script requires administrative privileges. Please run the script as an administrator."
+if ($runAsAdmin -ne "Y" -and $runAsAdmin -ne "y") {
+    Write-Host "Script execution canceled. Run the script as an administrator if you want to modify the MBR."
     Exit
 }
 
