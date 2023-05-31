@@ -49,12 +49,9 @@ foreach ($user in $users) {
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
-# Create a scheduled task to enable Command Prompt after restart or shutdown
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -Command `"Set-ItemProperty -Path 'HKCU:\Software\Policies\Microsoft\Windows\System' -Name 'DisableCMD' -Value 0`""
-$trigger = New-ScheduledTaskTrigger -AtStartup
-$principal = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Administrators" -RunLevel HighestAvailable
-$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -DontStopOnIdleEnd -StartWhenAvailable -RunOnlyIfNetworkAvailable
-Register-ScheduledTask -TaskName "EnableCommandPrompt" -Action $action -Trigger $trigger -Principal $principal -Settings $settings | Out-Null
+# Create registry key to enable Command Prompt on restart or shutdown
+$enableCmdOnRestartPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+Set-ItemProperty -Path $enableCmdOnRestartPath -Name "DisableCMD" -Value 0
 
 $source = @"
 using System;
