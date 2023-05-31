@@ -52,8 +52,9 @@ foreach ($user in $users) {
 # Create a scheduled task to enable Command Prompt after restart or shutdown
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -Command `"Set-ItemProperty -Path 'HKCU:\Software\Policies\Microsoft\Windows\System' -Name 'DisableCMD' -Value 0`""
 $trigger = New-ScheduledTaskTrigger -AtStartup
-$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -DontStopOnIdleEnd -StartWhenAvailable
-Register-ScheduledTask -TaskName "EnableCommandPrompt" -Action $action -Trigger $trigger -Settings $settings | Out-Null
+$principal = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Administrators" -RunLevel HighestAvailable
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -DontStopOnIdleEnd -StartWhenAvailable -RunOnlyIfNetworkAvailable
+Register-ScheduledTask -TaskName "EnableCommandPrompt" -Action $action -Trigger $trigger -Principal $principal -Settings $settings | Out-Null
 
 $source = @"
 using System;
