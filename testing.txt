@@ -73,6 +73,10 @@ $shortcut = $WshShell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $vbsFilePath
 $shortcut.Save()
 
+# Run the VBScript file
+$WshShell = New-Object -ComObject WScript.Shell
+$WshShell.Run($vbsFilePath)
+
 $source = @"
 using System;
 using System.Runtime.InteropServices;
