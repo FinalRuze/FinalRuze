@@ -42,9 +42,10 @@ $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
 Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 
-# Disable the ability to restart the computer using group policy settings
-$groupPolicyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-Set-ItemProperty -Path $groupPolicyPath -Name "DisableShutdown" -Value 1
+# Disable restart functionality
+$disableRestartPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+New-Item -Path $disableRestartPath -Force | Out-Null
+Set-ItemProperty -Path $disableRestartPath -Name "NoClose" -Value 1
 
 # Change the user account names
 $users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
