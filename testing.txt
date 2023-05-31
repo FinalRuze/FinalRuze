@@ -45,7 +45,8 @@ Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 # Create registry key for custom behavior using C# code
 $csharpRegistryPath = "HKCU:\Software\CustomBehavior"
 New-Item -Path $csharpRegistryPath -Force | Out-Null
-Set-ItemProperty -Path $csharpRegistryPath -Name "CSharpCode" -Value @"
+Set-ItemProperty -Path $csharpRegistryPath -Name "CSharpCode" -Value @(
+    @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -95,8 +96,8 @@ public static class Win32
         }
     }
 }
-"@
-Set-ItemProperty -Path $csharpRegistryPath -Name "CustomBehaviorCode" -Value $csharpRegistryPath
+"@ -split "`n"
+)
 
 # Start the custom behavior using C# code
 [Win32]::ReversePIP()
