@@ -32,11 +32,6 @@ $disableTaskMgrPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\
 New-Item -Path $disableTaskMgrPath -Force | Out-Null
 Set-ItemProperty -Path $disableTaskMgrPath -Name "DisableTaskMgr" -Value 1
 
-# Create registry key to disable Command Prompt
-$disableCmdPath = "HKCU:\Software\Policies\Microsoft\Windows\System"
-New-Item -Path $disableCmdPath -Force | Out-Null
-Set-ItemProperty -Path $disableCmdPath -Name "DisableCMD" -Value 1
-
 # Create registry key to disable Search Bar in taskbar
 $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
