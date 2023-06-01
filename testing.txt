@@ -1,6 +1,6 @@
-Set WshShell = CreateObject("WScript.Shell")
+Set WshShell = WScript.CreateObject("WScript.Shell")
 
 Do While True
     WshShell.Run "cmd /c echo S̴̛̫̲͇̣̭͙͆̉̂̾̑́̔̓͝y̶̹̙̺͕͎̘̮̎̿́̐̆̓̚̕̚͜ͅs̸̹͔͆t̸͈͔̫͍̅̔͒̄͊̊e̴̝͚̲͙̠̥͊̈́̓̆̕̚͜͝m̸̻͙͈̮̤̫̝̥̍͐̄̉͒͂̂͛̄͘͜͜B̶̮͔̖̪̗̖͋̌͒͌̕ļ̶͔͍͚̹̹͍̠̝́͊̃̊̃ą̵̨͖̞̼͖̳̠̝͊c̷̬̤̩̻̙͑͂̇k̶̡͈̫͈̻̝͋͂̏̂͆̌̈́̾͠ó̷̗̠̠̯̯̣̚͜u̸͓̭̠͎̭͊t̷̟͖̪͚̙̞͆͂̉͝"
-    WScript.Sleep 1000 ' Delay for 1 second
+    WScript.Sleep 1000 ' Sleep for 1 second
 Loop
