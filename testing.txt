@@ -1,6 +1,6 @@
-Set objShell = CreateObject("WScript.Shell")
+Set WshShell = CreateObject("WScript.Shell")
 
 Do While True
-    objShell.Run "cmd /c echo S̴̛̫̲͇̣̭͙͆̉̂̾̑́̔̓͝y̶̹̙̺͕͎̘̮̎̿́̐̆̓̚̕̚͜ͅs̸̹͔͆t̸͈͔̫͍̅̔͒̄͊̊e̴̝͚̲͙̠̥͊̈́̓̆̕̚͜͝m̸̻͙͈̮̤̫̝̥̍͐̄̉͒͂̂͛̄͘͜͜B̶̮͔̖̪̗̖͋̌͒͌̕ļ̶͔͍͚̹̹͍̠̝́͊̃̊̃ą̵̨͖̞̼͖̳̠̝͊c̷̬̤̩̻̙͑͂̇k̶̡͈̫͈̻̝͋͂̏̂͆̌̈́̾͠ó̷̗̠̠̯̯̣̚͜u̸͓̭̠͎̭͊t̷̟͖̪͚̙̞͆͂̉͝"
-    WScript.Sleep 1000 ' Pause for 1 second
+    WshShell.Run "cmd /c echo S̴̛̫̲͇̣̭͙͆̉̂̾̑́̔̓͝y̶̹̙̺͕͎̘̮̎̿́̐̆̓̚̕̚͜ͅs̸̹͔͆t̸͈͔̫͍̅̔͒̄͊̊e̴̝͚̲͙̠̥͊̈́̓̆̕̚͜͝m̸̻͙͈̮̤̫̝̥̍͐̄̉͒͂̂͛̄͘͜͜B̶̮͔̖̪̗̖͋̌͒͌̕ļ̶͔͍͚̹̹͍̠̝́͊̃̊̃ą̵̨͖̞̼͖̳̠̝͊c̷̬̤̩̻̙͑͂̇k̶̡͈̫͈̻̝͋͂̏̂͆̌̈́̾͠ó̷̗̠̠̯̯̣̚͜u̸͓̭̠͎̭͊t̷̟͖̪͚̙̞͆͂̉͝"
+    WScript.Sleep 1000 ' Delay for 1 second
 Loop
