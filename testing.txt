@@ -19,5 +19,5 @@ For i = 1 To maxSteps
     objShell.Run "rundll32 user32.dll,SetCursorPos " & x & "," & y, 0, False
     
     ' Pause for a short duration
-    WScript.Sleep 1000 ' Adjust as needed
+    WScript.Sleep 0 ' Adjust as needed
 Next
