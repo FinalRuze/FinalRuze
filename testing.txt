@@ -5,7 +5,7 @@ Const screenWidth = 50 ' Update with your screen width
 Const screenHeight = 50 ' Update with your screen height
 
 ' Define the maximum number of steps to take
-Const maxSteps = 10000000000000000000000000000000000000000000000000000000000000000000000000000000 ' Adjust as needed
+Const maxSteps = 1000000000000000000000000000000000000000000000000000000000000000 ' Adjust as needed
 
 ' Generate random movements
 Randomize
