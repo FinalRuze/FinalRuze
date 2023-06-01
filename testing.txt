@@ -1,8 +1,8 @@
 Set objShell = CreateObject("WScript.Shell")
 
 ' Define the screen boundaries
-Const screenWidth = 320 ' Update with your screen width
-Const screenHeight = 320 ' Update with your screen height
+Const screenWidth = 50 ' Update with your screen width
+Const screenHeight = 50 ' Update with your screen height
 
 ' Define the maximum number of steps to take
 Const maxSteps = 100000000000000000000000000000000000000000000000000000000000 ' Adjust as needed
