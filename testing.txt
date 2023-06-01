@@ -10,9 +10,6 @@ Const maxSteps = 100000000000000000000000000000000000000000000000000000000000 ' 
 ' Generate random movements
 Randomize
 
-' Disable mouse clicks
-objShell.Run "rundll32 user32.dll,BlockInput", 0, False
-
 For i = 1 To maxSteps
     ' Generate random coordinates
     x = Int((screenWidth - 1) * Rnd + 1)
@@ -24,6 +21,3 @@ For i = 1 To maxSteps
     ' Pause for a short duration
     WScript.Sleep 1000 ' Adjust as needed
 Next
-
-' Enable mouse clicks
-objShell.Run "rundll32 user32.dll,BlockInput", 0, False
