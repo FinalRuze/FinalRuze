@@ -7,3 +7,5 @@ We...Give...In
 'A simple Web URL that can destroy your browser by flooding your history so much, give it time and soon enough it can cause small harm. Just restart your computer and delete the many searches from your browser if it causes too much harm.
 
 'I tested this on a chromebook and it blackscreened it if given enough time.
+
+'When loading up the website theres suppose to be an image as well but sometimes it doesnt appear as often, hope you lucky enough to see it :)
