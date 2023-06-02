@@ -1,1 +1,39 @@
+Option Explicit
+
+Dim MorseCodeDict
+Set MorseCodeDict = CreateObject("Scripting.Dictionary")
+MorseCodeDict.Add("A", ".-")
+MorseCodeDict.Add("B", "-...")
+MorseCodeDict.Add("C", "-.-.")
+MorseCodeDict.Add("D", "-..")
+MorseCodeDict.Add("E", ".")
+' ... Add more mappings for the remaining letters
+
+Dim message
+message = "HELLO" ' The message you want to convert to Morse code
+
+Dim i, j
+For i = 1 To Len(message)
+    Dim letter, morseCode
+    letter = UCase(Mid(message, i, 1))
+    
+    If MorseCodeDict.Exists(letter) Then
+        morseCode = MorseCodeDict(letter)
+        
+        For j = 1 To Len(morseCode)
+            Dim symbol
+            symbol = Mid(morseCode, j, 1)
+            
+            If symbol = "." Then
+                Beep 500, 100 ' Play a short beep for a dot
+            ElseIf symbol = "-" Then
+                Beep 500, 300 ' Play a longer beep for a dash
+            End If
+            
+            WScript.Sleep 100 ' Pause between symbols
+        Next
+        
+        WScript.Sleep 300 ' Pause between letters
+    End If
+Next
 
