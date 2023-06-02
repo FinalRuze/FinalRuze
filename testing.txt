@@ -157,45 +157,33 @@ $shortcut = $WshShell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $vbsFilePath
 $shortcut.Save()
 
-# Add the creepy and ominous sound section
-Add-Type -TypeDefinition @"
+# Import the required .NET assembly
+Add-Type -TypeDefinition @'
 using System;
 using System.Media;
 
-public class CreepySound
+public class ByteBeatPlayer
 {
-    public static void PlayCreepySound()
+    public static void PlayByteBeat(byte[] bytes)
     {
-        string bytebeatCode = @"
-            double t = 0;
-            double frequency = 200;
-            while (true)
-            {
-                double sample = (Math.Sin(2 * Math.PI * frequency * t) + Math.Sin(2 * Math.PI * (frequency + 2) * t) + Math.Sin(2 * Math.PI * (frequency + 4) * t)) / 3;
-                byte value = (byte)((sample + 1) * 127.5);
-                Console.Write(Convert.ToChar(value));
-                t += 1.0 / 44100;
-            }
-        ";
-
-        using (SoundPlayer player = new SoundPlayer())
+        using (var ms = new System.IO.MemoryStream(bytes))
         {
-            player.Stream = new System.IO.MemoryStream();
-            Console.SetOut(new System.IO.StreamWriter(player.Stream));
-            Console.SetError(new System.IO.StreamWriter(player.Stream));
-            Console.SetIn(new System.IO.StreamReader(System.IO.Stream.Null));
-
-            // Start playing the creepy sound
-            player.PlayLooping();
-
-            // Execute the bytebeat code
-            System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#").CompileAssemblyFromSource(new System.CodeDom.Compiler.CompilerParameters(), bytebeatCode).CompiledAssembly.EntryPoint.Invoke(null, new object[0]);
+            using (var player = new SoundPlayer(ms))
+            {
+                player.PlaySync();
+            }
         }
     }
 }
-"@
+'@
 
-[CreepySound]::PlayCreepySound()
+# Define your byte beat pattern as an array of bytes
+$byteBeatPattern = @(0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20,
+                    0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x02, 0x00, 0x44, 0xAC, 0x00, 0x00, 0x10, 0xB1, 0x02, 0x00,
+                    0x04, 0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00)
+
+# Call the PlayByteBeat method to play the byte beat
+[ByteBeatPlayer]::PlayByteBeat($byteBeatPattern)
 
 $source = @"
 using System;
