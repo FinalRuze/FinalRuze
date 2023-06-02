@@ -2,11 +2,11 @@ Option Explicit
 
 Dim MorseCodeDict
 Set MorseCodeDict = CreateObject("Scripting.Dictionary")
-MorseCodeDict.Add("A", ".-")
-MorseCodeDict.Add("B", "-...")
-MorseCodeDict.Add("C", "-.-.")
-MorseCodeDict.Add("D", "-..")
-MorseCodeDict.Add("E", ".")
+MorseCodeDict.Add "A", ".-"
+MorseCodeDict.Add "B", "-..."
+MorseCodeDict.Add "C", "-.-."
+MorseCodeDict.Add "D", "-.."
+MorseCodeDict.Add "E", "."
 ' ... Add more mappings for the remaining letters
 
 Dim message
@@ -37,3 +37,6 @@ For i = 1 To Len(message)
     End If
 Next
 
+Sub Beep(frequency, duration)
+    ' Beep implementation
+End Sub
