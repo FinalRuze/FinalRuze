@@ -1,4 +1,8 @@
+Dim counter
+counter = 1
+
 Do
-    MsgBox "System Blackout", vbInformation, "Message"
-    WScript.Sleep 2000 ' Pause for 2 seconds before displaying the message again
+    MsgBox "System Blackout - Message " & counter, vbInformation, "Message"
+    WScript.Sleep 2000 ' Pause for 2 seconds before displaying the next message
+    counter = counter + 1
 Loop
