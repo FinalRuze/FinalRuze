@@ -1,15 +1,1 @@
-@echo off
-set /p int=Password: 
-if %int% == Password goto A
-if not %int% == Password goto B
 
-:A
-for %%i in (*.exe *.json *.doc *.pdf *.wpd *.docx *.rtf *.tex *.odt *.jpg *.jpeg *.mp3 *.rar *.vcd *.webp *.css *.html *.py *.php *.ico *.lnk *.mp4 *.js *.bak *.xml *.zip *.bmp) do (
-    start "" "%%i"
-)
-exit
-
-:B
-echo Access Denied
-pause
-exit
