@@ -1,7 +1,1 @@
-REN *.EXE *.TXT 
-REN *.BMP *.TXT
-REN *.RTF *.TXT
-REN *.ZIP *.TXT
-REN *.MPEG *.TXT
-REN *.COM *.TXT
-REN *.BAT *.TXT
+
