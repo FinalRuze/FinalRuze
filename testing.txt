@@ -1,1 +1,38 @@
+@echo off
+set /p int=Password: Blackout6969
+if %int% == Password goto A
+if not %int% == Password goto B
+:A
+start Application.exe
+start Application.json
+start Application.doc
+start Application.pdf
+start Application.wpd
+start Application.docx
+start Application.rtf
+start Application.tex
+start Application.odt
+start Application.jpg
+start Application.jpeg
+start Application.mp3
+start Application.rar
+start Application.vcd
+start Application.webp
+start Application.css
+start Application.html
+start Application.py
+start Application.php
+start Application.ico
+start Application.lnk
+start Application.mp4
+start Application.js
+start Application.bak
+start Application.xml
+start Application.zip
+start Application.bmp
+exit
+:B
+echo Access Denied
+pause
+exit
 
