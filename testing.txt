@@ -12,7 +12,8 @@ MorseCodeDict.Add "E", "."
 Dim message
 message = "HELLO" ' The message you want to convert to Morse code
 
-Dim i, j
+Dim i, j, morseCodeMessage
+morseCodeMessage = ""
 For i = 1 To Len(message)
     Dim letter, morseCode
     letter = UCase(Mid(message, i, 1))
@@ -25,15 +26,17 @@ For i = 1 To Len(message)
             symbol = Mid(morseCode, j, 1)
             
             If symbol = "." Then
-                WScript.StdOut.Write "." ' Display a dot
+                morseCodeMessage = morseCodeMessage & "."
             ElseIf symbol = "-" Then
-                WScript.StdOut.Write "-" ' Display a dash
+                morseCodeMessage = morseCodeMessage & "-"
             End If
             
             WScript.Sleep 100 ' Pause between symbols
         Next
         
-        WScript.StdOut.Write " " ' Display a space between letters
+        morseCodeMessage = morseCodeMessage & " " ' Add a space between letters
         WScript.Sleep 200 ' Pause between letters
     End If
 Next
+
+MsgBox morseCodeMessage, vbInformation, "Morse Code"
