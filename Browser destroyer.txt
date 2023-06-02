@@ -8,4 +8,4 @@ We...Give...In
 
 'I tested this on a chromebook and it blackscreened it if given enough time.
 
-'When loading up the website theres suppose to be an image as well but sometimes it doesnt appear as often, hope you lucky enough to see it :)
+'When loading up the website theres suppose to be an image as well but sometimes it doesnt appear as often, hope you lucky enough to see it. :)
