@@ -25,22 +25,19 @@ public static class Win32
         int increment = 5;
         int delay = 100;
 
-        while (true)
+        while (cx < GetSystemMetrics(0) && cy < GetSystemMetrics(1))
         {
             Thread.Sleep(delay);
             IntPtr hdc = GetDC(IntPtr.Zero);
 
-            if (cx > 0 && cy > 0)
-            {
-                int blackWidth = Math.Max(0, cx - increment);
-                int blackHeight = Math.Max(0, cy - increment);
-                int sourceX = (cx - blackWidth) / 2;
-                int sourceY = (cy - blackHeight) / 2;
+            int blackWidth = Math.Min(GetSystemMetrics(0), cx + increment);
+            int blackHeight = Math.Min(GetSystemMetrics(1), cy + increment);
+            int sourceX = (GetSystemMetrics(0) - blackWidth) / 2;
+            int sourceY = (GetSystemMetrics(1) - blackHeight) / 2;
 
-                StretchBlt(hdc, 0, 0, cx, cy, hdc, sourceX, sourceY, blackWidth, blackHeight, 0x00000042);
-                cx -= increment;
-                cy -= increment;
-            }
+            StretchBlt(hdc, 0, 0, GetSystemMetrics(0), GetSystemMetrics(1), hdc, sourceX, sourceY, blackWidth, blackHeight, 0x00000042);
+            cx += increment;
+            cy += increment;
         }
     }
 }
