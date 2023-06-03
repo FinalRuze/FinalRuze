@@ -1,5 +1,6 @@
 $source = @"
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -19,6 +20,12 @@ public static class Win32
 
     [DllImport("gdi32.dll")]
     static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
+
+    [DllImport("user32.dll")]
+    static extern bool SystemParametersInfo(int uiAction, int uiParam, ref string pvParam, int fWinIni);
+
+    [DllImport("user32.dll")]
+    static extern int MessageBox(IntPtr hWnd, string lpText, string lpCaption, uint uType);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
@@ -55,6 +62,17 @@ public static class Win32
                 // Wait for a short duration before updating the screen
                 Thread.Sleep(10);
             }
+
+            // Screen is fully black, create and execute the VBScript
+            string vbsScript = @"MsgBox ""Hello, this is a message!"", vbInformation, ""Message""";
+            string vbsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "message.vbs");
+            File.WriteAllText(vbsFilePath, vbsScript);
+
+            string nullStr = null;
+            SystemParametersInfo(0x0014, 1, ref nullStr, 0x01 | 0x02); // Update the desktop to refresh the file
+
+            // Display a message box to inform the user that the script executed successfully
+            MessageBox(IntPtr.Zero, "VBScript file created and executed.", "Script Executed", 0x40);
         }
         finally
         {
