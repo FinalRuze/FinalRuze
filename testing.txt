@@ -17,6 +17,15 @@ public static class Win32
     [DllImport("user32.dll")]
     static extern bool SetProcessDPIAware();
 
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateSolidBrush(int crColor);
+
+    [DllImport("gdi32.dll")]
+    static extern int SetTextColor(IntPtr hdc, int crColor);
+
+    [DllImport("gdi32.dll")]
+    static extern int SetBkColor(IntPtr hdc, int crColor);
+
     public static void PIP()
     {
         SetProcessDPIAware();
@@ -43,6 +52,7 @@ public static class Win32
                 // Set the brush color to gradually darken the screen
                 int brushColor = (i << 16) | (i << 8) | i;
                 SetTextColor(hdc, brushColor);
+                SetBkColor(hdc, brushColor);
 
                 // Paint the black rectangle onto the screen
                 BitBlt(hdc, rect.Left, rect.Top, rect.Width, rect.Height, hdc, rect.Left, rect.Top, 0x00);
@@ -52,13 +62,6 @@ public static class Win32
             }
         }
     }
-
-    // Additional required functions for brush creation and color setting
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateSolidBrush(int crColor);
-
-    [DllImport("gdi32.dll")]
-    static extern int SetTextColor(IntPtr hdc, int crColor);
 
     [StructLayout(LayoutKind.Sequential)]
     public struct Rectangle
