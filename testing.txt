@@ -12,7 +12,7 @@ public static class Win32
     static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint dwRop);
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
@@ -29,30 +29,30 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool DeleteObject(IntPtr hObject);
 
-    public static void PIP()
+    public static void BlackOutScreen()
     {
         SetProcessDPIAware();
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
-        uint rop = 0xCC0020; // Raster operation code (ROP) for SRCCOPY
+        uint black = 0x000000;
 
         IntPtr hdc = GetDC(IntPtr.Zero);
-        IntPtr hBrush = CreateSolidBrush(0x000000); // Create a black brush
-        IntPtr hOldBrush = SelectObject(hdc, hBrush);
+        IntPtr brush = CreateSolidBrush(black);
+        IntPtr oldBrush = SelectObject(hdc, brush);
 
         while (true)
         {
-            Thread.Sleep(200);
-
-            PatBlt(hdc, 0, 0, cx, cy, rop);
-            StretchBlt(hdc, 50, 50, cx - 100, cy - 100, hdc, 0, 0, cx, cy, rop);
+            for (int alpha = 0; alpha <= 255; alpha += 5)
+            {
+                Thread.Sleep(20);
+                PatBlt(hdc, 0, 0, cx, cy, 0x000F0000 | (uint)((alpha + 1) << 24));
+            }
         }
 
-        SelectObject(hdc, hOldBrush);
-        DeleteObject(hBrush);
+        DeleteObject(SelectObject(hdc, oldBrush));
     }
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::PIP()
+[Win32]::BlackOutScreen()
