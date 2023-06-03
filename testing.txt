@@ -42,11 +42,11 @@ public static class Win32
             {
                 // Set the brush color to gradually darken the screen
                 int brushColor = (i << 16) | (i << 8) | i;
-                SetBrushColor(hBrush, brushColor);
+                SetTextColor(hdc, brushColor);
 
                 // Paint the black rectangle onto the screen
                 BitBlt(hdc, rect.Left, rect.Top, rect.Width, rect.Height, hdc, rect.Left, rect.Top, 0x00);
-                
+
                 // Pause for a short duration to create the fading effect
                 Thread.Sleep(20);
             }
@@ -58,7 +58,7 @@ public static class Win32
     static extern IntPtr CreateSolidBrush(int crColor);
 
     [DllImport("gdi32.dll")]
-    static extern bool SetBrushColor(IntPtr hbr, int crColor);
+    static extern int SetTextColor(IntPtr hdc, int crColor);
 
     [StructLayout(LayoutKind.Sequential)]
     public struct Rectangle
