@@ -12,57 +12,72 @@ public static class Win32
     static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
 
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateSolidBrush(uint crColor);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
-
-    [DllImport("gdi32.dll")]
-    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
-
-    [DllImport("gdi32.dll")]
-    static extern bool DeleteObject(IntPtr hObject);
-
-    [DllImport("user32.dll", SetLastError = true)]
+    [DllImport("user32.dll")]
     static extern bool SetProcessDPIAware();
 
-    public static void BlackoutScreen()
+    public static void PIP()
     {
         SetProcessDPIAware();
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
-        
+
         IntPtr hdc = GetDC(IntPtr.Zero);
-        IntPtr hdcMem = IntPtr.Zero;
-        IntPtr hBrush = IntPtr.Zero;
-        
-        try
+
+        // Create a black brush
+        IntPtr hBrush = CreateSolidBrush(0x000000);
+
+        // Get the screen dimensions
+        int screenWidth = GetSystemMetrics(0);
+        int screenHeight = GetSystemMetrics(1);
+
+        // Create a black rectangle the size of the screen
+        Rectangle rect = new Rectangle(0, 0, screenWidth, screenHeight);
+
+        while (true)
         {
-            hdcMem = CreateCompatibleDC(hdc);
-            hBrush = CreateSolidBrush(0x00000000);
-            
-            while (true)
+            // Slowly turn the screen pitch black
+            for (int i = 0; i < 256; i++)
             {
-                Thread.Sleep(800);
+                // Set the brush color to gradually darken the screen
+                int brushColor = (i << 16) | (i << 8) | i;
+                SetBrushColor(hBrush, brushColor);
+
+                // Paint the black rectangle onto the screen
+                BitBlt(hdc, rect.Left, rect.Top, rect.Width, rect.Height, hdc, rect.Left, rect.Top, 0x00);
                 
-                SelectObject(hdcMem, hBrush);
-                PatBlt(hdc, 0, 0, cx, cy, 0x000F0000);
+                // Pause for a short duration to create the fading effect
+                Thread.Sleep(20);
             }
         }
-        finally
+    }
+
+    // Additional required functions for brush creation and color setting
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateSolidBrush(int crColor);
+
+    [DllImport("gdi32.dll")]
+    static extern bool SetBrushColor(IntPtr hbr, int crColor);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Rectangle
+    {
+        public int Left;
+        public int Top;
+        public int Width;
+        public int Height;
+
+        public Rectangle(int left, int top, int width, int height)
         {
-            if (hdcMem != IntPtr.Zero)
-                DeleteDC(hdcMem);
-                
-            if (hBrush != IntPtr.Zero)
-                DeleteObject(hBrush);
+            Left = left;
+            Top = top;
+            Width = width;
+            Height = height;
         }
     }
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::BlackoutScreen()
+[Win32]::PIP()
