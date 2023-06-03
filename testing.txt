@@ -26,6 +26,18 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern int SetBkColor(IntPtr hdc, int crColor);
 
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+    [DllImport("gdi32.dll")]
+    static extern bool TextOut(IntPtr hdc, int nXStart, int nYStart, string lpString, int cchString);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateFont(int nHeight, int nWidth, int nEscapement, int nOrientation, int fnWeight, uint fdwItalic, uint fdwUnderline, uint fdwStrikeOut, uint fdwCharSet, uint fdwOutputPrecision, uint fdwClipPrecision, uint fdwQuality, uint fdwPitchAndFamily, string lpszFace);
+
+    [DllImport("gdi32.dll")]
+    static extern bool DeleteObject(IntPtr hObject);
+
     public static void PIP()
     {
         SetProcessDPIAware();
@@ -37,6 +49,12 @@ public static class Win32
         // Create a black brush
         IntPtr hBrush = CreateSolidBrush(0x000000);
 
+        // Create a white font
+        IntPtr hFont = CreateFont(16, 0, 0, 0, 400, 0, 0, 0, 0, 0, 0, 0, 0, "Arial");
+
+        // Select the white font
+        SelectObject(hdc, hFont);
+
         // Get the screen dimensions
         int screenWidth = GetSystemMetrics(0);
         int screenHeight = GetSystemMetrics(1);
@@ -45,6 +63,7 @@ public static class Win32
         Rectangle rect = new Rectangle(0, 0, screenWidth, screenHeight);
 
         Random rand = new Random();
+        string message = "Your Message Here";
 
         while (true)
         {
@@ -79,6 +98,23 @@ public static class Win32
 
                 // Pause for a short duration to create the melting effect
                 Thread.Sleep(20);
+            }
+
+            // Display the message all over the screen
+            for (int x = 0; x < rect.Width; x += 50)
+            {
+                for (int y = 0; y < rect.Height; y += 50)
+                {
+                    // Set the position for the text
+                    int textX = x + rand.Next(40);
+                    int textY = y + rand.Next(40);
+
+                    // Display the message in white text
+                    TextOut(hdc, textX, textY, message, message.Length);
+
+                    // Pause for a short duration to create the effect
+                    Thread.Sleep(10);
+                }
             }
         }
     }
