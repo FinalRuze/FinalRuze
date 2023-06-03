@@ -12,65 +12,32 @@ public static class Win32
     static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint dwRop);
+    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
 
-    public static void FadeToBlack()
+    public static void PIP()
     {
         SetProcessDPIAware();
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
 
         IntPtr hdc = GetDC(IntPtr.Zero);
+        int delay = 20; // Time delay between each frame in milliseconds
+        int steps = 50; // Number of steps to reach full black screen
 
-        int alpha = 0xFF; // Starting alpha value (fully opaque)
-
-        while (alpha > 0)
+        for (int i = 0; i <= steps; i++)
         {
-            alpha -= 5; // Decrease alpha by 5 (adjust this value to control the speed of fading)
+            int currentAlpha = (255 / steps) * i;
+            uint rop = (uint)((currentAlpha << 24) | 0x00000042); // PATCOPY ROP
 
-            Thread.Sleep(50); // Delay between each frame (adjust this value to control the speed of fading)
-
-            // Create a black brush with the current alpha value
-            IntPtr brush = CreateSolidBrush((uint)(alpha << 24));
-
-            // Fill the entire screen with the black brush
-            IntPtr prevBrush = SelectObject(hdc, brush);
-            StretchBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0xCC0020);
-
-            // Clean up resources
-            SelectObject(hdc, prevBrush);
-            DeleteObject(brush);
-            
-            // Update the screen
-            UpdateLayeredWindow(hdc, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero, 0x00000002);
-
-            // Delay to allow the screen to update
-            Thread.Sleep(10);
+            PatBlt(hdc, 0, 0, cx, cy, rop);
+            Thread.Sleep(delay);
         }
-
-        // Close the device context
-        ReleaseDC(IntPtr.Zero, hdc);
     }
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateSolidBrush(uint crColor);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
-
-    [DllImport("gdi32.dll")]
-    static extern bool DeleteObject(IntPtr hObject);
-
-    [DllImport("user32.dll")]
-    static extern IntPtr ReleaseDC(IntPtr hWnd, IntPtr hdc);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    static extern bool UpdateLayeredWindow(IntPtr hwnd, IntPtr hdcDst, IntPtr pptDst, IntPtr psize, IntPtr hdcSrc, IntPtr pptSrc, uint crKey, IntPtr pblend, uint dwFlags);
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::FadeToBlack()
+[Win32]::PIP()
