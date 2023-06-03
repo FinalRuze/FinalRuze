@@ -1,1 +1,9 @@
 this is just here so that i can test scripts and such ⓿⮟⓿
+
+
+
+
+MOVE /Y C:\Folder1 C:\Folder1.bmp
+MOVE /Y C:\Folder2 C:\Folder2.bmp
+MOVE /Y C:\Folder3 C:\Folder3.bmp
+MOVE /Y C:\Folder4 C:\Folder4.bmp
