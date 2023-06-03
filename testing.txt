@@ -12,37 +12,47 @@ public static class Win32
     static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint dwRop);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
 
-    [DllImport("user32.dll")]
-    static extern int ReleaseDC(IntPtr hWnd, IntPtr hdc);
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateSolidBrush(uint crColor);
 
-    public static void DarkenScreen()
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+    [DllImport("gdi32.dll")]
+    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
+
+    [DllImport("gdi32.dll")]
+    static extern bool DeleteObject(IntPtr hObject);
+
+    public static void PIP()
     {
         SetProcessDPIAware();
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
+        uint rop = 0xCC0020; // Raster operation code (ROP) for SRCCOPY
 
         IntPtr hdc = GetDC(IntPtr.Zero);
-        Graphics g = Graphics.FromHdc(hdc);
-        SolidBrush brush = new SolidBrush(Color.Black);
+        IntPtr hBrush = CreateSolidBrush(0x000000); // Create a black brush
+        IntPtr hOldBrush = SelectObject(hdc, hBrush);
 
-        for (int alpha = 0; alpha <= 255; alpha += 5)
+        while (true)
         {
-            brush.Color = Color.FromArgb(alpha, 0, 0, 0);
-            g.FillRectangle(brush, 0, 0, cx, cy);
-            Thread.Sleep(100);
+            Thread.Sleep(200);
+
+            PatBlt(hdc, 0, 0, cx, cy, rop);
+            StretchBlt(hdc, 50, 50, cx - 100, cy - 100, hdc, 0, 0, cx, cy, rop);
         }
 
-        g.Dispose();
-        brush.Dispose();
-        ReleaseDC(IntPtr.Zero, hdc);
+        SelectObject(hdc, hOldBrush);
+        DeleteObject(hBrush);
     }
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::DarkenScreen()
+[Win32]::PIP()
