@@ -43,6 +43,12 @@ public static class Win32
             // Clean up resources
             SelectObject(hdc, prevBrush);
             DeleteObject(brush);
+            
+            // Update the screen
+            UpdateLayeredWindow(hdc, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero, 0x00000002);
+
+            // Delay to allow the screen to update
+            Thread.Sleep(10);
         }
 
         // Close the device context
@@ -60,6 +66,9 @@ public static class Win32
 
     [DllImport("user32.dll")]
     static extern IntPtr ReleaseDC(IntPtr hWnd, IntPtr hdc);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool UpdateLayeredWindow(IntPtr hwnd, IntPtr hdcDst, IntPtr pptDst, IntPtr psize, IntPtr hdcSrc, IntPtr pptSrc, uint crKey, IntPtr pblend, uint dwFlags);
 }
 "@
 
