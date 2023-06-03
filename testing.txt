@@ -18,19 +18,28 @@ public static class Win32
     static extern bool SetProcessDPIAware();
 
     [DllImport("gdi32.dll")]
-    static extern IntPtr CreateSolidBrush(int crColor);
+    static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
+
+    [DllImport("gdi32.dll")]
+    static extern bool DeleteObject(IntPtr hObject);
+
+    [DllImport("gdi32.dll")]
+    static extern bool DeleteDC(IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint dwRop);
 
     [DllImport("gdi32.dll")]
     static extern int SetTextColor(IntPtr hdc, int crColor);
 
     [DllImport("gdi32.dll")]
     static extern int SetBkColor(IntPtr hdc, int crColor);
-
-    [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint dwRop);
-
-    [DllImport("gdi32.dll")]
-    static extern bool GaussianBlur(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidth, int nHeight, int nRadius);
 
     public static void PIP()
     {
@@ -50,6 +59,11 @@ public static class Win32
         // Create a black rectangle the size of the screen
         Rectangle rect = new Rectangle(0, 0, screenWidth, screenHeight);
 
+        // Create a compatible DC and bitmap for blurring effect
+        IntPtr hdcCompatible = CreateCompatibleDC(hdc);
+        IntPtr hBitmap = CreateCompatibleBitmap(hdc, screenWidth, screenHeight);
+        IntPtr hOldBitmap = SelectObject(hdcCompatible, hBitmap);
+
         while (true)
         {
             // Slowly turn the screen pitch black
@@ -63,20 +77,18 @@ public static class Win32
                 // Paint the black rectangle onto the screen
                 BitBlt(hdc, rect.Left, rect.Top, rect.Width, rect.Height, hdc, rect.Left, rect.Top, 0x00);
 
-                // Pause for a short duration to create the fading effect
+                // Blur the screen by copying the black rectangle with reduced opacity
+                StretchBlt(hdc, rect.Left, rect.Top, rect.Width, rect.Height, hdcCompatible, rect.Left, rect.Top, rect.Width, rect.Height, 0x00CC0020);
+
+                // Pause for a short duration to create the fading and blurring effect
                 Thread.Sleep(20);
             }
-
-            // Slowly blur the screen
-            for (int radius = 0; radius < 100; radius += 5)
-            {
-                // Apply Gaussian blur effect to the entire screen
-                GaussianBlur(hdc, rect.Left, rect.Top, rect.Right, rect.Bottom, rect.Width, rect.Height, radius);
-
-                // Pause for a short duration to create the blurring effect
-                Thread.Sleep(100);
-            }
         }
+
+        // Cleanup
+        SelectObject(hdcCompatible, hOldBitmap);
+        DeleteObject(hBitmap);
+        DeleteDC(hdcCompatible);
     }
 
     [StructLayout(LayoutKind.Sequential)]
