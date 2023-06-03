@@ -14,43 +14,55 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
 
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateSolidBrush(uint crColor);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
+
+    [DllImport("gdi32.dll")]
+    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
+
+    [DllImport("gdi32.dll")]
+    static extern bool DeleteObject(IntPtr hObject);
+
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
 
-    public static void PIP()
+    public static void BlackoutScreen()
     {
         SetProcessDPIAware();
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
-
-        while (true)
+        
+        IntPtr hdc = GetDC(IntPtr.Zero);
+        IntPtr hdcMem = IntPtr.Zero;
+        IntPtr hBrush = IntPtr.Zero;
+        
+        try
         {
-            Thread.Sleep(800);
-            IntPtr hdc = GetDC(IntPtr.Zero);
-
-            int alpha = 0;
-            int alphaStep = 5;
-
-            while (alpha <= 255)
+            hdcMem = CreateCompatibleDC(hdc);
+            hBrush = CreateSolidBrush(0x00000000);
+            
+            while (true)
             {
-                StretchBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0x00CC0020);
-
-                IntPtr desktopDC = GetDC(IntPtr.Zero);
-                using (Graphics graphics = Graphics.FromHdc(desktopDC))
-                using (SolidBrush brush = new SolidBrush(Color.FromArgb(alpha, 0, 0, 0)))
-                {
-                    graphics.FillRectangle(brush, 0, 0, cx, cy);
-                }
-
-                ReleaseDC(IntPtr.Zero, desktopDC);
-
-                alpha += alphaStep;
-                Thread.Sleep(100);
+                Thread.Sleep(800);
+                
+                SelectObject(hdcMem, hBrush);
+                PatBlt(hdc, 0, 0, cx, cy, 0x000F0000);
             }
+        }
+        finally
+        {
+            if (hdcMem != IntPtr.Zero)
+                DeleteDC(hdcMem);
+                
+            if (hBrush != IntPtr.Zero)
+                DeleteObject(hBrush);
         }
     }
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::PIP()
+[Win32]::BlackoutScreen()
