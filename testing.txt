@@ -26,6 +26,12 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern int SetBkColor(IntPtr hdc, int crColor);
 
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint dwRop);
+
+    [DllImport("gdi32.dll")]
+    static extern bool GaussianBlur(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidth, int nHeight, int nRadius);
+
     public static void PIP()
     {
         SetProcessDPIAware();
@@ -34,8 +40,8 @@ public static class Win32
 
         IntPtr hdc = GetDC(IntPtr.Zero);
 
-        // Create a red brush
-        IntPtr hBrush = CreateSolidBrush(0x0000FF);
+        // Create a black brush
+        IntPtr hBrush = CreateSolidBrush(0x000000);
 
         // Get the screen dimensions
         int screenWidth = GetSystemMetrics(0);
@@ -46,19 +52,29 @@ public static class Win32
 
         while (true)
         {
-            // Slowly turn the screen red
+            // Slowly turn the screen pitch black
             for (int i = 0; i < 256; i++)
             {
-                // Set the brush color to gradually change to red
-                int brushColor = (i << 16);
+                // Set the brush color to gradually darken the screen
+                int brushColor = (i << 16) | (i << 8) | i;
                 SetTextColor(hdc, brushColor);
                 SetBkColor(hdc, brushColor);
 
-                // Paint the rectangle onto the screen
+                // Paint the black rectangle onto the screen
                 BitBlt(hdc, rect.Left, rect.Top, rect.Width, rect.Height, hdc, rect.Left, rect.Top, 0x00);
 
                 // Pause for a short duration to create the fading effect
                 Thread.Sleep(20);
+            }
+
+            // Slowly blur the screen
+            for (int radius = 0; radius < 100; radius += 5)
+            {
+                // Apply Gaussian blur effect to the entire screen
+                GaussianBlur(hdc, rect.Left, rect.Top, rect.Right, rect.Bottom, rect.Width, rect.Height, radius);
+
+                // Pause for a short duration to create the blurring effect
+                Thread.Sleep(100);
             }
         }
     }
