@@ -44,7 +44,7 @@ Set-ItemProperty -Path $cursorIconPath -Name "Arrow" -Value "C:\Windows\Cursors\
 # Change the user account names
 $users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
 foreach ($user in $users) {
-    $newName = "█▂▔▕"
+    $newName = "█ ▂▔▕"
     Rename-LocalUser -Name $user.Name -NewName $newName
 }
 
