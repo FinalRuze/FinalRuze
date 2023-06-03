@@ -63,7 +63,7 @@ public static class Win32
         Rectangle rect = new Rectangle(0, 0, screenWidth, screenHeight);
 
         Random rand = new Random();
-        string message = "Your Message Here";
+        string message = "S̵̟̹̙̳̖͒͑̅̀͆͐͝ͅẙ̸̨͍͔̣̘̘̈́s̶̡͇͎̻͖͓̣̦̝̮̉͐̔ṱ̶̜̦̫̠̹̝̫͖̚ě̶̳͎̠̺̘̥͈̩́̍̂̚m̶̧̢̻̞̝̬̹̳̻̋̈́͐̃̒̌̑̽̈́͠ ̸̨̨̧̮̠͍̮͓̍̎B̷̞̱̤͋́̍̕͝͠l̵͔̗͉̝̿̕a̷̡̬̮̱̻̤̖͆͂̒c̷̲̣̈́̈́̐͒̈́̉̐̍͐͋k̶͍͉͉̫͚̑̇̄͊̿͘͘͜ŏ̷̮̤̣̎͒̀̊́̕͝ṷ̸̔͌̉̿̄̒ẗ̶͉̠̟̥͙̥͖̈̇̑̌̉̉̀̄͠";
 
         while (true)
         {
@@ -99,7 +99,7 @@ public static class Win32
                 BitBlt(hdc, meltX + meltOffsetX, meltY + meltOffsetY, meltWidth, meltHeight, hdc, meltX, meltY, 0x00);
 
                 // Pause for a short duration to create the melting effect
-                Thread.Sleep(20);
+                Thread.Sleep(200000000000);
             }
 
             // Slowly turn the screen pitch black
