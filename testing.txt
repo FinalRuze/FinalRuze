@@ -12,7 +12,7 @@ public static class Win32
     static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
@@ -23,17 +23,30 @@ public static class Win32
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
 
-        IntPtr hdc = GetDC(IntPtr.Zero);
-        int delay = 20; // Time delay between each frame in milliseconds
-        int steps = 50; // Number of steps to reach full black screen
-
-        for (int i = 0; i <= steps; i++)
+        while (true)
         {
-            int currentAlpha = (255 / steps) * i;
-            uint rop = (uint)((currentAlpha << 24) | 0x00000042); // PATCOPY ROP
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
 
-            PatBlt(hdc, 0, 0, cx, cy, rop);
-            Thread.Sleep(delay);
+            int alpha = 0;
+            int alphaStep = 5;
+
+            while (alpha <= 255)
+            {
+                StretchBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0x00CC0020);
+
+                IntPtr desktopDC = GetDC(IntPtr.Zero);
+                using (Graphics graphics = Graphics.FromHdc(desktopDC))
+                using (SolidBrush brush = new SolidBrush(Color.FromArgb(alpha, 0, 0, 0)))
+                {
+                    graphics.FillRectangle(brush, 0, 0, cx, cy);
+                }
+
+                ReleaseDC(IntPtr.Zero, desktopDC);
+
+                alpha += alphaStep;
+                Thread.Sleep(100);
+            }
         }
     }
 }
