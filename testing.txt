@@ -34,8 +34,8 @@ public static class Win32
 
         IntPtr hdc = GetDC(IntPtr.Zero);
 
-        // Create a black brush
-        IntPtr hBrush = CreateSolidBrush(0x000000);
+        // Create a red brush
+        IntPtr hBrush = CreateSolidBrush(0x0000FF);
 
         // Get the screen dimensions
         int screenWidth = GetSystemMetrics(0);
@@ -46,15 +46,15 @@ public static class Win32
 
         while (true)
         {
-            // Slowly turn the screen pitch black
+            // Slowly turn the screen red
             for (int i = 0; i < 256; i++)
             {
-                // Set the brush color to gradually darken the screen
-                int brushColor = (i << 16) | (i << 8) | i;
+                // Set the brush color to gradually change to red
+                int brushColor = (i << 16);
                 SetTextColor(hdc, brushColor);
                 SetBkColor(hdc, brushColor);
 
-                // Paint the black rectangle onto the screen
+                // Paint the rectangle onto the screen
                 BitBlt(hdc, rect.Left, rect.Top, rect.Width, rect.Height, hdc, rect.Left, rect.Top, 0x00);
 
                 // Pause for a short duration to create the fading effect
