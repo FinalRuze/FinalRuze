@@ -37,10 +37,6 @@ $searchBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
 New-Item -Path $searchBarPath -Force | Out-Null
 Set-ItemProperty -Path $searchBarPath -Name "SearchboxTaskbarMode" -Value 0
 
-# Set registry key to change cursor icon
-$cursorIconPath = "HKCU:\Control Panel\Cursors"
-Set-ItemProperty -Path $cursorIconPath -Name "Arrow" -Value "C:\Windows\Cursors\sizeall.cur"
-
 # Change the user account names
 $users = Get-LocalUser | Where-Object {$_.Enabled -eq $true}
 foreach ($user in $users) {
