@@ -1,4 +1,4 @@
-$source = @"
+$source= @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -17,42 +17,34 @@ public static class Win32
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
 
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateSolidBrush(uint crColor);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
-
-    [DllImport("gdi32.dll")]
-    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
-
-    [DllImport("gdi32.dll")]
-    static extern bool DeleteObject(IntPtr hObject);
-
-    public static void BlackOutScreen()
+    public static void PIP()
     {
         SetProcessDPIAware();
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
-        uint black = 0x000000;
-
-        IntPtr hdc = GetDC(IntPtr.Zero);
-        IntPtr brush = CreateSolidBrush(black);
-        IntPtr oldBrush = SelectObject(hdc, brush);
+        int increment = 5;
+        int delay = 100;
 
         while (true)
         {
-            for (int alpha = 0; alpha <= 255; alpha += 5)
+            Thread.Sleep(delay);
+            IntPtr hdc = GetDC(IntPtr.Zero);
+
+            if (cx > 0 && cy > 0)
             {
-                Thread.Sleep(20);
-                PatBlt(hdc, 0, 0, cx, cy, 0x000F0000 | (uint)((alpha + 1) << 24));
+                int blackWidth = Math.Max(0, cx - increment);
+                int blackHeight = Math.Max(0, cy - increment);
+                int sourceX = (cx - blackWidth) / 2;
+                int sourceY = (cy - blackHeight) / 2;
+
+                StretchBlt(hdc, 0, 0, cx, cy, hdc, sourceX, sourceY, blackWidth, blackHeight, 0x00000042);
+                cx -= increment;
+                cy -= increment;
             }
         }
-
-        DeleteObject(SelectObject(hdc, oldBrush));
     }
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::BlackOutScreen()
+[Win32]::PIP()
