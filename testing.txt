@@ -14,11 +14,32 @@ public static class Win32
     [DllImport("gdi32.dll")]
     static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
 
-    [DllImport("gdi32.dll")]
-    static extern int SetPixel(IntPtr hdc, int X, int Y, int crColor);
-
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
+
+    [DllImport("gdi32.dll")]
+    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+    [DllImport("gdi32.dll")]
+    static extern bool DeleteDC(IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    static extern bool DeleteObject(IntPtr hObject);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    static extern IntPtr GetConsoleWindow();
+
+    [DllImport("user32.dll")]
+    static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    const int SW_HIDE = 0;
+    const int SW_SHOW = 5;
 
     public static void PIP()
     {
@@ -26,29 +47,33 @@ public static class Win32
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
 
-        while (true)
+        IntPtr hdc = GetDC(IntPtr.Zero);
+        IntPtr hdcCompatible = CreateCompatibleDC(hdc);
+        IntPtr hBitmap = IntPtr.Zero;
+
+        try
         {
-            for (int i = 0; i <= 255; i++)
+            hBitmap = IntPtr.Zero;
+            hBitmap = new IntPtr(0x100000);
+
+            SelectObject(hdcCompatible, hBitmap);
+
+            while (true)
             {
-                Thread.Sleep(10);
-                IntPtr hdc = GetDC(IntPtr.Zero);
-
-                for (int x = 0; x < cx; x++)
-                {
-                    for (int y = 0; y < cy; y++)
-                    {
-                        SetPixel(hdc, x, y, RGB(i, i, i));
-                    }
-                }
-
-                StretchBlt(hdc, 50, 50, cx - 100, cy - 100, hdc, 0, 0, cx, cy, 0x00CC0020);
+                Thread.Sleep(1000);
+                BitBlt(hdc, 0, 0, cx, cy, hdcCompatible, 0, 0, 0x00000042);
             }
         }
-    }
+        finally
+        {
+            if (hBitmap != IntPtr.Zero)
+                DeleteObject(hBitmap);
 
-    private static int RGB(int r, int g, int b)
-    {
-        return r | (g << 8) | (b << 16);
+            if (hdcCompatible != IntPtr.Zero)
+                DeleteDC(hdcCompatible);
+
+            ShowWindow(GetConsoleWindow(), SW_SHOW);
+        }
     }
 }
 "@
