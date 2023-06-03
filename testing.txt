@@ -3,6 +3,6 @@ Do
     objShell.Run "wscript.exe path_to_error_script.vbs", 1, False
     
     ' Adjust the delay time (in milliseconds) between each loop iteration
-    WScript.Sleep 5000 ' 5 seconds delay
+    WScript.Sleep 0
 Loop
 
