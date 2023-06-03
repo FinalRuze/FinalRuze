@@ -17,66 +17,32 @@ public static class Win32
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
 
-    [DllImport("gdi32.dll")]
-    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateCompatibleDC(IntPtr hdc);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
-
-    [DllImport("gdi32.dll")]
-    static extern bool DeleteDC(IntPtr hdc);
-
-    [DllImport("gdi32.dll")]
-    static extern bool DeleteObject(IntPtr hObject);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    static extern IntPtr GetConsoleWindow();
-
     [DllImport("user32.dll")]
-    static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    static extern int ReleaseDC(IntPtr hWnd, IntPtr hdc);
 
-    const int SW_HIDE = 0;
-    const int SW_SHOW = 5;
-
-    public static void PIP()
+    public static void DarkenScreen()
     {
         SetProcessDPIAware();
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
 
         IntPtr hdc = GetDC(IntPtr.Zero);
-        IntPtr hdcCompatible = CreateCompatibleDC(hdc);
-        IntPtr hBitmap = IntPtr.Zero;
+        Graphics g = Graphics.FromHdc(hdc);
+        SolidBrush brush = new SolidBrush(Color.Black);
 
-        try
+        for (int alpha = 0; alpha <= 255; alpha += 5)
         {
-            hBitmap = IntPtr.Zero;
-            hBitmap = new IntPtr(0x100000);
-
-            SelectObject(hdcCompatible, hBitmap);
-
-            while (true)
-            {
-                Thread.Sleep(1000);
-                BitBlt(hdc, 0, 0, cx, cy, hdcCompatible, 0, 0, 0x00000042);
-            }
+            brush.Color = Color.FromArgb(alpha, 0, 0, 0);
+            g.FillRectangle(brush, 0, 0, cx, cy);
+            Thread.Sleep(100);
         }
-        finally
-        {
-            if (hBitmap != IntPtr.Zero)
-                DeleteObject(hBitmap);
 
-            if (hdcCompatible != IntPtr.Zero)
-                DeleteDC(hdcCompatible);
-
-            ShowWindow(GetConsoleWindow(), SW_SHOW);
-        }
+        g.Dispose();
+        brush.Dispose();
+        ReleaseDC(IntPtr.Zero, hdc);
     }
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::PIP()
+[Win32]::DarkenScreen()
