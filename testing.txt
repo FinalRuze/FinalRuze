@@ -18,22 +18,7 @@ public static class Win32
     static extern bool SetProcessDPIAware();
 
     [DllImport("gdi32.dll")]
-    static extern IntPtr CreateCompatibleDC(IntPtr hdc);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
-
-    [DllImport("gdi32.dll")]
-    static extern bool DeleteObject(IntPtr hObject);
-
-    [DllImport("gdi32.dll")]
-    static extern bool DeleteDC(IntPtr hdc);
-
-    [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint dwRop);
+    static extern IntPtr CreateSolidBrush(int crColor);
 
     [DllImport("gdi32.dll")]
     static extern int SetTextColor(IntPtr hdc, int crColor);
@@ -59,10 +44,7 @@ public static class Win32
         // Create a black rectangle the size of the screen
         Rectangle rect = new Rectangle(0, 0, screenWidth, screenHeight);
 
-        // Create a compatible DC and bitmap for blurring effect
-        IntPtr hdcCompatible = CreateCompatibleDC(hdc);
-        IntPtr hBitmap = CreateCompatibleBitmap(hdc, screenWidth, screenHeight);
-        IntPtr hOldBitmap = SelectObject(hdcCompatible, hBitmap);
+        Random rand = new Random();
 
         while (true)
         {
@@ -77,18 +59,28 @@ public static class Win32
                 // Paint the black rectangle onto the screen
                 BitBlt(hdc, rect.Left, rect.Top, rect.Width, rect.Height, hdc, rect.Left, rect.Top, 0x00);
 
-                // Blur the screen by copying the black rectangle with reduced opacity
-                StretchBlt(hdc, rect.Left, rect.Top, rect.Width, rect.Height, hdcCompatible, rect.Left, rect.Top, rect.Width, rect.Height, 0x00CC0020);
+                // Pause for a short duration to create the fading effect
+                Thread.Sleep(20);
+            }
 
-                // Pause for a short duration to create the fading and blurring effect
+            // Apply the melting effect
+            int meltX = rand.Next(rect.Width);
+            int meltY = rand.Next(rect.Height);
+            int meltWidth = rand.Next(rect.Width - meltX);
+            int meltHeight = rand.Next(rect.Height - meltY);
+
+            for (int j = 0; j < 50; j++)
+            {
+                int meltOffsetX = rand.Next(10) - 5;
+                int meltOffsetY = rand.Next(10) - 5;
+
+                // Paint a melted region onto the screen
+                BitBlt(hdc, meltX + meltOffsetX, meltY + meltOffsetY, meltWidth, meltHeight, hdc, meltX, meltY, 0x00);
+
+                // Pause for a short duration to create the melting effect
                 Thread.Sleep(20);
             }
         }
-
-        // Cleanup
-        SelectObject(hdcCompatible, hOldBitmap);
-        DeleteObject(hBitmap);
-        DeleteDC(hdcCompatible);
     }
 
     [StructLayout(LayoutKind.Sequential)]
