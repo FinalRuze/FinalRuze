@@ -1,4 +1,4 @@
-$source= @"
+$source = @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -12,63 +12,58 @@ public static class Win32
     static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateCompatibleDC(IntPtr hdc);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
-
-    [DllImport("gdi32.dll")]
-    static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, uint dwRop);
-
-    [DllImport("gdi32.dll")]
-    static extern bool DeleteObject(IntPtr hObject);
+    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
 
-    public static void PIP()
+    public static void BleedingEffect()
     {
         SetProcessDPIAware();
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
 
-        IntPtr hdc = GetDC(IntPtr.Zero);
-        IntPtr hdcCompatible = CreateCompatibleDC(hdc);
-        IntPtr hBitmap = CreateCompatibleBitmap(hdc, cx, cy);
-        IntPtr hOldBitmap = SelectObject(hdcCompatible, hBitmap);
-
-        int bleedRop = 0x00220326; // BLENDSCREEN
-        int sleepInterval = 50;
-        int bleedAlpha = 5;
-
         while (true)
         {
-            Thread.Sleep(sleepInterval);
+            Thread.Sleep(800);
+            IntPtr hdc = GetDC(IntPtr.Zero);
 
-            PatBlt(hdcCompatible, 0, 0, cx, cy, bleedRop);
-            StretchBlt(hdc, 0, 0, cx, cy, hdcCompatible, 0, 0, cx, cy, 0x00CC0020);
+            // Create a temporary bitmap
+            IntPtr hdcTemp = GetDC(IntPtr.Zero);
+            IntPtr hBitmap = IntPtr.Zero;
+            IntPtr hOldBitmap = IntPtr.Zero;
 
-            if (bleedAlpha < 255)
+            try
             {
-                uint alphaBlendRop = (uint)((bleedAlpha << 24) | (bleedAlpha << 16) | (bleedAlpha << 8) | bleedAlpha);
-                PatBlt(hdcCompatible, 0, 0, cx, cy, alphaBlendRop);
-                StretchBlt(hdc, 0, 0, cx, cy, hdcCompatible, 0, 0, cx, cy, 0x00CC0020);
-                bleedAlpha += 5;
-            }
-        }
+                hBitmap = CreateCompatibleBitmap(hdc, cx, cy);
+                hOldBitmap = SelectObject(hdcTemp, hBitmap);
 
-        SelectObject(hdcCompatible, hOldBitmap);
-        DeleteObject(hBitmap);
-        DeleteObject(hdcCompatible);
+                // Draw a semi-transparent red rectangle on the temporary bitmap
+                using (var g = Graphics.FromHdc(hdcTemp))
+                {
+                    g.FillRectangle(new SolidBrush(Color.FromArgb(128, Color.Red)), 0, 0, cx, cy);
+                }
+
+                // Copy the temporary bitmap to the screen
+                BitBlt(hdc, 0, 0, cx, cy, hdcTemp, 0, 0, 0xCC0020);
+            }
+            finally
+            {
+                // Clean up resources
+                if (hdcTemp != IntPtr.Zero)
+                {
+                    SelectObject(hdcTemp, hOldBitmap);
+                    DeleteObject(hBitmap);
+                    ReleaseDC(IntPtr.Zero, hdcTemp);
+                }
+            }
+
+            // Release the screen's device context
+            ReleaseDC(IntPtr.Zero, hdc);
+        }
     }
 }
 "@
 
 Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::PIP()
+[Win32]::BleedingEffect()
