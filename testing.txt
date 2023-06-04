@@ -64,7 +64,7 @@ public static class Win32
             }
 
             // Screen is fully black, create and execute the VBScript
-            string vbsScript = @"MsgBox ""How are your eyes?"", vbInformation, ""Message""";
+            string vbsScript = @"MsgBox ""How are your eyes?"", vbInformation, ""FinalRuze""";
             string vbsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "message from creator.vbs");
             File.WriteAllText(vbsFilePath, vbsScript);
 
@@ -72,7 +72,7 @@ public static class Win32
             SystemParametersInfo(0x0014, 1, ref nullStr, 0x01 | 0x02); // Update the desktop to refresh the file
 
             // Display a message box to inform the user that the script executed successfully
-            MessageBox(IntPtr.Zero, "Think Fast Chucklenuts!", "Script Executed", 0x40);
+            MessageBox(IntPtr.Zero, "Think Fast Chucklenuts!", "Scout", 0x40);
         }
         finally
         {
