@@ -100,14 +100,11 @@ public static class Win32
 }
 "@
 
-$psFilePath = [System.IO.Path]::Combine($videosPath, "sliding.ps1")
+$psFilePath = Join-Path -Path $desktopPath -ChildPath "script.ps1"
 $psScript | Out-File -FilePath $psFilePath -Encoding ASCII
 
-# Get the user's Startup folder
-$startupFolder = [System.IO.Path]::Combine($env:APPDATA, "Microsoft\Windows\Start Menu\Programs\Startup")
-
-# Create a shortcut to the PowerShell script in the Startup folder
-$shortcutPath = [System.IO.Path]::Combine($startupFolder, "slide.lnk")
+# Create a shortcut to the PowerShell script on the desktop
+$shortcutPath = Join-Path -Path $desktopPath -ChildPath "script.lnk"
 $WshShell = New-Object -ComObject WScript.Shell
 $shortcut = $WshShell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = "powershell.exe"
