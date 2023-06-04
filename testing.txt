@@ -1,1 +1,65 @@
+$source= @"
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+public static class Win32
+{
+    [DllImport("user32.dll")]
+    static extern int GetSystemMetrics(int smIndex);
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("gdi32.dll")]
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SetProcessDPIAware();
+
+    [DllImport("gdi32.dll")]
+    public static extern IntPtr CreateSolidBrush(int crColor);
+
+    [DllImport("gdi32.dll")]
+    public static extern int SetBkColor(IntPtr hdc, int crColor);
+
+    [DllImport("user32.dll")]
+    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+    [DllImport("gdi32.dll")]
+    public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+    [DllImport("gdi32.dll")]
+    public static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, int dwRop);
+
+    public static void PIP()
+    {
+        SetProcessDPIAware();
+        int cx = GetSystemMetrics(0);
+        int cy = GetSystemMetrics(1);
+
+        while (true)
+        {
+            Thread.Sleep(50);
+
+            IntPtr hdc = GetDC(IntPtr.Zero);
+            IntPtr brush = CreateSolidBrush(0x000000);
+            IntPtr oldBrush = SelectObject(hdc, brush);
+            SetBkColor(hdc, 0x000000);
+
+            for (int alpha = 0; alpha <= 255; alpha += 5)
+            {
+                PatBlt(hdc, 0, 0, cx, cy, 0x000F0001 | (alpha << 24));
+                Thread.Sleep(10);
+            }
+
+            ReleaseDC(IntPtr.Zero, hdc);
+            SelectObject(hdc, oldBrush);
+        }
+    }
+}
+"@
+
+Add-Type -TypeDefinition $source -Language CSharp
+[Win32]::PIP()
 
