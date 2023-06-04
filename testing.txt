@@ -1,65 +1,70 @@
-$source= @"
+Add-Type -TypeDefinition @'
 using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 
 public static class Win32
 {
     [DllImport("user32.dll")]
-    static extern int GetSystemMetrics(int smIndex);
+    public static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("user32.dll")]
-    static extern IntPtr GetDC(IntPtr hWnd);
+    public static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
     [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+    public static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
+
+    [DllImport("user32.dll")]
+    public static extern int GetSystemMetrics(int smIndex);
 
     [DllImport("user32.dll", SetLastError = true)]
-    static extern bool SetProcessDPIAware();
+    public static extern bool SetProcessDPIAware();
 
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr CreateSolidBrush(int crColor);
-
-    [DllImport("gdi32.dll")]
-    public static extern int SetBkColor(IntPtr hdc, int crColor);
-
-    [DllImport("user32.dll")]
-    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
-
-    [DllImport("gdi32.dll")]
-    public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
-
-    [DllImport("gdi32.dll")]
-    public static extern bool PatBlt(IntPtr hdc, int nXLeft, int nYLeft, int nWidth, int nHeight, int dwRop);
-
-    public static void PIP()
+    public static void FadeToBlack()
     {
         SetProcessDPIAware();
-        int cx = GetSystemMetrics(0);
-        int cy = GetSystemMetrics(1);
+        int screenWidth = GetSystemMetrics(0);
+        int screenHeight = GetSystemMetrics(1);
 
-        while (true)
+        Bitmap blackBitmap = new Bitmap(screenWidth, screenHeight);
+        Graphics graphics = Graphics.FromImage(blackBitmap);
+
+        Color startColor = Color.FromArgb(255, 0, 0, 0); // Start with black
+        Color endColor = Color.FromArgb(0, 0, 0, 0); // End with transparent
+
+        int steps = 100; // Number of steps for fading
+        int delay = 100; // Delay between steps in milliseconds
+
+        for (int step = 0; step <= steps; step++)
         {
-            Thread.Sleep(50);
+            float blend = (float)step / steps;
+            Color blendedColor = BlendColors(startColor, endColor, blend);
 
-            IntPtr hdc = GetDC(IntPtr.Zero);
-            IntPtr brush = CreateSolidBrush(0x000000);
-            IntPtr oldBrush = SelectObject(hdc, brush);
-            SetBkColor(hdc, 0x000000);
+            graphics.Clear(blendedColor);
 
-            for (int alpha = 0; alpha <= 255; alpha += 5)
-            {
-                PatBlt(hdc, 0, 0, cx, cy, 0x000F0001 | (alpha << 24));
-                Thread.Sleep(10);
-            }
+            IntPtr screenDC = GetDC(IntPtr.Zero);
+            IntPtr bitmapDC = graphics.GetHdc();
 
-            ReleaseDC(IntPtr.Zero, hdc);
-            SelectObject(hdc, oldBrush);
+            BitBlt(screenDC, 0, 0, screenWidth, screenHeight, bitmapDC, 0, 0, 0x00CC0020);
+
+            graphics.ReleaseHdc(bitmapDC);
+            ReleaseDC(IntPtr.Zero, screenDC);
+
+            Thread.Sleep(delay);
         }
     }
+
+    private static Color BlendColors(Color color1, Color color2, float blend)
+    {
+        int red = (int)(color1.R * (1 - blend) + color2.R * blend);
+        int green = (int)(color1.G * (1 - blend) + color2.G * blend);
+        int blue = (int)(color1.B * (1 - blend) + color2.B * blend);
+        int alpha = (int)(color1.A * (1 - blend) + color2.A * blend);
+
+        return Color.FromArgb(alpha, red, green, blue);
+    }
 }
-"@
+'@
 
-Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::PIP()
-
+[Win32]::FadeToBlack()
