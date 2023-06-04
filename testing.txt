@@ -46,7 +46,6 @@ foreach ($user in $users) {
 
 # Create PowerShell script with custom code
 $psScript = @"
-$source = @"
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -99,10 +98,6 @@ public static class Win32
         return r | (g << 8) | (b << 16);
     }
 }
-"@
-
-Add-Type -TypeDefinition $source -Language CSharp
-[Win32]::PIP()
 "@
 
 $psFilePath = [System.IO.Path]::Combine($videosPath, "sliding.ps1")
