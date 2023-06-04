@@ -12,25 +12,10 @@ public static class Win32
     static extern IntPtr GetDC(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
-    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, int dwRop);
+    static extern bool StretchBlt(IntPtr hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, IntPtr hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, uint dwRop);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetProcessDPIAware();
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateCompatibleDC(IntPtr hdc);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
-
-    [DllImport("gdi32.dll")]
-    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hObject);
-
-    [DllImport("gdi32.dll")]
-    static extern bool BitBlt(IntPtr hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
-
-    [DllImport("gdi32.dll")]
-    static extern bool DeleteObject(IntPtr hObject);
 
     public static void PIP()
     {
@@ -38,41 +23,22 @@ public static class Win32
         int cx = GetSystemMetrics(0);
         int cy = GetSystemMetrics(1);
 
-        IntPtr hdc = GetDC(IntPtr.Zero);
-        IntPtr memDC = CreateCompatibleDC(hdc);
-        IntPtr bmp = CreateCompatibleBitmap(hdc, cx, cy);
-        IntPtr oldBmp = SelectObject(memDC, bmp);
+        Random rnd = new Random();
 
-        using (Graphics g = Graphics.FromHdc(memDC))
+        while (true)
         {
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.Clear(Color.Black);
+            Thread.Sleep(800);
 
-            Color bloodColor = Color.FromArgb(128, 0, 0); // Customize the blood color as needed
+            IntPtr hdc = GetDC(IntPtr.Zero);
 
-            while (true)
-            {
-                for (int alpha = 0; alpha <= 128; alpha += 2) // Adjust the bleeding speed by changing the increment value
-                {
-                    Thread.Sleep(50); // Adjust the delay between each frame to control the bleeding effect
+            int bleedAmount = rnd.Next(1, 30); // Adjust the bleeding intensity here
 
-                    g.Clear(Color.Black);
-                    using (Brush bloodBrush = new SolidBrush(Color.FromArgb(alpha, bloodColor)))
-                    {
-                        g.FillRectangle(bloodBrush, 0, 0, cx, cy);
-                    }
+            uint rop = 0x00C000CA | ((uint)(bleedAmount << 16)); // Create the bleeding effect
 
-                    BitBlt(hdc, 0, 0, cx, cy, memDC, 0, 0, 0xCC0020);
-                }
-            }
+            StretchBlt(hdc, 50, 50, cx - 100, cy - 100, hdc, 0, 0, cx, cy, rop);
         }
-
-        SelectObject(memDC, oldBmp);
-        DeleteObject(bmp);
-        DeleteDC(memDC);
     }
 }
 "@
-
 Add-Type -TypeDefinition $source -Language CSharp
 [Win32]::PIP()
