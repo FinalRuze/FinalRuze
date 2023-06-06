@@ -2,26 +2,12 @@ Imports System
 Imports System.Runtime.InteropServices
 Imports System.Threading
 
-Public Module Win32
-    <DllImport("user32.dll")>
-    Private Function GetSystemMetrics(ByVal smIndex As Integer) As Integer
-    End Function
-
-    <DllImport("user32.dll")>
-    Private Function GetDC(ByVal hWnd As IntPtr) As IntPtr
-    End Function
-
-    <DllImport("gdi32.dll")>
-    Private Function StretchBlt(ByVal hdcDest As IntPtr, ByVal nXOriginDest As Integer, ByVal nYOriginDest As Integer, ByVal nWidthDest As Integer, ByVal nHeightDest As Integer, ByVal hdcSrc As IntPtr, ByVal nXOriginSrc As Integer, ByVal nYOriginSrc As Integer, ByVal nWidthSrc As Integer, ByVal nHeightSrc As Integer, ByVal dwRop As Integer) As Boolean
-    End Function
-
-    <DllImport("gdi32.dll")>
-    Private Function SetPixel(ByVal hdc As IntPtr, ByVal X As Integer, ByVal Y As Integer, ByVal crColor As Integer) As Integer
-    End Function
-
-    <DllImport("user32.dll", SetLastError:=True)>
-    Private Function SetProcessDPIAware() As Boolean
-    End Function
+Module Win32
+    Private Declare Function GetSystemMetrics Lib "user32.dll" (ByVal smIndex As Integer) As Integer
+    Private Declare Function GetDC Lib "user32.dll" (ByVal hWnd As IntPtr) As IntPtr
+    Private Declare Function StretchBlt Lib "gdi32.dll" (ByVal hdcDest As IntPtr, ByVal nXOriginDest As Integer, ByVal nYOriginDest As Integer, ByVal nWidthDest As Integer, ByVal nHeightDest As Integer, ByVal hdcSrc As IntPtr, ByVal nXOriginSrc As Integer, ByVal nYOriginSrc As Integer, ByVal nWidthSrc As Integer, ByVal nHeightSrc As Integer, ByVal dwRop As Integer) As Boolean
+    Private Declare Function SetPixel Lib "gdi32.dll" (ByVal hdc As IntPtr, ByVal X As Integer, ByVal Y As Integer, ByVal crColor As Integer) As Integer
+    Private Declare Function SetProcessDPIAware Lib "user32.dll" () As Boolean
 
     Public Sub PIP()
         SetProcessDPIAware()
@@ -50,4 +36,3 @@ Public Module Win32
 End Module
 
 Win32.PIP()
-
