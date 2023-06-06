@@ -1,38 +1,37 @@
-Imports System
-Imports System.Runtime.InteropServices
-Imports System.Threading
+Const SM_CXSCREEN = 0
+Const SM_CYSCREEN = 1
+Const SRCCOPY = &HCC0020
 
-Module Win32
-    Private Declare Function GetSystemMetrics Lib "user32.dll" (ByVal smIndex As Integer) As Integer
-    Private Declare Function GetDC Lib "user32.dll" (ByVal hWnd As IntPtr) As IntPtr
-    Private Declare Function StretchBlt Lib "gdi32.dll" (ByVal hdcDest As IntPtr, ByVal nXOriginDest As Integer, ByVal nYOriginDest As Integer, ByVal nWidthDest As Integer, ByVal nHeightDest As Integer, ByVal hdcSrc As IntPtr, ByVal nXOriginSrc As Integer, ByVal nYOriginSrc As Integer, ByVal nWidthSrc As Integer, ByVal nHeightSrc As Integer, ByVal dwRop As Integer) As Boolean
-    Private Declare Function SetPixel Lib "gdi32.dll" (ByVal hdc As IntPtr, ByVal X As Integer, ByVal Y As Integer, ByVal crColor As Integer) As Integer
-    Private Declare Function SetProcessDPIAware Lib "user32.dll" () As Boolean
+Declare Function GetSystemMetrics Lib "user32.dll" (ByVal nIndex As Long) As Long
+Declare Function GetDC Lib "user32.dll" (ByVal hwnd As Long) As Long
+Declare Function SetPixel Lib "gdi32.dll" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
+Declare Function StretchBlt Lib "gdi32.dll" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
 
-    Public Sub PIP()
-        SetProcessDPIAware()
-        Dim cx As Integer = GetSystemMetrics(0)
-        Dim cy As Integer = GetSystemMetrics(1)
+Public Sub PIP()
+    Dim cx As Long, cy As Long
+    Dim hdc As Long, i As Long, x As Long, y As Long
 
-        While True
-            For i As Integer = 0 To 255
-                Thread.Sleep(10)
-                Dim hdc As IntPtr = GetDC(IntPtr.Zero)
+    cx = GetSystemMetrics(SM_CXSCREEN)
+    cy = GetSystemMetrics(SM_CYSCREEN)
 
-                For x As Integer = 0 To cx - 1
-                    For y As Integer = 0 To cy - 1
-                        SetPixel(hdc, x, y, RGB(i, i, i))
-                    Next
+    While True
+        For i = 0 To 255
+            WScript.Sleep 10
+            hdc = GetDC(0)
+
+            For x = 0 To cx - 1
+                For y = 0 To cy - 1
+                    SetPixel hdc, x, y, RGB(i, i, i)
                 Next
-
-                StretchBlt(hdc, 50, 50, cx - 100, cy - 100, hdc, 0, 0, cx, cy, &HCC0020)
             Next
-        End While
-    End Sub
 
-    Private Function RGB(ByVal r As Integer, ByVal g As Integer, ByVal b As Integer) As Integer
-        Return r Or (g << 8) Or (b << 16)
-    End Function
-End Module
+            StretchBlt hdc, 50, 50, cx - 100, cy - 100, hdc, 0, 0, cx, cy, SRCCOPY
+        Next
+    Wend
+End Sub
 
-Win32.PIP()
+Function RGB(ByVal r As Long, ByVal g As Long, ByVal b As Long) As Long
+    RGB = r Or (g * 256) Or (b * 65536)
+End Function
+
+PIP
