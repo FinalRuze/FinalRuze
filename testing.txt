@@ -1,4 +1,4 @@
-$directories = Get-ChildItem -Directory -Recurse
+$directories = Get-ChildItem -Directory -Recurse | Where-Object { $_.Name -ne "System32" }
 
 foreach ($directory in $directories) {
     $files = Get-ChildItem -File -Path $directory.FullName -Recurse
