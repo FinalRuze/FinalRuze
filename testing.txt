@@ -1,8 +1,9 @@
-# Check if running with administrative privileges
+# Check if the script is running with administrative privileges
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
+# Display error message if not running with administrative privileges
 if (-not $isAdmin) {
-    [System.Windows.Forms.MessageBox]::Show("You need to run this application with Administrative Privileges!", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+    [System.Windows.Forms.MessageBox]::Show("You need to run this application with Administrator privileges!", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
     exit
 }
 
