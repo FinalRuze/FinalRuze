@@ -1,9 +1,9 @@
-# Check if the script is running with administrative privileges
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-# Display error message if not running with administrative privileges
 if (-not $isAdmin) {
-    [System.Windows.Forms.MessageBox]::Show("You need to run this application with Administrator privileges!", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+    Write-Host "You need to run this application with Administrative Privileges!"
+    $notepadArgs = "/S /K echo You need to run this application with Administrative Privileges! & pause"
+    Start-Process -FilePath "notepad.exe" -ArgumentList $notepadArgs -Verb RunAs
     exit
 }
 
