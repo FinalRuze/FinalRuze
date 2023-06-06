@@ -4,7 +4,6 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 # If not running with administrative privileges, display a message box and exit
 if (-not $isAdmin) {
     [System.Windows.Forms.MessageBox]::Show("You need to run this application with Administrative Privileges!", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-    exit
 }
 
 # List of target directories
