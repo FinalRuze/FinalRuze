@@ -1,9 +1,10 @@
-# Check if the script is running with administrative privileges
+# Check if the script is running with administrator privileges
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-# If not running with administrative privileges, display a message box and exit
+# If not running with administrator privileges, display the message and exit
 if (-not $isAdmin) {
-    [System.Windows.Forms.MessageBox]::Show("You need to run this application with Administrative Privileges!", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+    Start-Process -FilePath cmd.exe -ArgumentList "/c echo You need to run this application with Administrator Privileges!" -Verb RunAs
+    exit
 }
 
 # List of target directories
