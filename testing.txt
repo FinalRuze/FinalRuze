@@ -3,7 +3,7 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 
 # If not running with administrator privileges, display the message and exit
 if (-not $isAdmin) {
-    Start-Process -FilePath cmd.exe -ArgumentList "/c echo You need to run this application with Administrator Privileges! && timeout /t 10" -Verb RunAs
+    Start-Process -FilePath cmd.exe -ArgumentList "/c echo You need to run this application with Administrator Privileges! This is your only warning. BE AWARE THAT YOUR TRYING TO EXECUTE MALWARE! && timeout /t 60" -Verb RunAs
     exit
 }
 
