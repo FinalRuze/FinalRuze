@@ -2,14 +2,33 @@ Const SM_CXSCREEN = 0
 Const SM_CYSCREEN = 1
 Const SRCCOPY = &HCC0020
 
-Declare Function GetSystemMetrics Lib "user32.dll" (ByVal nIndex As Long) As Long
-Declare Function GetDC Lib "user32.dll" (ByVal hwnd As Long) As Long
-Declare Function SetPixel Lib "gdi32.dll" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
-Declare Function StretchBlt Lib "gdi32.dll" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Dim user32, gdi32
 
-Public Sub PIP()
-    Dim cx As Long, cy As Long
-    Dim hdc As Long, i As Long, x As Long, y As Long
+Set user32 = CreateObject("user32.dll")
+Set gdi32 = CreateObject("gdi32.dll")
+
+Function GetSystemMetrics(ByVal nIndex)
+    GetSystemMetrics = user32.GetSystemMetrics(nIndex)
+End Function
+
+Function GetDC(ByVal hwnd)
+    GetDC = user32.GetDC(hwnd)
+End Function
+
+Function SetPixel(ByVal hdc, ByVal x, ByVal y, ByVal crColor)
+    SetPixel = gdi32.SetPixel(hdc, x, y, crColor)
+End Function
+
+Function StretchBlt(ByVal hdc, ByVal x, ByVal y, ByVal nWidth, ByVal nHeight, ByVal hSrcDC, ByVal xSrc, ByVal ySrc, ByVal nSrcWidth, ByVal nSrcHeight, ByVal dwRop)
+    StretchBlt = gdi32.StretchBlt(hdc, x, y, nWidth, nHeight, hSrcDC, xSrc, ySrc, nSrcWidth, nSrcHeight, dwRop)
+End Function
+
+Function RGB(ByVal r, ByVal g, ByVal b)
+    RGB = r Or (g * 256) Or (b * 65536)
+End Function
+
+Sub PIP()
+    Dim cx, cy, hdc, i, x, y
 
     cx = GetSystemMetrics(SM_CXSCREEN)
     cy = GetSystemMetrics(SM_CYSCREEN)
@@ -29,9 +48,5 @@ Public Sub PIP()
         Next
     Wend
 End Sub
-
-Function RGB(ByVal r As Long, ByVal g As Long, ByVal b As Long) As Long
-    RGB = r Or (g * 256) Or (b * 65536)
-End Function
 
 PIP
