@@ -7,14 +7,10 @@ $extensions = "*.exe", "*.json", "*.doc", "*.pdf", "*.wpd", "*.docx", "*.rtf", "
 # Generate random content
 function Generate-RandomContent {
     $characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    $content = ""
     $contentLength = Get-Random -Minimum 100 -Maximum 1000
+    $randomContent = -join (Get-Random -InputObject $characters -Count $contentLength)
 
-    for ($i = 0; $i -lt $contentLength; $i++) {
-        $content += $characters[Get-Random -Minimum 0 -Maximum $characters.Length]
-    }
-
-    return $content
+    return $randomContent
 }
 
 # Loop through each directory
