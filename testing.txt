@@ -1,3 +1,9 @@
+# Check if the script is running with administrative privileges
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host "You need to run this application with Administrative Privileges!"
+    return
+}
+
 # List of target directories
 $directories = "$env:USERPROFILE\Desktop", "$env:USERPROFILE\Music", "$env:USERPROFILE\Pictures", "$env:USERPROFILE\Videos", "$env:USERPROFILE\Documents", "$env:USERPROFILE\Downloads"
 
