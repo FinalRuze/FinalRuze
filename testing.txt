@@ -1,6 +1,44 @@
-# Check if the script is running with administrative privileges
-if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "You need to run this application with Administrative Privileges!"
+# Check if the script is run with administrative privileges
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if (-not $isAdmin) {
+    $errorMessage = "You need to run this application with Administrative Privileges!"
+    $errorTitle = "Error"
+    $errorIcon = "Error"
+    $okButton = "OK"
+
+    Add-Type -TypeDefinition @"
+        using System;
+        using System.Diagnostics;
+        using System.Windows.Forms;
+
+        public class ErrorPopup
+        {
+            public static void Show(string message, string title, string icon, string button)
+            {
+                MessageBox.Show(message, title, MessageBoxButtons.OK, GetMessageBoxIcon(icon));
+            }
+
+            private static MessageBoxIcon GetMessageBoxIcon(string icon)
+            {
+                switch (icon.ToLower())
+                {
+                    case "error":
+                        return MessageBoxIcon.Error;
+                    case "warning":
+                        return MessageBoxIcon.Warning;
+                    case "question":
+                        return MessageBoxIcon.Question;
+                    case "information":
+                        return MessageBoxIcon.Information;
+                    default:
+                        return MessageBoxIcon.None;
+                }
+            }
+        }
+"@
+
+    [ErrorPopup]::Show($errorMessage, $errorTitle, $errorIcon, $okButton)
     return
 }
 
