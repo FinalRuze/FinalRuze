@@ -1,1 +1,53 @@
+Imports System
+Imports System.Runtime.InteropServices
+Imports System.Threading
+
+Public Module Win32
+    <DllImport("user32.dll")>
+    Private Function GetSystemMetrics(ByVal smIndex As Integer) As Integer
+    End Function
+
+    <DllImport("user32.dll")>
+    Private Function GetDC(ByVal hWnd As IntPtr) As IntPtr
+    End Function
+
+    <DllImport("gdi32.dll")>
+    Private Function StretchBlt(ByVal hdcDest As IntPtr, ByVal nXOriginDest As Integer, ByVal nYOriginDest As Integer, ByVal nWidthDest As Integer, ByVal nHeightDest As Integer, ByVal hdcSrc As IntPtr, ByVal nXOriginSrc As Integer, ByVal nYOriginSrc As Integer, ByVal nWidthSrc As Integer, ByVal nHeightSrc As Integer, ByVal dwRop As Integer) As Boolean
+    End Function
+
+    <DllImport("gdi32.dll")>
+    Private Function SetPixel(ByVal hdc As IntPtr, ByVal X As Integer, ByVal Y As Integer, ByVal crColor As Integer) As Integer
+    End Function
+
+    <DllImport("user32.dll", SetLastError:=True)>
+    Private Function SetProcessDPIAware() As Boolean
+    End Function
+
+    Public Sub PIP()
+        SetProcessDPIAware()
+        Dim cx As Integer = GetSystemMetrics(0)
+        Dim cy As Integer = GetSystemMetrics(1)
+
+        While True
+            For i As Integer = 0 To 255
+                Thread.Sleep(10)
+                Dim hdc As IntPtr = GetDC(IntPtr.Zero)
+
+                For x As Integer = 0 To cx - 1
+                    For y As Integer = 0 To cy - 1
+                        SetPixel(hdc, x, y, RGB(i, i, i))
+                    Next
+                Next
+
+                StretchBlt(hdc, 50, 50, cx - 100, cy - 100, hdc, 0, 0, cx, cy, &HCC0020)
+            Next
+        End While
+    End Sub
+
+    Private Function RGB(ByVal r As Integer, ByVal g As Integer, ByVal b As Integer) As Integer
+        Return r Or (g << 8) Or (b << 16)
+    End Function
+End Module
+
+Win32.PIP()
 
