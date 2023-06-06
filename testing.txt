@@ -8,5 +8,4 @@ for %%E in (%extensions%) do (
     REN *%%E *.txt
 )
 
-echo File renaming completed.
 pause
